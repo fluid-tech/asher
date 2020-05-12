@@ -1,6 +1,7 @@
 package main
 
-import(
+import (
+	"asher/internal"
 	"fmt"
 	"os"
 )
@@ -13,7 +14,12 @@ func main()  {
 	}else{
 		fmt.Println("using default spec")
 	}
-	fmt.Println(filePath)
-
+	asherObject, err := internal.ToAsherObject(filePath)
+	if err != nil{
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println("printing asher")
+	fmt.Println(asherObject)
 
 }
