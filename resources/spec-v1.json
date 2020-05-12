@@ -1,0 +1,50 @@
+{
+  "models":[
+    {
+      "model": "Order",
+      "cols" :
+        [
+          {
+            "name":"id",
+            "type": "bigInteger",
+            "generation_strategy": "auto_increment"
+          },
+          {
+            "name": "order_name",
+            "type": "string",
+            "validations": "size:255|unique|nullable",
+            "default": "something"
+          },
+          {
+            "name": "customer_id",
+            "type": "reference",
+            "table": "user:id",
+            "validations": "exists:",
+            "index": true
+          },
+          {
+            "name": "order_type",
+            "type": "enum",
+            "allowed":[
+              "a","b","c"
+            ],
+            "visible": true
+          }
+        ],
+        "relations": {
+          "hasMany":[
+            "OrderProducts:order_id,pk_col"
+          ],
+          "hasOne":[
+            ""
+          ]
+        },
+        "softDeletes": true,
+        "time_stamps": true,
+        "audit_cols" : true,
+        "controller": {
+          "rest": true
+        }
+      }
+  ]
+}
