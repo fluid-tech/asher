@@ -1,34 +1,34 @@
 {
   "models":[
     {
-      "model": "Order",
+      "name": "Order",
       "cols" :
         [
           {
             "name":"id",
-            "type": "bigInteger",
-            "generation_strategy": "auto_increment"
+            "colType": "bigInteger",
+            "generationStrategy": "auto_increment"
           },
           {
             "name": "order_name",
-            "type": "string",
+            "colType": "string",
             "validations": "size:255|unique|nullable",
-            "default": "something"
+            "defaultVal": "something"
           },
           {
             "name": "customer_id",
-            "type": "reference",
+            "colType": "reference",
             "table": "user:id",
             "validations": "exists:",
             "index": true
           },
           {
-            "name": "order_type",
-            "type": "enum",
+            "name": "order_colType",
+            "colType": "enum",
             "allowed":[
               "a","b","c"
             ],
-            "visible": true
+            "invisible": true
           }
         ],
         "relations": {
@@ -40,8 +40,8 @@
           ]
         },
         "softDeletes": true,
-        "time_stamps": true,
-        "audit_cols" : true,
+        "timestamps": true,
+        "auditCols" : true,
         "controller": {
           "rest": true
         }
