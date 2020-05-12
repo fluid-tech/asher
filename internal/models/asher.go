@@ -1,5 +1,5 @@
 package models
 
 type Asher struct{
-	models []Model
+	Models []Model `json:"models"`
 }

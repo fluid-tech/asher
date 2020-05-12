@@ -1,6 +1,6 @@
 package models
 
 type Relation struct {
-	hasMany []string
-	hasOne []string
+	HasMany []string `json:"hasMany"`
+	HasOne []string  `json:"hasOne"`
 }

@@ -1,6 +1,6 @@
 package models
 
 type Controller struct{
-	rest bool
-	mvc bool
+	Rest bool `json:"rest"`
+	Mvc bool `json:"mvc"`
 }

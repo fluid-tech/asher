@@ -1,13 +1,13 @@
 package models
 
 type Model struct{
-	name        string
-	cols        []Column
-	relations   []Relation
-	softDeletes bool
-	timestamps  bool
-	auditCols   bool
-	controller  Controller
+	Name        string	`json:"name"`
+	Cols        []Column `json:"cols"`
+	Relations   []Relation `json:"relations"`
+	SoftDeletes bool `json:"softDeletes"`
+	Timestamps  bool `json:"timestamps"`
+	AuditCols   bool `json:"auditCols"`
+	Controller  Controller `json:"controller"`
 }
 
 // todo add getters
