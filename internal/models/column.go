@@ -7,7 +7,7 @@ type Column struct {
 	DefaultVal         string   `json:"defaultVal"`         // the default val to be assigned
 	Table              string   `json:"table"`              // the table this maps a foreign key from
 	Validations        string   `json:"validations"`        // a set of validation rules separated by |
-	Index              bool     `json:"index"`
-	Allowed            []string `json:"allowed"`   // a set of allowed values to be used in cases of enums
-	Invisible          bool     `json:"invisible"` // indicates whether this col is presented when jsonified
+	Index              bool     `json:"index"`				// should this col be indexed
+	Allowed            []string `json:"allowed"`   			// a set of allowed values to be used in cases of enums
+	Invisible          bool     `json:"invisible"` 			// indicates whether this col is presented when jsonified
 }
