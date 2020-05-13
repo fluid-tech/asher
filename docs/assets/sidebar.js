@@ -4,36 +4,57 @@ const Sidebar = [
         link: '/introduction'
     },
     {
-        title: 'Guide',
+        title: 'Getting Started',
         children: [
             {
-                title: 'Introduction',
+                title: 'Installation',
                 link: '/'
             },
             {
                 title: 'Customization',
                 link: '/guide/customization'
             },
-            {
-                title: 'Markdown Features',
-                link: '/guide/markdown-features'
-            },
-            {
-                title: 'Use Vue in Markdown',
-                link: '/guide/use-vue-in-markdown'
-            },
-            {
-                title: 'Internationalization',
-                link: '/guide/internationalization'
-            },
-            {
-                title: 'Plugin',
-                link: '/guide/plugin'
-            },
-            {
-                title: 'Deployment',
-                link: '/guide/deployment'
-            }
         ]
+    },
+    {
+        title: 'The basics',
+        children: [
+            {
+                title: 'Configuration',
+                link: '/'
+            },
+            {
+                title: 'Migrations',
+                link: '/'
+            },
+            {
+                title: 'Models',
+                link: '/'
+            },
+            {
+                title: 'Mutators',
+                link: '/'
+            },
+            {
+                title: 'Transactors',
+                link: '/'
+            },
+            {
+                title: 'Controllers',
+                link: '/'
+            },
+            {
+                title: 'Customization',
+                link: '/guide/customization'
+            },
+        ]
+    },
+    {
+        title: "Contact Us",
+        link: '/contact'
+    },
+    {
+        title: "Contributing",
+        link: '/contributing'
     },
 ];
