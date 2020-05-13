@@ -43,7 +43,13 @@
         "timestamps": true,
         "auditCols" : true,
         "controller": {
-          "rest": true
+          "rest": true,
+          "pattern": {
+            "name": "transactor",
+            "extraInfo": [
+              "fileTransactor"
+            ]
+          }
         }
       }
   ]
