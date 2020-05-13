@@ -1,4 +1,5 @@
 # Asher
+![Go](https://github.com/fluid-tech/asher/workflows/Go/badge.svg)
 [![CodeFactor](https://www.codefactor.io/repository/github/fluid-tech/asher/badge)](https://www.codefactor.io/repository/github/fluid-tech/asher) 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Website shields.io](https://img.shields.io/website-up-down-green-red/http/shields.io.svg)](http://shields.io/)
 
