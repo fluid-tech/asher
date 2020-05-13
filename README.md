@@ -4,3 +4,8 @@
 
 
 A build tool for various frameworks
+
+### Table of content
+1. [Introduction]()
+2. [Getting started]()
+3. [Documentation]()
