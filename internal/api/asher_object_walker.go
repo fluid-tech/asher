@@ -10,14 +10,16 @@ type AsherObjectWalker struct {
 	asherObject models.Asher // the object this instance iterates over
 }
 
+/**
+Constructs a new AsherObjectWalker with the given args
+*/
 func NewAsherObjectWalker(asherObject models.Asher, emitter Emitter) *AsherObjectWalker {
 	return &AsherObjectWalker{emitter: emitter, asherObject: asherObject}
 }
 
-func (walker AsherObjectWalker) Register(emitter Emitter) {
-	walker.emitter = emitter
-}
-
+/**
+Walks over the asher object provided and triggers callbacks
+*/
 func (walker AsherObjectWalker) Walk() {
 	walker.walkModels()
 	fileData := walker.emitter.GetFileMap()
