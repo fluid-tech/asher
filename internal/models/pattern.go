@@ -1,6 +1,6 @@
 package models
 
 type Pattern struct {
-	Name      string   `json:"name"`
+	Type      string   `json:"type"`
 	ExtraInfo []string `json:"extraInfo"`
 }

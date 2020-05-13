@@ -45,7 +45,7 @@
         "controller": {
           "rest": true,
           "pattern": {
-            "name": "transactor",
+            "type": "transactor",q
             "extraInfo": [
               "fileTransactor"
             ]
