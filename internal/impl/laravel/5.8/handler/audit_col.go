@@ -34,9 +34,9 @@ func (auditColHandler *AuditCol) handleFillable(identifier string) error {
 	if modelClass != nil{
 		element, err := modelClass.FindInMembers("fillable")
 		if err != nil {
-			// todo return an err
 			return err
 		}
+		// todo add validation rules in the CREATE_VALIDATION_RULES and UPDATE_VALIDATION_RULES array
 		arrayAssignment := (*element).(*core.ArrayAssignment)
 		arrayAssignment.Rhs = append(arrayAssignment.Rhs, "created_by", "updated_by")
 		return nil
