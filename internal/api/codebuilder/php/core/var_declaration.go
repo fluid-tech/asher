@@ -20,7 +20,6 @@ func GetVarDeclaration(visibility string, id string) *VarDeclaration {
 	}
 }
 
-
 func (v *VarDeclaration) SetNumTabs(tabs int) {
 	v.tabs = tabs
 }
@@ -29,9 +28,9 @@ func (v *VarDeclaration) Id() string {
 	return v.Identifier
 }
 
-func (v *VarDeclaration) String() string  {
+func (v *VarDeclaration) String() string {
 	var builder strings.Builder
-	fmt.Fprintf(&builder, TabbedString(uint(v.tabs)),
-		v.Visibility, " $", v.Identifier, ";\n")
+	fmt.Fprint(&builder, TabbedString(uint(v.tabs)),
+		v.Visibility, " $", v.Identifier, ";")
 	return builder.String()
 }
