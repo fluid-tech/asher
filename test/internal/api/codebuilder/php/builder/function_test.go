@@ -13,13 +13,31 @@ const Ctor =
 }
 
 `
+const Ctor2 =
+`public function __construct(BaseMutator $mutator, BaseQuery $query, ImageHandler $imageHandler) {
+    $this->query = $query;
+    $this->mutator = $mutator;
+}
+
+`
 func TestFunctionBuilder(t *testing.T) {
 	assigmentSS := core.TabbedUnit(core.GetSimpleStatement("$this->mutator = $mutator"))
 	assigmentSS2:= core.TabbedUnit(core.GetSimpleStatement("$this->query = $query"))
 	builder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
 		AddArgument("BaseMutator $mutator").AddArgument("BaseQuery $query").AddStatement(&assigmentSS2).
 		AddStatement(&assigmentSS)
-	if builder.GetFunction().String() != Ctor{
-		t.Errorf("expected \n%s \nfound:\n%s", Ctor, builder.GetFunction().String())
+
+	var table = []struct{
+		in string
+		out string
+	}{
+		{builder.GetFunction().String(), Ctor},
+		{builder.AddArgument("ImageHandler $imageHandler").GetFunction().String(), Ctor2},
+	}
+
+	for _, element := range table{
+		if element.in != element.out {
+			t.Errorf("expected '%s' found '%s'", element.in, element.out)
+		}
 	}
 }
