@@ -11,8 +11,7 @@ var handlerRegistry = map[string]api.Handler{
 
 /**
 Returns a Handler instance from the registry.
-This method
-exists only to avoid writes to this map from outside this package */
+This method exists only to avoid writes to this map from outside this package */
 func GetFromRegistry(key string) api.Handler {
 	return handlerRegistry[key]
 }
