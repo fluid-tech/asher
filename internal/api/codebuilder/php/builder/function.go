@@ -10,6 +10,9 @@ type Function struct {
 	function core.Function
 }
 
+/**
+Returns a Function Builder instance
+*/
 func NewFunctionBuilder() *Function {
 	return &Function{
 		function: core.Function{},
