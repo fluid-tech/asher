@@ -10,6 +10,12 @@ type SimpleStatement struct {
 	statement core.SimpleStatement
 }
 
+func GetSimpleStatementBuilder() *SimpleStatement{
+	return &SimpleStatement{
+		statement:       core.SimpleStatement{},
+	}
+}
+
 func (s *SimpleStatement) SetStatement(statement string) interfaces.SimpleStatement {
 	s.statement.SimpleStatement = statement
 	return s
