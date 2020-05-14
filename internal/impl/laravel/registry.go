@@ -6,7 +6,7 @@ import (
 )
 
 var handlerRegistry = map[string]api.Handler{
-	"auditCol": handler.NewAuditColHandler(),
+	"auditCols": handler.NewAuditColHandler(),
 }
 
 /**
