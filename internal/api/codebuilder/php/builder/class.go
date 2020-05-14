@@ -25,7 +25,14 @@ func (klass *Class) SetName(name string) interfaces.Class {
 }
 
 /**
-Adds a TabbedUnit to this class
+Add a TabbedUnit to this this class's members list
+*/
+func (klass *Class) AddMember(unit *core.TabbedUnit) interfaces.Class {
+	return klass.AddMembers([]*core.TabbedUnit{unit})
+}
+
+/**
+Adds a list of TabbedUnit to this class's members list
 */
 func (klass *Class) AddMembers(units []*core.TabbedUnit) interfaces.Class {
 	klass.class.Members = append(klass.class.Members, units...)
