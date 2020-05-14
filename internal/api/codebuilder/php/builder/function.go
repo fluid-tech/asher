@@ -10,6 +10,12 @@ type Function struct {
 	function core.Function
 }
 
+func NewFunctionBuilder() *Function {
+	return &Function{
+		function: core.Function{},
+	}
+}
+
 func (f *Function) SetName(name string) interfaces.Function {
 	f.function.Name = name
 	return f
