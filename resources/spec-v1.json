@@ -7,7 +7,8 @@
           {
             "name":"id",
             "colType": "bigInteger",
-            "generationStrategy": "auto_increment"
+            "generationStrategy": "auto_increment",
+            "primary" : true
           },
           {
             "name": "order_name",
@@ -21,6 +22,14 @@
             "table": "user:id",
             "validations": "exists:",
             "index": true
+          },
+          {
+            "name": "order_colType",
+            "colType": "enum",
+            "allowed":[
+              "a","b","c"
+            ],
+            "invisible": true
           },
           {
             "name": "order_colType",
@@ -45,7 +54,7 @@
         "controller": {
           "rest": true,
           "pattern": {
-            "type": "transactor",q
+            "type": "transactor",
             "extraInfo": [
               "fileTransactor"
             ]
