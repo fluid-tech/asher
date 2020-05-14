@@ -11,7 +11,9 @@ type Class struct {
 }
 
 func NewClassBuilder() *Class {
-	return &Class{}
+	return &Class{
+		class: core.Class{},
+	}
 }
 
 /**
