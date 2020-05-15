@@ -24,7 +24,7 @@ func (c *Closure) SetNumTabs(tabs int) {
 }
 
 func (c *Closure) Id() string {
-	return c.def
+	return c.Def
 }
 
 /**
