@@ -9,6 +9,7 @@ import (
 type ModelGenerator struct {
 	class interfaces.Class
 	fillables []string
+	hidden []string
 }
 
 /**
@@ -42,5 +43,17 @@ func (modelGenerator *ModelGenerator) SetName(tableName string) *ModelGenerator 
  */
 func (modelGenerator *ModelGenerator) AddFillable(columnName string) *ModelGenerator {
 	modelGenerator.fillables = append(modelGenerator.fillables, columnName)
+	return modelGenerator
+}
+
+/**
+ Adds the given column to hidden fields of this model
+ Parameters:
+	- columnName: the name of the column to add
+ Returns:
+	- instance of the generator object
+*/
+func (modelGenerator *ModelGenerator) AddHiddenField(columnName string) *ModelGenerator {
+	modelGenerator.hidden = append(modelGenerator.hidden, columnName)
 	return modelGenerator
 }
