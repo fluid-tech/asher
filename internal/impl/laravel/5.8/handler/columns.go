@@ -36,6 +36,7 @@ func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []model
 	for _, singleColumn := range colArr {
 		modelGenerator.SetName(modelName)
 		columnHandler.handleHidden(modelGenerator, singleColumn.Hidden, singleColumn.Name)
+		columnHandler.handleGuarded(modelGenerator, singleColumn.Guarded, singleColumn.Name)
 	}
 	fmt.Print(modelGenerator.Build().String())
 	context.GetFromRegistry("model").AddToCtx(modelName, modelGenerator.Build())
@@ -76,6 +77,13 @@ func (columnHandler *ColumnHandler) handleSingleColumn(modelName string, column 
 func (columnHandler *ColumnHandler) handleHidden(modelGenerator *generator.ModelGenerator, isHidden bool, colName string) error {
 	if isHidden {
 		modelGenerator.AddHiddenField(colName)
+	}
+	return nil
+}
+
+func (columnHandler *ColumnHandler) handleGuarded(modelGenerator *generator.ModelGenerator, isGuarded bool, colName string) error {
+	if isGuarded {
+		modelGenerator.AddFillable(colName)
 	}
 	return nil
 }
