@@ -58,7 +58,7 @@ func (klass Class) String() string {
 /**
 Searches for the identifier in the members list
 */
-func (klass *Class) FindInMembers(identifier string) (*TabbedUnit, error) {
+func (klass *Class) FindMember(identifier string) (*TabbedUnit, error) {
 	for _, element := range klass.Members {
 		if (*element).Id() == identifier {
 			return element, nil
@@ -70,13 +70,20 @@ func (klass *Class) FindInMembers(identifier string) (*TabbedUnit, error) {
 /**
 Searches for the identifier in the functions list
 */
-func (klass *Class) FindInFunctions(identifier string) (*Function, error) {
+func (klass *Class) FindFunction(identifier string) (*Function, error) {
 	for _, element := range klass.Functions {
 		if element.Id() == identifier {
 			return element, nil
 		}
 	}
 	return nil, errors.New(fmt.Sprintf("couldnt find function with identifier %s", identifier))
+}
+
+/**
+Appends a tabbed unit to the members list
+ */
+func (klass *Class) AppendMember(unit *TabbedUnit){
+	klass.Members = append(klass.Members, unit)
 }
 
 func (klass *Class) handlePackage(builder *strings.Builder) {

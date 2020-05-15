@@ -13,7 +13,7 @@ type VarAssignment struct {
 	Rhs        string
 }
 
-func GetVarAssignment(visibility string, id string, rhs string) *VarAssignment {
+func NewVarAssignment(visibility string, id string, rhs string) *VarAssignment {
 	return &VarAssignment{
 		tabs:       0,
 		Visibility: visibility,
