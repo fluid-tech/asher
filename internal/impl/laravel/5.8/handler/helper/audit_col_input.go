@@ -50,7 +50,7 @@ func (input *AuditColInput) GetFillableArray() []string {
 func (input *AuditColInput) GetCreateValidationRules() []string{
 	var arr[]string
 	if input.IsAuditColSet(){
-		arr = append(arr, `"created_by" => "required|exists:users,id"'`)
+		arr = append(arr, `"created_by" => "required|exists:users,id"`)
 	}
 	return arr
 }
