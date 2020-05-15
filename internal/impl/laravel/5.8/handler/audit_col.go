@@ -8,12 +8,37 @@ import (
 	"fmt"
 )
 
+const CreatedBy = "$table->%s('created_by')"
+const UpdatedBy = "$table->%s('updated_by')->nullable()"
+const Timestamp = `$table->timestamps();`
+const SoftDeletes = `$table->softDeletes();`
+
 type AuditCol struct {
 	api.Handler
 }
 
-const CreatedBy = "$table->%s('created_by')->nullable()"
-const UpdatedBy = "$table->%s('updated_by')->nullable()"
+type AuditColInput struct {
+	/**
+	The column type specifies the action this handler performs
+	For
+	 	1 	- for CreatedBy,
+		2 	- for UpdatedBy,
+		3 	- for Both Created And UpdatedBy or formally AuditCols
+		4 	- for Soft Deletes
+		7 	- for CreatedBy, UpdatedBy, SoftDeletes
+		8 	- for Timestamp
+		15	- for CreatedBy, UpdatedBy, SoftDeletes, Timestamp
+	*/
+	columnType int
+	value      bool
+}
+
+func NewAuditColInputFromType(auditCol bool, softDeletes bool, timestamp bool, value bool) *AuditColInput {
+	return &AuditColInput{
+		columnType: formatColumnType(auditCol, softDeletes, timestamp),
+		value:      value,
+	}
+}
 
 func NewAuditColHandler() *AuditCol {
 	return &AuditCol{}
@@ -31,7 +56,7 @@ func (auditColHandler *AuditCol) Handle(identifier string, value interface{}) ([
 
 func (auditColHandler *AuditCol) handleFillable(identifier string) error {
 	modelClass := context.GetFromRegistry("model").GetCtx(identifier).(*core.Class)
-	if modelClass != nil{
+	if modelClass != nil {
 		element, err := modelClass.FindInMembers("fillable")
 		if err != nil {
 			return err
@@ -46,7 +71,7 @@ func (auditColHandler *AuditCol) handleFillable(identifier string) error {
 
 func (auditColHandler *AuditCol) handleMigration(identifier string) error {
 	migrationInfo := context.GetFromRegistry("migration").GetCtx(identifier).(*context.MigrationInfo)
-	if migrationInfo != nil{
+	if migrationInfo != nil {
 		primaryKeyCol := getPrimaryKeyString(migrationInfo.PrimaryKeyCol)
 
 		migrationClass := migrationInfo.Class
@@ -72,7 +97,7 @@ func (auditColHandler *AuditCol) appendToFunction(function *core.Function, prima
 	str := fmt.Sprintf(auditColumn, primaryKeyCol)
 	_, err := function.FindStatement(str)
 	if err != nil {
-		simple := core.GetSimpleStatement(str)
+		simple := core.NewSimpleStatement(str)
 		stmt := core.TabbedUnit(simple)
 		function.Statements = append(function.Statements, &stmt)
 	}
@@ -87,4 +112,18 @@ func getPrimaryKeyString(primaryKeyCol string) string {
 
 	}
 	return "unsignedBigInteger"
+}
+
+func formatColumnType(auditCol bool, softDeletes bool, timestamp bool) int {
+	colType := 0
+	if auditCol {
+		colType |= 3
+	}
+	if softDeletes {
+		colType |= 4
+	}
+	if timestamp {
+		colType |= 8
+	}
+	return colType
 }

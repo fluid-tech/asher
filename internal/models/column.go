@@ -12,7 +12,7 @@ type Column struct {
 	Invisible          bool     `json:"invisible"`          // indicates whether this col is presented when jsonified
 	Guarded            bool     `json:"fillable"`           // indicates whether or not this field is fillable ie placed in the fillable array
 	Primary            bool     `json:"primary"`            // indicates whether or not this field is the pk for this table
-	Unique             bool     `json:"unique"`
-	Nullable           bool     `json:"unique"`
-	CascadingDeletes   bool     `json:"cascadingDeletes"`
+	Unique             bool     `json:"unique"`             // whether or not this col is unique
+	Nullable           bool     `json:"nullable"`           // whether or not this cols is nullable
+	OnDelete           string   `json:"onDelete"`           // action to be performed on this col when a ref type is used
 }
