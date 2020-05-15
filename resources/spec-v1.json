@@ -57,7 +57,13 @@
             "type": "transactor",
             "extraInfo": [
               "fileTransactor"
-            ]
+            ],
+            "auth": {
+              "strategy": "jwt",
+              "extras": {
+                "jwt-expiry": 213123
+              }
+            }
           }
         }
       }
