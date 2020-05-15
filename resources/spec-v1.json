@@ -13,7 +13,7 @@
           {
             "name": "order_name",
             "colType": "string",
-            "validations": "size:255|unique|nullable",
+            "validations": "min:10|max:255|unique|nullable",
             "defaultVal": "something"
           },
           {

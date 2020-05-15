@@ -11,7 +11,7 @@ type SimpleStatement struct {
 	SimpleStatement string
 }
 
-func GetSimpleStatement(simpleStatement string) *SimpleStatement {
+func NewSimpleStatement(simpleStatement string) *SimpleStatement {
 	return &SimpleStatement{
 		SimpleStatement: simpleStatement,
 	}
@@ -27,6 +27,6 @@ func (stmt *SimpleStatement) Id() string {
 
 func (stmt *SimpleStatement) String() string {
 	var builder strings.Builder
-	fmt.Fprint(&builder, TabbedString(uint(stmt.numTabs)), stmt.SimpleStatement, ";\n")
+	fmt.Fprint(&builder, TabbedString(uint(stmt.numTabs)), stmt.SimpleStatement, ";")
 	return builder.String()
 }

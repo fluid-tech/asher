@@ -7,7 +7,22 @@ import (
 
 type Function struct {
 	interfaces.Function
-	function core.Function
+	function *core.Function
+}
+
+/**
+Returns a Function Builder instance
+*/
+func NewFunctionBuilder() *Function {
+	return &Function{
+		function: core.NewFunction(),
+	}
+}
+
+func NewFunctionBuilderFromFunction(function *core.Function) *Function {
+	return &Function{
+		function: function,
+	}
 }
 
 func (f *Function) SetName(name string) interfaces.Function {
@@ -39,5 +54,5 @@ func (f *Function) SetVisibility(vis string) interfaces.Function {
 }
 
 func (f *Function) GetFunction() *core.Function {
-	return &f.function
+	return f.function
 }

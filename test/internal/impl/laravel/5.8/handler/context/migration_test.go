@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func Test_MigrationContext(t *testing.T) {
+func TestMigrationContext(t *testing.T) {
 	migration := context.GetFromRegistry("migration")
 	var classes = []struct {
 		class        *core.Class

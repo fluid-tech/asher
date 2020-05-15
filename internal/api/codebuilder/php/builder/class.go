@@ -7,11 +7,25 @@ import (
 
 type Class struct {
 	interfaces.Class
-	class core.Class
+	class *core.Class
 }
 
+/**
+Creates a new instance of this builder, with a new core.Class
+ */
 func NewClassBuilder() *Class {
-	return &Class{}
+	return &Class{
+		class: core.NewClass(),
+	}
+}
+
+/**
+Creates a new instance of this builder, with an existing core.Class
+ */
+func NewClassBuilderFromClass(class *core.Class) *Class{
+	return &Class{
+		class: class,
+	}
 }
 
 /**
@@ -23,7 +37,14 @@ func (klass *Class) SetName(name string) interfaces.Class {
 }
 
 /**
-Adds a TabbedUnit to this class
+Add a TabbedUnit to this this class's members list
+*/
+func (klass *Class) AddMember(unit *core.TabbedUnit) interfaces.Class {
+	return klass.AddMembers([]*core.TabbedUnit{unit})
+}
+
+/**
+Adds a list of TabbedUnit to this class's members list
 */
 func (klass *Class) AddMembers(units []*core.TabbedUnit) interfaces.Class {
 	klass.class.Members = append(klass.class.Members, units...)
@@ -57,9 +78,16 @@ func (klass *Class) AddInterface(ifName string) interfaces.Class {
 /**
 Adds imports to this class
 */
-func (klass *Class) AddImport(imports []string) interfaces.Class {
+func (klass *Class) AddImports(imports []string) interfaces.Class {
 	klass.class.Imports = append(klass.class.Imports, imports...)
 	return klass
+}
+
+/**
+Add import to this class
+ */
+func (klass *Class) AddImport(importPkg string) interfaces.Class {
+	return klass.AddImports([]string{importPkg})
 }
 
 /**
@@ -70,6 +98,6 @@ func (klass *Class) SetPackage(pkg string) interfaces.Class {
 	return klass
 }
 
-func (klass *Class) GetClass() core.Class {
+func (klass *Class) GetClass() *core.Class {
 	return klass.class
 }
