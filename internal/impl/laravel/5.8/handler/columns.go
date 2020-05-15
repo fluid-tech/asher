@@ -182,6 +182,7 @@ func (ColumnHandler *ColumnHandler) handleAllowedKeywordsToString(allowed []stri
 func (columnHandler *ColumnHandler) ColTypeSwitcher(colType string, colName string, allowed []string) string {
 	var columnNameBracket = "('" + colName + "')"
 	switch colType {
+	// TODO : Add more column types here
 	case "unsignedBigInteger":
 		return "unsignedBigInteger" + columnNameBracket
 	case "bigInteger":
