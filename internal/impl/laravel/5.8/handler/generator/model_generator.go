@@ -13,6 +13,7 @@ type ModelGenerator struct {
 	hidden []string
 	timestamps bool
 	createValidationRules []string
+	updateValidationRules []string
 }
 
 /**
@@ -24,9 +25,31 @@ func NewModelGenerator() *ModelGenerator {
 	}
 }
 
+/**
+Adds the validation rule in createValidationRules array which will is in form of associative array.
+Parameters:
+	- colName: this will be the Name of Column
+	- colRule: This will be rule/constraint imposed on the specified passed column.
+Returns:
+	- instance of the generator object
+ */
 func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, colRule string) *ModelGenerator {
 	midStageString := colName + " => \"" + colRule + "\""
 	modelGenerator.createValidationRules = append(modelGenerator.createValidationRules, midStageString)
+	return modelGenerator
+}
+
+/**
+Adds the validation rule in updateValidationRules array which will is in form of associative array.
+Parameters:
+	- colName: this will be the Name of Column
+	- colRule: This will be rule/constraint imposed on the specified passed column.
+Returns:
+	- instance of the generator object
+*/
+func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, colRule string) *ModelGenerator {
+	midStageString := colName + " => \"" + colRule + "\""
+	modelGenerator.updateValidationRules = append(modelGenerator.createValidationRules, midStageString)
 	return modelGenerator
 }
 
@@ -103,6 +126,12 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 		returnArray := core.TabbedUnit( core.NewReturnArray(modelGenerator.createValidationRules) )
 		createFunction := builder.NewFunctionBuilder().SetName("createValidationRules").SetVisibility("public").AddStatement(&returnArray).GetFunction()
 		modelGenerator.class = modelGenerator.class.AddFunction(createFunction)
+	}
+
+	if len(modelGenerator.updateValidationRules) > 0 {
+		returnArray := core.TabbedUnit( core.NewReturnArray(modelGenerator.updateValidationRules) )
+		updateFunction := builder.NewFunctionBuilder().SetName("updateValidationRules").SetVisibility("public").AddStatement(&returnArray).GetFunction()
+		modelGenerator.class = modelGenerator.class.AddFunction(updateFunction)
 	}
 
 	return modelGenerator.class.GetClass()
