@@ -60,7 +60,7 @@ func (auditColHandler *AuditCol) handleTimestamp(modelClass *core.Class, isTimeS
 func (auditColHandler *AuditCol) handleSoftDeletes(modelClass *core.Class, isSoftDeleteSet bool) {
 	// adding use SoftDeletes
 	if isSoftDeleteSet {
-		tab := core.TabbedUnit(core.NewSimpleStatement("use SoftDeletes;"))
+		tab := core.TabbedUnit(core.NewSimpleStatement("use SoftDeletes"))
 		modelClass.AppendMember(&tab)
 	}
 }
