@@ -117,9 +117,9 @@ func TestMigration(t *testing.T) {
 		out []bool
 	}{
 		{genMigTest("TTT", true, true, true, t), []bool{true, true, true, true}},
-		{genMigTest("TT", true, false, true, t), []bool{true, true, true, true}},
-		{genMigTest("T", false, true, true, t), []bool{true, true, true, true}},
-		{genMigTest("TTTA", true, true, false, t), []bool{true, true, true, true}},
+		{genMigTest("TT", true, false, true, t), []bool{true, true, false, true}},
+		{genMigTest("T", false, true, true, t), []bool{false, false, true, true}},
+		{genMigTest("TTTA", true, true, false, t), []bool{true, true, true, false}},
 	}
 
 	for i, element := range table {
@@ -174,7 +174,7 @@ func runTestFor(condition bool, stmt string, anon *core.Function, t *testing.T) 
 		}
 		return true
 	}
-	return true
+	return false
 }
 
 /**
