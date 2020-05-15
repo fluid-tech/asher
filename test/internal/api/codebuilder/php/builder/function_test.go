@@ -3,6 +3,7 @@ package builder
 import (
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/core"
+	"asher/test/api"
 	"testing"
 )
 
@@ -21,23 +22,34 @@ const Ctor2 =
 
 `
 func TestFunctionBuilder(t *testing.T) {
-	assigmentSS := core.TabbedUnit(core.GetSimpleStatement("$this->mutator = $mutator"))
-	assigmentSS2:= core.TabbedUnit(core.GetSimpleStatement("$this->query = $query"))
+	assigmentSS := core.TabbedUnit(core.NewSimpleStatement("$this->mutator = $mutator"))
+	assigmentSS2:= core.TabbedUnit(core.NewSimpleStatement("$this->query = $query"))
 	builder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
 		AddArgument("BaseMutator $mutator").AddArgument("BaseQuery $query").AddStatement(&assigmentSS2).
 		AddStatement(&assigmentSS)
 
-	var table = []struct{
-		in string
-		out string
-	}{
-		{builder.GetFunction().String(), Ctor},
-		{builder.AddArgument("ImageHandler $imageHandler").GetFunction().String(), Ctor2},
+	var table = []*api.GeneralTest{
+		api.NewGeneralTest(builder.GetFunction().String(), Ctor),
+		api.NewGeneralTest(builder.AddArgument("ImageHandler $imageHandler").GetFunction().String(), Ctor2),
+		buildFunctionBuilderWithExistingFunction(),
 	}
 
-	for _, element := range table{
-		if element.in != element.out {
-			t.Errorf("expected '%s' found '%s'", element.in, element.out)
-		}
-	}
+	api.IterateAndTest(table, t)
 }
+
+func buildFunctionBuilderWithExistingFunction() *api.GeneralTest {
+	function := core.NewFunction()
+	function.Name = "up"
+	function.Visibility = "protected"
+	function.Arguments = []string{"$hello", "$world"}
+	s := core.TabbedUnit(core.NewSimpleStatement("return $world+$hello"))
+	b := builder.NewFunctionBuilderFromFunction(function).AddStatement(&s)
+	return api.NewGeneralTest(b.GetFunction().String(), TestFunction)
+}
+
+
+const TestFunction=`protected function up($hello, $world) {
+    return $world+$hello;
+}
+
+`
