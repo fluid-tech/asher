@@ -5,8 +5,8 @@ import (
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/core"
 	"asher/internal/impl/laravel/5.8/handler/context"
+	"asher/internal/impl/laravel/5.8/handler/generator"
 	"asher/internal/models"
-	"errors"
 	"fmt"
 	"github.com/iancoleman/strcase"
 	"strings"
@@ -25,8 +25,20 @@ func (columnHandler *ColumnHandler) Handle(modelName string, colsArr interface{}
 	myColsArray := colsArr.([]models.Column)
 
 	columnHandler.handleMigration(modelName, myColsArray)
+	columnHandler.handleModel(modelName, myColsArray)
 
 	return []*api.EmitterFile{}, nil
+}
+
+func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []models.Column) {
+	var modelGenerator = generator.NewModelGenerator()
+
+	for _, singleColumn := range colArr {
+		modelGenerator.SetName(modelName)
+		columnHandler.handleHidden(modelGenerator, singleColumn.Hidden, singleColumn.Name)
+	}
+	fmt.Print(modelGenerator.Build().String())
+	context.GetFromRegistry("model").AddToCtx(modelName, modelGenerator.Build())
 }
 
 func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr []models.Column) error {
@@ -48,7 +60,6 @@ func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr
 
 func (columnHandler *ColumnHandler) handleSingleColumn(modelName string, column models.Column) core.SimpleStatement {
 
-
 	if column.Primary {
 		//Handle PrimaryKey
 		return columnHandler.handlePrimary(column)
@@ -62,19 +73,11 @@ func (columnHandler *ColumnHandler) handleSingleColumn(modelName string, column 
 
 }
 
-func (columnHandler *ColumnHandler) handleFillable(modelName string, column models.Column) error {
-	modelClass := context.GetFromRegistry("model").GetCtx(modelName).(*core.Class)
-	if modelClass != nil {
-		element, err := modelClass.FindMember("fillable")
-		if err != nil {
-			// todo return an err
-			return err
-		}
-		arrayAssignment := (*element).(*core.ArrayAssignment)
-		arrayAssignment.Rhs = append(arrayAssignment.Rhs, column.Name)
-		return nil
+func (columnHandler *ColumnHandler) handleHidden(modelGenerator *generator.ModelGenerator, isHidden bool, colName string) error {
+	if isHidden {
+		modelGenerator.AddHiddenField(colName)
 	}
-	return errors.New(fmt.Sprintf("model class %s not found", modelName))
+	return nil
 }
 
 func (columnHandler *ColumnHandler) handlePrimary(column models.Column) core.SimpleStatement {
@@ -196,7 +199,6 @@ func (columnHandler *ColumnHandler) ColTypeSwitcher(colType string, colName stri
 		panic("not supported or wrong input in ColTypeSwitcher" + colType)
 	}
 }
-
 
 func generateMigrationTemplate(migrationClassName string, columns []core.SimpleStatement) *core.Class {
 	// Preparing the arguments for up function
