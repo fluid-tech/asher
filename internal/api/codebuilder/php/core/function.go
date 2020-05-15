@@ -1,6 +1,7 @@
 package core
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -48,6 +49,9 @@ func (f *Function) String() string {
 	return builder.String()
 }
 
+/**
+Finds a statement with a regex
+ */
 func (f *Function) FindStatement(pattern string) (*TabbedUnit, error) {
 	var err error
 	for _, element := range f.Statements {
@@ -57,4 +61,16 @@ func (f *Function) FindStatement(pattern string) (*TabbedUnit, error) {
 		}
 	}
 	return nil, err
+}
+
+/**
+Finds a tabbed unit by id
+ */
+func (f *Function) FindById(id string) (*TabbedUnit, error) {
+	for _, element := range f.Statements {
+		if  (*element).Id() == id {
+			return element, nil
+		}
+	}
+	return nil, errors.New(fmt.Sprintf("cant find statement with identifier %s", id))
 }

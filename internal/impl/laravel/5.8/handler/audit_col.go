@@ -4,6 +4,7 @@ import (
 	"asher/internal/api"
 	"asher/internal/api/codebuilder/php/core"
 	"asher/internal/impl/laravel/5.8/handler/context"
+	"asher/internal/impl/laravel/5.8/handler/helper"
 	"errors"
 	"fmt"
 )
@@ -13,31 +14,12 @@ const UpdatedBy = "$table->%s('updated_by')->nullable()"
 const Timestamp = `$table->timestamps();`
 const SoftDeletes = `$table->softDeletes();`
 
+const FillableIdentifier = "fillable"
+const CreateValidationRulesIdentifier = "getCreateValidationRules"
+const UpdateValidationRulesIdentifier = "getUpdateValidationRules"
+
 type AuditCol struct {
 	api.Handler
-}
-
-type AuditColInput struct {
-	/**
-	The column type specifies the action this handler performs
-	For
-	 	1 	- for CreatedBy,
-		2 	- for UpdatedBy,
-		3 	- for Both Created And UpdatedBy or formally AuditCols
-		4 	- for Soft Deletes
-		7 	- for CreatedBy, UpdatedBy, SoftDeletes
-		8 	- for Timestamp
-		15	- for CreatedBy, UpdatedBy, SoftDeletes, Timestamp
-	*/
-	columnType int
-	value      bool
-}
-
-func NewAuditColInputFromType(auditCol bool, softDeletes bool, timestamp bool, value bool) *AuditColInput {
-	return &AuditColInput{
-		columnType: formatColumnType(auditCol, softDeletes, timestamp),
-		value:      value,
-	}
 }
 
 func NewAuditColHandler() *AuditCol {
@@ -45,29 +27,73 @@ func NewAuditColHandler() *AuditCol {
 }
 
 func (auditColHandler *AuditCol) Handle(identifier string, value interface{}) ([]*api.EmitterFile, error) {
-	requiresAuditCols := value.(bool)
-	if requiresAuditCols {
-		auditColHandler.handleFillable(identifier)
-		auditColHandler.handleMigration(identifier)
-
-	}
+	input := value.(*helper.AuditColInput)
+	// todo handle errors
+	auditColHandler.handleModel(identifier, input)
 	return []*api.EmitterFile{}, nil
 }
 
-func (auditColHandler *AuditCol) handleFillable(identifier string) error {
+/**
+Function orchestrates methods that adds data to the model class
+ */
+func (auditColHandler *AuditCol) handleModel(identifier string , input *helper.AuditColInput) error {
 	modelClass := context.GetFromRegistry("model").GetCtx(identifier).(*core.Class)
 	if modelClass != nil {
-		element, err := modelClass.FindInMembers("fillable")
-		if err != nil {
-			return err
-		}
-		// todo add validation rules in the CREATE_VALIDATION_RULES and UPDATE_VALIDATION_RULES array
-		arrayAssignment := (*element).(*core.ArrayAssignment)
-		arrayAssignment.Rhs = append(arrayAssignment.Rhs, "created_by", "updated_by")
+		auditColHandler.handleTimestamp(modelClass, input.IsTimestampSet())
+		auditColHandler.handleSoftDeletes(modelClass, input.IsSoftDeletesSet())
+		auditColHandler.handleFillable(modelClass, input.GetFillableArray())
+		auditColHandler.handleValidationRules(UpdateValidationRulesIdentifier, modelClass, input.GetUpdateValidationRules())
+		auditColHandler.handleValidationRules(CreateValidationRulesIdentifier, modelClass, input.GetCreateValidationRules())
 		return nil
 	}
 	return errors.New(fmt.Sprintf("model class %s not found", identifier))
 }
+
+func (auditColHandler *AuditCol) handleTimestamp(modelClass *core.Class, isTimeStampSet bool) {
+	// adding timestamps true
+	if isTimeStampSet {
+		tab := core.TabbedUnit(core.NewVarAssignment("public", "timestamps", "true"))
+		modelClass.AppendMember(&tab)
+	}
+}
+
+func (auditColHandler *AuditCol) handleSoftDeletes(modelClass *core.Class, isSoftDeleteSet bool) {
+	// adding use SoftDeletes
+	if isSoftDeleteSet {
+		tab := core.TabbedUnit(core.NewSimpleStatement("use SoftDeletes"))
+		modelClass.AppendMember(&tab)
+	}
+}
+
+func (auditColHandler *AuditCol) handleFillable(modelClass *core.Class, fillableArray []string) error {
+	element, err := modelClass.FindMember(FillableIdentifier)
+	if err != nil {
+		return err
+	}
+	arrayAssignment := (*element).(*core.ArrayAssignment)
+	arrayAssignment.Rhs = append(arrayAssignment.Rhs, fillableArray...)
+	return nil
+}
+
+func (auditColHandler *AuditCol) handleValidationRules(currentIdentifier string, klass *core.Class, arrayToAppend []string) error {
+	// adding validation rules for audit cols
+
+	function, err := klass.FindFunction(currentIdentifier)
+	if err != nil {
+		return err
+	}
+	// this is an assumption that this method returns an array in the first line itself
+	// ie the first element is a ReturnArray
+	returnStmt, err := function.FindById("return")
+	if err != nil {
+		return err
+	}
+
+	returnArray := (*returnStmt).(*core.ReturnArray)
+	returnArray.Append(arrayToAppend)
+	return nil
+}
+
 
 func (auditColHandler *AuditCol) handleMigration(identifier string) error {
 	migrationInfo := context.GetFromRegistry("migration").GetCtx(identifier).(*context.MigrationInfo)
@@ -75,7 +101,7 @@ func (auditColHandler *AuditCol) handleMigration(identifier string) error {
 		primaryKeyCol := getPrimaryKeyString(migrationInfo.PrimaryKeyCol)
 
 		migrationClass := migrationInfo.Class
-		function, err := migrationClass.FindInFunctions("up")
+		function, err := migrationClass.FindFunction("up")
 		if err != nil {
 			return err
 		}
@@ -112,18 +138,4 @@ func getPrimaryKeyString(primaryKeyCol string) string {
 
 	}
 	return "unsignedBigInteger"
-}
-
-func formatColumnType(auditCol bool, softDeletes bool, timestamp bool) int {
-	colType := 0
-	if auditCol {
-		colType |= 3
-	}
-	if softDeletes {
-		colType |= 4
-	}
-	if timestamp {
-		colType |= 8
-	}
-	return colType
 }
