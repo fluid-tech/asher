@@ -6,15 +6,12 @@ import (
 	"asher/internal/impl/laravel/5.8/handler"
 	"asher/internal/impl/laravel/5.8/handler/context"
 	"asher/internal/impl/laravel/5.8/handler/helper"
+	"fmt"
 	"reflect"
 	"testing"
 )
 
-func TestAuditCol(t *testing.T) {
-	modelTests(t)
-}
-
-func modelTests(t *testing.T) {
+func TestModel(t *testing.T) {
 	var table = []*struct {
 		in  [][]string
 		out [][]string
@@ -88,10 +85,6 @@ func getFillableRhs(klass *core.Class, t *testing.T) []string {
 	return (*element).(*core.ArrayAssignment).Rhs
 }
 
-func migrationTest(t *testing.T) {
-
-}
-
 func buildClassWithArrayDecl(className string) *core.Class {
 	assigmentSS := core.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
 	functionBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
@@ -115,6 +108,90 @@ func buildClassWithArrayDecl(className string) *core.Class {
 		AddFunction(getCreateRules.GetFunction()).AddFunction(getUpdateRules.GetFunction())
 
 	return klass.GetClass()
+}
+
+func TestMigration(t *testing.T) {
+
+	var table = []struct {
+		in  []bool
+		out []bool
+	}{
+		{genMigTest("TTT", true, true, true, t), []bool{true, true, true, true}},
+		{genMigTest("TT", true, false, true, t), []bool{true, true, true, true}},
+		{genMigTest("T", false, true, true, t), []bool{true, true, true, true}},
+		{genMigTest("TTTA", true, true, false, t), []bool{true, true, true, true}},
+	}
+
+	for i, element := range table {
+		if !reflect.DeepEqual(element.in, element.out) {
+			t.Errorf("failed %d expected %t found %t", i, element.in, element.out)
+		}
+	}
+
+}
+
+func genMigTest(className string, auditCol bool, softDeletes bool, timestamp bool, t *testing.T) []bool {
+	klass := genMigrationClass(className)
+	context.GetFromRegistry("migration").AddToCtx(className, klass)
+
+	// calling handle for fillable
+	auditColHandler := handler.NewAuditColHandler()
+	auditColHandler.Handle(className, helper.NewAuditColInputFromType(auditCol, softDeletes, timestamp))
+
+	function, err := klass.FindFunction("up")
+	if err != nil {
+		t.Error("cant find method up")
+	}
+	upFunc, err := function.FindById("Schema::create")
+	if err != nil {
+		t.Error("cant find method call Schema::create")
+	}
+
+	up := (*upFunc).(*core.FunctionCall)
+	fun, err := up.FindById("anon")
+	if err != nil {
+		t.Error("cant find anon")
+	}
+	anonFunction := (*fun).(*core.Function)
+	createdBy := fmt.Sprintf(handler.CreatedBy, "unsignedBigInteger")
+	updatedBy := fmt.Sprintf(handler.UpdatedBy, "unsignedBigInteger")
+
+	return []bool{
+		runTestFor(auditCol, createdBy, anonFunction, t),
+		runTestFor(auditCol, updatedBy, anonFunction, t),
+		runTestFor(softDeletes, handler.SoftDeletes, anonFunction, t),
+		runTestFor(timestamp, handler.Timestamp, anonFunction, t),
+	}
+
+}
+
+func runTestFor(condition bool, stmt string, anon *core.Function, t *testing.T) bool {
+	if condition {
+		_, err := anon.FindById(stmt)
+		if err != nil {
+			t.Errorf("%s failed", stmt)
+			return false
+		}
+		return true
+	}
+	return true
+}
+
+/**
+Returns a half baked migration class with up method only
+*/
+func genMigrationClass(id string) *core.Class {
+
+	stmt := core.TabbedUnit(core.NewSimpleStatement("$table->bigIncrements('id')"))
+	anon := core.TabbedUnit(builder.NewFunctionBuilder().AddArgument("Blueprint $table").
+		AddStatement(&stmt).GetFunction())
+	funcCall := core.TabbedUnit(core.NewFunctionCall("Schema::create").AddArg(&anon))
+
+	funcBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("up").
+		AddStatement(&funcCall)
+
+	return builder.NewClassBuilder().SetName(id).AddFunction(funcBuilder.GetFunction()).GetClass()
+
 }
 
 /*** CONSTANT STRINGS/ ARRAYS ***/
