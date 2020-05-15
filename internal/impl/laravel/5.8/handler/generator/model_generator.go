@@ -3,6 +3,7 @@ package generator
 import (
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/builder/interfaces"
+	"asher/internal/api/codebuilder/php/core"
 	"github.com/iancoleman/strcase"
 )
 
@@ -31,7 +32,7 @@ func NewModelGenerator() *ModelGenerator {
  */
 func (modelGenerator *ModelGenerator) SetName(tableName string) *ModelGenerator {
 	className := strcase.ToCamel(tableName)
-	modelGenerator.SetName(className)
+	modelGenerator.class.SetName(className)
 	return modelGenerator
 }
 
@@ -43,7 +44,7 @@ func (modelGenerator *ModelGenerator) SetName(tableName string) *ModelGenerator 
 	- instance of the generator object
  */
 func (modelGenerator *ModelGenerator) AddFillable(columnName string) *ModelGenerator {
-	modelGenerator.fillables = append(modelGenerator.fillables, columnName)
+	modelGenerator.fillables = append(modelGenerator.fillables, `"` + columnName + `"`)
 	return modelGenerator
 }
 
@@ -55,7 +56,7 @@ func (modelGenerator *ModelGenerator) AddFillable(columnName string) *ModelGener
 	- instance of the generator object
 */
 func (modelGenerator *ModelGenerator) AddHiddenField(columnName string) *ModelGenerator {
-	modelGenerator.hidden = append(modelGenerator.hidden, columnName)
+	modelGenerator.hidden = append(modelGenerator.hidden, `"` + columnName + `"`)
 	return modelGenerator
 }
 
@@ -69,4 +70,28 @@ func (modelGenerator *ModelGenerator) SetTimestamps(flag bool) *ModelGenerator {
 	return modelGenerator
 }
 
+func (modelGenerator *ModelGenerator) Build() *core.Class {
+	modelGenerator.class = modelGenerator.class.SetPackage("App").AddImports([]string{
+		`Illuminate\Database\Eloquent\Model`,
+	})
+
+	if len(modelGenerator.fillables) > 0 {
+		fillableArray := core.TabbedUnit(core.NewArrayAssignment("protected", "fillable",
+			modelGenerator.fillables))
+		modelGenerator.class = modelGenerator.class.AddMember(&fillableArray)
+	}
+
+	if len(modelGenerator.hidden) > 0 {
+		hiddenArray := core.TabbedUnit(core.NewArrayAssignment("protected", "visible",
+			modelGenerator.hidden))
+		modelGenerator.class = modelGenerator.class.AddMember(&hiddenArray)
+	}
+
+	if modelGenerator.timestamps {
+		timestamps := core.TabbedUnit(core.NewVarAssignment("public","timestamps", "true"))
+		modelGenerator.class = modelGenerator.class.AddMember(&timestamps)
+	}
+
+	return modelGenerator.class.GetClass()
+}
 
