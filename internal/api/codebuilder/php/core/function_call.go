@@ -5,25 +5,25 @@ import (
 	"strings"
 )
 
-type Closure struct {
+type FunctionCall struct {
 	TabbedUnit
 	tabs int
 	Def  string
 	Args []*TabbedUnit
 }
 
-func NewClosure(def string) *Closure {
-	return &Closure{
+func NewClosure(def string) *FunctionCall {
+	return &FunctionCall{
 		Def:        def,
 		Args:       []*TabbedUnit{},
 	}
 }
 
-func (c *Closure) SetNumTabs(tabs int) {
+func (c *FunctionCall) SetNumTabs(tabs int) {
 	c.tabs = tabs
 }
 
-func (c *Closure) Id() string {
+func (c *FunctionCall) Id() string {
 	return c.Def
 }
 
@@ -31,12 +31,12 @@ func (c *Closure) Id() string {
 Adds a tabbed unit to the args list
 Returns the current instance so that you can chain it
  */
-func (c *Closure) AddArg(unit *TabbedUnit) *Closure{
+func (c *FunctionCall) AddArg(unit *TabbedUnit) *FunctionCall {
 	c.Args = append(c.Args, unit)
 	return c
 }
 
-func (c *Closure) String() string {
+func (c *FunctionCall) String() string {
 	var builder strings.Builder
 	fmt.Fprint(&builder, TabbedString(uint(c.tabs)), c.Def, "(")
 	argLen := len(c.Args)
