@@ -122,7 +122,7 @@ func Test_Columns(t *testing.T) {
 		},
 	}
 	
-	handler.NewColumnHandler().Handle("Users", columnArray)
+	handler.NewColumnHandler().Handle("student_enrollments", columnArray)
 	t.Error("Unexpected data")
 
 

@@ -8,6 +8,7 @@ import (
 	"asher/internal/models"
 	"errors"
 	"fmt"
+	"github.com/iancoleman/strcase"
 	"strings"
 )
 
@@ -198,6 +199,7 @@ func (columnHandler *ColumnHandler) ColTypeSwitcher(colType string, colName stri
 
 func generateMigrationTemplate(migrationClassName string, columns []core.SimpleStatement) *core.Class {
 	// Preparing the arguments for up function
+	className := "Create" + strcase.ToCamel(migrationClassName) + "Table"
 	tableName := "'" + migrationClassName + "'"
 	arg1 := core.TabbedUnit(core.NewArgument(tableName))
 	closure := builder.NewFunctionBuilder().AddArgument("Blueprint $table")
@@ -220,7 +222,7 @@ func generateMigrationTemplate(migrationClassName string, columns []core.SimpleS
 		`Illuminate\Database\Migrations\Migration`,
 		`Illuminate\DatabaseSchema\Blueprint`,
 		`Illuminate\Support\Facades\Schema`,
-	}).SetName(migrationClassName).SetExtends("Migration").AddFunction(upFunction).AddFunction(downFunction)
+	}).SetName(className).SetExtends("Migration").AddFunction(upFunction).AddFunction(downFunction)
 
 	return klass.GetClass()
 }

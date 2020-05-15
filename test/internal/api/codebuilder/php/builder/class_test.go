@@ -17,7 +17,6 @@ func TestClassBuilder(t *testing.T) {
 	}
 
 	api.IterateAndTest(table, t)
-
 }
 
 func getClassWithoutExtendsAndInitialization() *api.GeneralTest {
@@ -35,6 +34,8 @@ func getClassWithoutExtendsAndInitialization() *api.GeneralTest {
 
 	return api.NewGeneralTest(klass.GetClass().String(), TestClass2)
 }
+
+
 
 func getClassWithExtendsAndInitialization() *api.GeneralTest {
 	assigmentSS := core.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
