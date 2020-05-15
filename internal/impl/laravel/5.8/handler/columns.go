@@ -24,7 +24,7 @@ func (columnHandler *ColumnHandler) Handle(modelName string, colsArr interface{}
 
 	myColsArray := colsArr.([]models.Column)
 
-	columnHandler.handleMigration(modelName, myColsArray)
+	//columnHandler.handleMigration(modelName, myColsArray)
 	columnHandler.handleModel(modelName, myColsArray)
 
 	return []*api.EmitterFile{}, nil
@@ -37,6 +37,7 @@ func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []model
 		modelGenerator.SetName(modelName)
 		columnHandler.handleHidden(modelGenerator, singleColumn.Hidden, singleColumn.Name)
 		columnHandler.handleGuarded(modelGenerator, singleColumn.Guarded, singleColumn.Name)
+		columnHandler.handleValidation(modelGenerator, singleColumn.Validations, singleColumn.Name)
 	}
 	fmt.Print(modelGenerator.Build().String())
 	context.GetFromRegistry("model").AddToCtx(modelName, modelGenerator.Build())
@@ -56,6 +57,11 @@ func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr
 	fmt.Println(klass)
 	context.GetFromRegistry("migration").AddToCtx(identifier, klass)
 
+	return nil
+}
+
+func (columnHandler *ColumnHandler) handleValidation(modelGenerator *generator.ModelGenerator, validations string, colName string) error{
+	modelGenerator.AddCreateValidationRule(colName, validations)
 	return nil
 }
 
@@ -221,7 +227,7 @@ func generateMigrationTemplate(migrationClassName string, columns []core.SimpleS
 	arg2 := core.TabbedUnit(closure.GetFunction())
 
 	// Preparing the statements for up function
-	schemaBlock := core.TabbedUnit(core.NewClosure("Schema::create").AddArg(&arg1).AddArg(&arg2))
+	schemaBlock := core.TabbedUnit(core.NewFunctionCall("Schema::create").AddArg(&arg1).AddArg(&arg2))
 	upFunction := builder.NewFunctionBuilder().SetName("up").SetVisibility("public").AddStatement(&schemaBlock).GetFunction()
 
 	// Preparing the statements for down function
