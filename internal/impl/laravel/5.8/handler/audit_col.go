@@ -31,6 +31,7 @@ func (auditColHandler *AuditCol) Handle(identifier string, value interface{}) ([
 	input := value.(*helper.AuditColInput)
 	// todo handle errors
 	auditColHandler.handleModel(identifier, input)
+	auditColHandler.handleMigration(identifier, input)
 	return []*api.EmitterFile{}, nil
 }
 
@@ -128,7 +129,7 @@ func (auditColHandler *AuditCol) appendToFunction(function *core.Function, audit
 		// no record of statement found inserting
 		simple := core.NewSimpleStatement(auditColStr)
 		stmt := core.TabbedUnit(simple)
-		function.Statements = append(function.Statements, &stmt)
+		function.AppendStatement(&stmt)
 	}
 }
 
@@ -138,7 +139,7 @@ func getLaravelColString(userMigration *context.MigrationInfo) string {
 		// using the first argument as the type of primaryKeyCol
 		primaryKeyStr = userMigration.PrimaryKeyCol[0]
 	}
-	return primaryKeyStr
+	return keyColToLaravelString(primaryKeyStr)
 
 }
 
@@ -154,7 +155,11 @@ func getSchemaCreateMethod(migrationInfo *context.MigrationInfo) (*core.Function
 	if err != nil {
 		return nil, err
 	}
-	return (*upFunc).(*core.Function), nil
+	upFun, err := (*upFunc).(*core.FunctionCall).FindById("anon")
+	if err != nil {
+		return nil, err
+	}
+	return (*upFun).(*core.Function), nil
 }
 
 func keyColToLaravelString(primaryKeyCol string) string {
