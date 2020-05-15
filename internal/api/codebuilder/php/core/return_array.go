@@ -8,12 +8,12 @@ import (
 type ReturnArray struct{
 	TabbedUnit
 	tabs int
-	statements []string
+	Statements []string
 }
 
 func NewReturnArray(arr []string) *ReturnArray {
 	return &ReturnArray{
-		statements: arr,
+		Statements: arr,
 	}
 }
 
@@ -27,12 +27,12 @@ func (r *ReturnArray) Id() string {
 
 func (r *ReturnArray) String() string {
 	var builder strings.Builder
-	fmt.Fprint(&builder, TabbedString(uint(r.tabs)), "return [\n", strings.Join(r.statements, ",\n"), "];\n")
+	fmt.Fprint(&builder, TabbedString(uint(r.tabs)), "return [\n", strings.Join(r.Statements, ",\n"), "];\n")
 	return builder.String()
 }
 /**
 Appends to return statements the given array
  */
 func (r *ReturnArray) Append(arrayContent []string){
-	r.statements = append(r.statements, arrayContent...)
+	r.Statements = append(r.Statements, arrayContent...)
 }
