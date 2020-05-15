@@ -15,6 +15,17 @@ type Function struct{
 	Statements []*TabbedUnit
 }
 
+func NewFunction() *Function {
+	return &Function{
+		TabbedUnit: nil,
+		tabs:       0,
+		Name:       "",
+		Visibility: "",
+		Arguments:  []string{},
+		Statements: []*TabbedUnit{},
+	}
+}
+
 func (f *Function) SetNumTabs(tabs int){
 	f.tabs = tabs
 }
