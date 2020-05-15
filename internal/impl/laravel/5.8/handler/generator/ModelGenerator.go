@@ -10,6 +10,7 @@ type ModelGenerator struct {
 	class interfaces.Class
 	fillables []string
 	hidden []string
+	timestamps bool
 }
 
 /**
@@ -57,3 +58,15 @@ func (modelGenerator *ModelGenerator) AddHiddenField(columnName string) *ModelGe
 	modelGenerator.hidden = append(modelGenerator.hidden, columnName)
 	return modelGenerator
 }
+
+/**
+ Control whether to set timestamps in the model of not
+ Returns:
+	- instance of the generator object
+*/
+func (modelGenerator *ModelGenerator) SetTimestamps(flag bool) *ModelGenerator {
+	modelGenerator.timestamps = flag
+	return modelGenerator
+}
+
+
