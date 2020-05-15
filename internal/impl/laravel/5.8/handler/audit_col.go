@@ -30,32 +30,60 @@ type AuditColInput struct {
 		15	- for CreatedBy, UpdatedBy, SoftDeletes, Timestamp
 	*/
 	columnType int
-	value      bool
+	identifier string	// name of the model
 }
 
-func NewAuditColInputFromType(auditCol bool, softDeletes bool, timestamp bool, value bool) *AuditColInput {
+func NewAuditColInputFromType(auditCol bool, softDeletes bool, timestamp bool, id string) *AuditColInput {
 	return &AuditColInput{
+		identifier: id,
 		columnType: formatColumnType(auditCol, softDeletes, timestamp),
-		value:      value,
 	}
 }
+
+func (input *AuditColInput) isAuditColSet() bool {
+	return input.columnType & 3 == 3
+}
+
+func (input *AuditColInput) isSoftDeletesSet() bool {
+	return input.columnType & 4 == 4
+}
+
+func (input *AuditColInput) isTimestampSet() bool {
+	return input.columnType & 8 == 8
+}
+
+/**
+Returns a slice containing a list of columns to be appended to the fillable array
+ */
+func (input *AuditColInput) getFillableArray() []string {
+	var arr []string
+	if  input.isAuditColSet() {
+		arr = append(arr, `"created_by"`, `"updated_by"`)
+	}
+	if input.isTimestampSet() {
+		arr = append(arr, `"created_at"`, `"updated_at"`)
+	}
+	if input.isSoftDeletesSet() {
+		arr = append(arr, `"deleted_at"`)
+	}
+	return arr
+}
+
 
 func NewAuditColHandler() *AuditCol {
 	return &AuditCol{}
 }
 
 func (auditColHandler *AuditCol) Handle(identifier string, value interface{}) ([]*api.EmitterFile, error) {
-	requiresAuditCols := value.(bool)
-	if requiresAuditCols {
-		auditColHandler.handleFillable(identifier)
-		auditColHandler.handleMigration(identifier)
-
-	}
+	input := value.(*AuditColInput)
+	// todo handle errors
+	auditColHandler.handleFillable(input)
 	return []*api.EmitterFile{}, nil
 }
 
-func (auditColHandler *AuditCol) handleFillable(identifier string) error {
-	modelClass := context.GetFromRegistry("model").GetCtx(identifier).(*core.Class)
+
+func (auditColHandler *AuditCol) handleFillable(input *AuditColInput) error {
+	modelClass := context.GetFromRegistry("model").GetCtx(input.identifier).(*core.Class)
 	if modelClass != nil {
 		element, err := modelClass.FindInMembers("fillable")
 		if err != nil {
@@ -63,11 +91,12 @@ func (auditColHandler *AuditCol) handleFillable(identifier string) error {
 		}
 		// todo add validation rules in the CREATE_VALIDATION_RULES and UPDATE_VALIDATION_RULES array
 		arrayAssignment := (*element).(*core.ArrayAssignment)
-		arrayAssignment.Rhs = append(arrayAssignment.Rhs, "created_by", "updated_by")
+		arrayAssignment.Rhs = append(arrayAssignment.Rhs, input.getFillableArray()...)
 		return nil
 	}
-	return errors.New(fmt.Sprintf("model class %s not found", identifier))
+	return errors.New(fmt.Sprintf("model class %s not found", input.identifier))
 }
+
 
 func (auditColHandler *AuditCol) handleMigration(identifier string) error {
 	migrationInfo := context.GetFromRegistry("migration").GetCtx(identifier).(*context.MigrationInfo)
@@ -113,7 +142,13 @@ func getPrimaryKeyString(primaryKeyCol string) string {
 	}
 	return "unsignedBigInteger"
 }
-
+/**
+Returns a bit mask of the booleans provided
+auditCols has a value of 3
+softDeletes - 4
+timestamp - 8
+if all are set then the integer would represent 15
+ */
 func formatColumnType(auditCol bool, softDeletes bool, timestamp bool) int {
 	colType := 0
 	if auditCol {
