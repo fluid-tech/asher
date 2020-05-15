@@ -45,6 +45,4 @@ func TestClassBuilder(t *testing.T)  {
 		t.Error("expected ", klass.GetClass().String(), " \n\n\n found", TEST_CLASS)
 	}
 
-
-
 }
