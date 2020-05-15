@@ -11,12 +11,13 @@ import (
 
 const CreatedBy = "$table->%s('created_by')"
 const UpdatedBy = "$table->%s('updated_by')->nullable()"
-const Timestamp = `$table->timestamps();`
-const SoftDeletes = `$table->softDeletes();`
+const Timestamp = `$table->timestamps()`
+const SoftDeletes = `$table->softDeletes()`
 
 const FillableIdentifier = "fillable"
 const CreateValidationRulesIdentifier = "getCreateValidationRules"
 const UpdateValidationRulesIdentifier = "getUpdateValidationRules"
+const UserModelIdentifier = "user"
 
 type AuditCol struct {
 	api.Handler
@@ -35,8 +36,8 @@ func (auditColHandler *AuditCol) Handle(identifier string, value interface{}) ([
 
 /**
 Function orchestrates methods that adds data to the model class
- */
-func (auditColHandler *AuditCol) handleModel(identifier string , input *helper.AuditColInput) error {
+*/
+func (auditColHandler *AuditCol) handleModel(identifier string, input *helper.AuditColInput) error {
 	modelClass := context.GetFromRegistry("model").GetCtx(identifier).(*core.Class)
 	if modelClass != nil {
 		auditColHandler.handleTimestamp(modelClass, input.IsTimestampSet())
@@ -94,48 +95,75 @@ func (auditColHandler *AuditCol) handleValidationRules(currentIdentifier string,
 	return nil
 }
 
-
-func (auditColHandler *AuditCol) handleMigration(identifier string) error {
-	migrationInfo := context.GetFromRegistry("migration").GetCtx(identifier).(*context.MigrationInfo)
+func (auditColHandler *AuditCol) handleMigration(identifier string, input *helper.AuditColInput) error {
+	migrationCtx := context.GetFromRegistry("migration")
+	migrationInfo := migrationCtx.GetCtx(identifier).(*context.MigrationInfo)
 	if migrationInfo != nil {
-		primaryKeyCol := getPrimaryKeyString(migrationInfo.PrimaryKeyCol)
 
-		migrationClass := migrationInfo.Class
-		function, err := migrationClass.FindFunction("up")
+		primaryKeyCol := getLaravelColString(migrationCtx.GetCtx("user").(*context.MigrationInfo))
+
+		function, err := getSchemaCreateMethod(migrationInfo)
 		if err != nil {
 			return err
 		}
-
-		auditColHandler.appendToFunction(function, primaryKeyCol, 0)
-		auditColHandler.appendToFunction(function, primaryKeyCol, 1)
-		return nil
+		if input.IsAuditColSet() {
+			auditColHandler.appendToFunction(function, fmt.Sprintf(CreatedBy, primaryKeyCol))
+			auditColHandler.appendToFunction(function, fmt.Sprintf(UpdatedBy, primaryKeyCol))
+		}
+		if input.IsSoftDeletesSet() {
+			auditColHandler.appendToFunction(function, SoftDeletes)
+		}
+		if input.IsTimestampSet() {
+			auditColHandler.appendToFunction(function, Timestamp)
+		}
 
 	}
 	return errors.New(fmt.Sprintf("model class %s not found", identifier))
 
 }
 
-func (auditColHandler *AuditCol) appendToFunction(function *core.Function, primaryKeyCol string, auditColType int) {
-	auditColumn := CreatedBy
-	if auditColType == 1 {
-		auditColumn = UpdatedBy
-	}
-	str := fmt.Sprintf(auditColumn, primaryKeyCol)
-	_, err := function.FindStatement(str)
+func (auditColHandler *AuditCol) appendToFunction(function *core.Function, auditColStr string) {
+	_, err := function.FindStatement(auditColStr)
 	if err != nil {
-		simple := core.NewSimpleStatement(str)
+		// no record of statement found inserting
+		simple := core.NewSimpleStatement(auditColStr)
 		stmt := core.TabbedUnit(simple)
 		function.Statements = append(function.Statements, &stmt)
 	}
 }
 
-func getPrimaryKeyString(primaryKeyCol string) string {
+func getLaravelColString(userMigration *context.MigrationInfo) string {
+	primaryKeyStr := ""
+	if userMigration != nil && len(userMigration.PrimaryKeyCol) > 0 {
+		// using the first argument as the type of primaryKeyCol
+		primaryKeyStr = userMigration.PrimaryKeyCol[0]
+	}
+	return primaryKeyStr
+
+}
+
+func getSchemaCreateMethod(migrationInfo *context.MigrationInfo) (*core.Function, error) {
+	migrationClass := migrationInfo.Class
+	function, err := migrationClass.FindFunction("up")
+	if err != nil {
+		return nil, err
+	}
+
+	// finding nested function Call schema::create
+	upFunc, err := function.FindById("Schema::create")
+	if err != nil {
+		return nil, err
+	}
+	return (*upFunc).(*core.Function), nil
+}
+
+func keyColToLaravelString(primaryKeyCol string) string {
+	// Todo add UUID
 	switch primaryKeyCol {
 	case "unsignedBigInteger":
 		return "unsignedBigInteger"
 	case "bigInteger":
 		return "bigInteger"
-
 	}
 	return "unsignedBigInteger"
 }

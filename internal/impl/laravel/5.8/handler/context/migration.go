@@ -11,7 +11,11 @@ type Migration struct {
 
 type MigrationInfo struct {
 	Class         *core.Class
-	PrimaryKeyCol string
+	PrimaryKeyCol []string
+}
+
+func (info *MigrationInfo) AppendToPk(col string) {
+	info.PrimaryKeyCol = append(info.PrimaryKeyCol, col)
 }
 
 func NewMigrationContext() *Migration {
@@ -20,15 +24,15 @@ func NewMigrationContext() *Migration {
 
 /**
 Store a MigrationInfo instance.
- */
+*/
 func (migration *Migration) AddToCtx(key string, value interface{}) {
-	migration.migrationContext[key] = &MigrationInfo{Class: value.(*core.Class), PrimaryKeyCol: ""}
+	migration.migrationContext[key] = &MigrationInfo{Class: value.(*core.Class), PrimaryKeyCol: []string{}}
 }
 
 /**
 Fetches a MigrationInfo instance
 The user of this method must cast and fetch appropriate data
- */
+*/
 func (migration *Migration) GetCtx(key string) interface{} {
 	return migration.migrationContext[key]
 }

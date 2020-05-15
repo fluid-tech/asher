@@ -10,40 +10,6 @@ import (
 	"testing"
 )
 
-var arr = []string{`"user_id"`, `"password"`, `"created_by"`, `"updated_by"`, `"deleted_at"`}
-var brr = []string{`"user_id"`, `"password"`, `"created_by"`, `"updated_by"`, `"deleted_at"`}
-var crr = []string{`"user_id"`, `"password"`, `"created_by"`, `"updated_by"`}
-var drr = []string{`"user_id"`, `"password"`, `"deleted_at"`}
-var frr = []string{`"user_id"`, `"password"`}
-
-var updateTest1 = []string {
-	`"user_id" => "required|exists:users,id"`,
-	`"password" => "min:8|max20"`,
-	`"updated_by" => "required|exists:users,id"`,
-	`"deleted_at" => "required|date_format:Y-m-d H:i:s"`,
-}
-var createTest1 = []string {
-	`"user_id" => "required|exists:users,id"`,
-	`"password" => "min:8|max20"`,
-	`"created_by" => "required|exists:users,id"`,
-}
-
-var updateTest3 = []string {
-	`"user_id" => "required|exists:users,id"`,
-	`"password" => "min:8|max20"`,
-	`"updated_by" => "required|exists:users,id"`,
-}
-
-var updateTest4 = []string{
-	`"user_id" => "required|exists:users,id"`,
-	`"password" => "min:8|max20"`,
-	`"deleted_at" => "required|date_format:Y-m-d H:i:s"`,
-}
-var createTest4 = []string{
-	`"user_id" => "required|exists:users,id"`,
-	`"password" => "min:8|max20"`,
-}
-
 func TestAuditCol(t *testing.T) {
 	modelTests(t)
 }
@@ -53,11 +19,11 @@ func modelTests(t *testing.T) {
 		in  [][]string
 		out [][]string
 	}{
-		{genTest("Hello",  true, true, true, t), [][]string{arr, updateTest1, createTest1}},
-		{genTest("Rnadom", true, true, false, t), [][]string{brr, updateTest1, createTest1}},
-		{genTest("Random", true, false, false, t), [][]string{crr, updateTest3, createTest1}},
-		{genTest("Hell4",  false, true, true, t), [][]string{drr, updateTest4, createTest4}},
-		{genTest("Hell1",  false, false, false, t), [][]string{frr, createTest4, createTest4}},
+		{genModelTest("Hello", true, true, true, t), [][]string{arr, updateTest1, createTest1}},
+		{genModelTest("Rnadom", true, true, false, t), [][]string{brr, updateTest1, createTest1}},
+		{genModelTest("Random", true, false, false, t), [][]string{crr, updateTest3, createTest1}},
+		{genModelTest("Hell4", false, true, true, t), [][]string{drr, updateTest4, createTest4}},
+		{genModelTest("Hell1", false, false, false, t), [][]string{frr, createTest4, createTest4}},
 	}
 
 	for i, element := range table {
@@ -70,7 +36,7 @@ func modelTests(t *testing.T) {
 	}
 }
 
-func genTest(className string, auditCol bool, softDeletes bool, timestamp bool, t *testing.T) [][]string {
+func genModelTest(className string, auditCol bool, softDeletes bool, timestamp bool, t *testing.T) [][]string {
 	klass := buildClassWithArrayDecl(className)
 	// adding klass to model registry
 	modelRegistry := context.GetFromRegistry("model")
@@ -122,6 +88,10 @@ func getFillableRhs(klass *core.Class, t *testing.T) []string {
 	return (*element).(*core.ArrayAssignment).Rhs
 }
 
+func migrationTest(t *testing.T) {
+
+}
+
 func buildClassWithArrayDecl(className string) *core.Class {
 	assigmentSS := core.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
 	functionBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
@@ -136,7 +106,6 @@ func buildClassWithArrayDecl(className string) *core.Class {
 	getUpdateRules := builder.NewFunctionBuilder().SetVisibility("public").SetName("getUpdateValidationRules").
 		AddStatement(&returnArray2)
 
-
 	member := core.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
 	rhs := []string{`"user_id"`, `"password"`}
 	arrayAssignmentMember := core.TabbedUnit(core.NewArrayAssignment("public", "fillable", rhs))
@@ -146,4 +115,40 @@ func buildClassWithArrayDecl(className string) *core.Class {
 		AddFunction(getCreateRules.GetFunction()).AddFunction(getUpdateRules.GetFunction())
 
 	return klass.GetClass()
+}
+
+/*** CONSTANT STRINGS/ ARRAYS ***/
+
+var arr = []string{`"user_id"`, `"password"`, `"created_by"`, `"updated_by"`, `"deleted_at"`}
+var brr = []string{`"user_id"`, `"password"`, `"created_by"`, `"updated_by"`, `"deleted_at"`}
+var crr = []string{`"user_id"`, `"password"`, `"created_by"`, `"updated_by"`}
+var drr = []string{`"user_id"`, `"password"`, `"deleted_at"`}
+var frr = []string{`"user_id"`, `"password"`}
+
+var updateTest1 = []string{
+	`"user_id" => "required|exists:users,id"`,
+	`"password" => "min:8|max20"`,
+	`"updated_by" => "required|exists:users,id"`,
+	`"deleted_at" => "required|date_format:Y-m-d H:i:s"`,
+}
+var createTest1 = []string{
+	`"user_id" => "required|exists:users,id"`,
+	`"password" => "min:8|max20"`,
+	`"created_by" => "required|exists:users,id"`,
+}
+
+var updateTest3 = []string{
+	`"user_id" => "required|exists:users,id"`,
+	`"password" => "min:8|max20"`,
+	`"updated_by" => "required|exists:users,id"`,
+}
+
+var updateTest4 = []string{
+	`"user_id" => "required|exists:users,id"`,
+	`"password" => "min:8|max20"`,
+	`"deleted_at" => "required|date_format:Y-m-d H:i:s"`,
+}
+var createTest4 = []string{
+	`"user_id" => "required|exists:users,id"`,
+	`"password" => "min:8|max20"`,
 }
