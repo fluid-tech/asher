@@ -12,6 +12,7 @@ type ModelGenerator struct {
 	fillables []string
 	hidden []string
 	timestamps bool
+	createValidationRules []string
 }
 
 /**
@@ -21,6 +22,12 @@ func NewModelGenerator() *ModelGenerator {
 	return &ModelGenerator{
 		class: builder.NewClassBuilder(),
 	}
+}
+
+func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, colRule string) *ModelGenerator {
+	midStageString := colName + " => \"" + colRule + "\""
+	modelGenerator.createValidationRules = append(modelGenerator.createValidationRules, midStageString)
+	return modelGenerator
 }
 
 /**
@@ -90,6 +97,12 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 	if modelGenerator.timestamps {
 		timestamps := core.TabbedUnit(core.NewVarAssignment("public","timestamps", "true"))
 		modelGenerator.class = modelGenerator.class.AddMember(&timestamps)
+	}
+
+	if len(modelGenerator.createValidationRules) > 0 {
+		returnArray := core.TabbedUnit( core.NewReturnArray(modelGenerator.createValidationRules) )
+		createFunction := builder.NewFunctionBuilder().SetName("createValidationRules").SetVisibility("public").AddStatement(&returnArray).GetFunction()
+		modelGenerator.class = modelGenerator.class.AddFunction(createFunction)
 	}
 
 	return modelGenerator.class.GetClass()
