@@ -11,7 +11,7 @@ type SimpleStatement struct {
 	SimpleStatement string
 }
 
-func GetSimpleStatement(simpleStatement string) *SimpleStatement {
+func NewSimpleStatement(simpleStatement string) *SimpleStatement {
 	return &SimpleStatement{
 		SimpleStatement: simpleStatement,
 	}
