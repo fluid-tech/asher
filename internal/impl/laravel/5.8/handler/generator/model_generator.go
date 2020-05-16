@@ -26,9 +26,6 @@ func NewModelGenerator() *ModelGenerator {
 }
 
 /**
-<<<<<<< HEAD
- Set's the name of the model classBuilder.
-=======
 Adds the validation rule in createValidationRules array which will is in form of associative array.
 Parameters:
 	- colName: this will be the Name of Column
