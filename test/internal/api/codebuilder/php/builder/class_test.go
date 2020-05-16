@@ -9,7 +9,6 @@ import (
 
 
 func TestClassBuilder(t *testing.T) {
-
 	var table = []*api.GeneralTest{
 		getClassWithExtendsAndInitialization(),
 		getClassWithoutExtendsAndInitialization(),

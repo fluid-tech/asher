@@ -1,9 +1,5 @@
 package builder
 
-
-
-// INITIALIZATION AREA FOR CONSTANTS
-// REMEMBER TO USE SPACES INSTEAD OF TABS :(
 const TestClass string = `namespace App;
 
 use Illuminate\Database\Eloquent\Model;

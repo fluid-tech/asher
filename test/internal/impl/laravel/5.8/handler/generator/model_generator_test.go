@@ -7,23 +7,44 @@ import (
 )
 
 func TestModelGenerator(t *testing.T) {
-	var table = []*api.GeneralTest {
-
+	var table = []*api.GeneralTest{
+		getEmptyModel(),
+		getModelWithFillable(),
+		getModelWithHiddenFields(),
+		getModelWithCreateValidationRules(),
+		getModelWithUpdateValidationRules(),
 	}
 
 	api.IterateAndTest(table, t)
 }
 
-func getModelWithoutFillable() *api.GeneralTest {
-	generator.NewModelGenerator().SetName("S")
+func getEmptyModel() *api.GeneralTest {
+	modelGenerator := generator.NewModelGenerator().SetName("student_allotments")
+	return api.NewGeneralTest(modelGenerator.Build().String(), EmptyModel)
 }
 
-
-const ModelWithoutFillable string = `namespace App;
-
-use Illuminate\Database\Eloquent\Model;
-
-class Student extends Model {
-
+func getModelWithFillable() *api.GeneralTest {
+	modelGenerator := generator.NewModelGenerator().SetName("student_allotments").
+		AddFillable("name").AddFillable("phone_number")
+	return api.NewGeneralTest(modelGenerator.Build().String(), ModelWithFillable)
 }
-`
+
+func getModelWithHiddenFields() *api.GeneralTest {
+	modelGenerator := generator.NewModelGenerator().SetName("student_allotments").
+		AddHiddenField("password").AddHiddenField("gender")
+	return api.NewGeneralTest(modelGenerator.Build().String(), ModelWithHidden)
+}
+
+func getModelWithCreateValidationRules() *api.GeneralTest {
+	modelGenerator := generator.NewModelGenerator().SetName("student_allotments").
+		AddCreateValidationRule("name", "string|max:255|unique:users").
+		AddCreateValidationRule("phone_number", "string|max:12|unique:users")
+	return api.NewGeneralTest(modelGenerator.Build().String(), ModelWithCreateValidationRules)
+}
+
+func getModelWithUpdateValidationRules() *api.GeneralTest {
+	modelGenerator := generator.NewModelGenerator().SetName("student_allotments").
+		AddUpdateValidationRule("name", "string|max:255|unique:users").
+		AddUpdateValidationRule("phone_number", "string|max:12|unique:users")
+	return api.NewGeneralTest(modelGenerator.Build().String(), ModelWithUpdateValidationRules)
+}
