@@ -12,12 +12,13 @@ func TestMigrationGenerator(t *testing.T) {
 		getEmptyMigrationWithName(),
 		getMigrationWithColumns(),
 	}
-
+	//fmt.Println(table)
 	api.IterateAndTest(table, t)
 }
 
 func getEmptyMigrationWithName() *api.GeneralTest {
 	migrationGenerator := generator.NewMigrationGenerator().SetName("student_allotments")
+
 	return api.NewGeneralTest(migrationGenerator.Build().String(), EmptyMigrationWithName)
 }
 

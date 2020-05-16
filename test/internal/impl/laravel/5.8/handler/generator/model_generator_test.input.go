@@ -41,7 +41,6 @@ class StudentAllotments extends Model {
         return [
 name => "string|max:255|unique:users",
 phone_number => "string|max:12|unique:users"];
-
     }
 
 
@@ -56,7 +55,6 @@ class StudentAllotments extends Model {
     public function updateValidationRules() {
         return [
 phone_number => "string|max:12|unique:users"];
-
     }
 
 

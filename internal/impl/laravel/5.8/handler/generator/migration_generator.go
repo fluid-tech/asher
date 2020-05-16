@@ -30,9 +30,10 @@ func NewMigrationGenerator() *MigrationGenerator {
  Returns:
 	- instance of the migration generator object.
 */
-func (migrationGenerator *MigrationGenerator) SetName(columnName string) *MigrationGenerator {
-	className := "Create" + strcase.ToCamel(columnName) + "Table"
+func (migrationGenerator *MigrationGenerator) SetName(tableName string) *MigrationGenerator {
+	className := "Create" + strcase.ToCamel(tableName) + "Table"
 	migrationGenerator.classBuilder.SetName(className)
+	migrationGenerator.tableName = tableName
 	return migrationGenerator
 }
 
@@ -69,7 +70,7 @@ func (migrationGenerator *MigrationGenerator) AddColumns(columns []core.SimpleSt
  */
 func (migrationGenerator *MigrationGenerator) Build() *core.Class {
 	// Preparing the arguments for up function
-	arg1 := api.TabbedUnit(core.NewParameter(migrationGenerator.tableName))
+	arg1 := api.TabbedUnit(core.NewParameter("'" + migrationGenerator.tableName + "'"))
 	closure := builder.NewFunctionBuilder().AddArgument("Blueprint $table")
 	for _, stmt := range migrationGenerator.columns {
 		tabbedStatement := api.TabbedUnit(&stmt)
@@ -82,7 +83,7 @@ func (migrationGenerator *MigrationGenerator) Build() *core.Class {
 	upFunction := builder.NewFunctionBuilder().SetName("up").SetVisibility("public").AddStatement(&schemaBlock).GetFunction()
 
 	// Preparing the statements for down function
-	dropStatement := api.TabbedUnit(core.NewSimpleStatement("Schema::dropIfExists(" + migrationGenerator.tableName + ")"))
+	dropStatement := api.TabbedUnit(core.NewSimpleStatement("Schema::dropIfExists('" + migrationGenerator.tableName + "')"))
 	downFunction := builder.NewFunctionBuilder().SetName("down").SetVisibility("public").AddStatement(&dropStatement).GetFunction()
 
 	migrationGenerator.classBuilder.AddImports([]string{
