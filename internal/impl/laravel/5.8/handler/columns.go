@@ -39,7 +39,7 @@ func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []model
 		columnHandler.handleGuarded(modelGenerator, singleColumn.Guarded, singleColumn.Name)
 		columnHandler.handleValidation(modelGenerator, singleColumn.Validations, singleColumn.Name)
 	}
-	fmt.Print(modelGenerator.Build().String())
+	//fmt.Print(modelGenerator.Build().String())
 	context.GetFromRegistry("model").AddToCtx(modelName, modelGenerator.Build())
 }
 
@@ -61,8 +61,10 @@ func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr
 }
 
 func (columnHandler *ColumnHandler) handleValidation(modelGenerator *generator.ModelGenerator, validations string, colName string) error{
-	modelGenerator.AddCreateValidationRule(colName, validations)
-	modelGenerator.AddUpdateValidationRule(colName, validations)
+	if validations != "" {
+		modelGenerator.AddCreateValidationRule(colName, validations)
+		modelGenerator.AddUpdateValidationRule(colName, validations)
+	}
 	return nil
 }
 
