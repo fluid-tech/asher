@@ -8,6 +8,7 @@ type Class interface {
 	AddMember(member *core.TabbedUnit) Class
 	SetExtends(extendsClass string) Class
 	AddFunction(function *core.Function) Class
+	AddFunctions(functions []*core.Function) Class
 	AddInterface(ifName string) Class
 	AddImports(imports []string) Class
 	AddImport(imports string) Class
