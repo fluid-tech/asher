@@ -84,13 +84,12 @@ func (migrationGenerator *MigrationGenerator) Build() *core.Class {
 	dropStatement := core.TabbedUnit(core.NewSimpleStatement("Schema::dropIfExists(" + migrationGenerator.tableName + ")"))
 	downFunction := builder.NewFunctionBuilder().SetName("down").SetVisibility("public").AddStatement(&dropStatement).GetFunction()
 
-	klass := builder.NewClassBuilder()
-	klass.AddImports([]string{
+	migrationGenerator.classBuilder.AddImports([]string{
 		`Illuminate\Database\Migrations\Migration`,
 		`Illuminate\DatabaseSchema\Blueprint`,
 		`Illuminate\Support\Facades\Schema`,
-	}).SetName(migrationGenerator.tableName).SetExtends("Migration").AddFunction(upFunction).
+	}).SetExtends("Migration").AddFunction(upFunction).
 	    AddFunction(downFunction)
 
-	return klass.GetClass()
+	return migrationGenerator.classBuilder.GetClass()
 }

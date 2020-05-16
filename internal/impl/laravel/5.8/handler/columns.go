@@ -22,8 +22,8 @@ func (columnHandler *ColumnHandler) Handle(modelName string, colsArr interface{}
 
 	myColsArray := colsArr.([]models.Column)
 
-	//columnHandler.handleMigration(modelName, myColsArray)
-	columnHandler.handleModel(modelName, myColsArray)
+	columnHandler.handleMigration(modelName, myColsArray)
+	//columnHandler.handleModel(modelName, myColsArray)
 
 	return []*api.EmitterFile{}, nil
 }
