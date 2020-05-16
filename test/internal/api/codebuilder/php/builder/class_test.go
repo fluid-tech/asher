@@ -13,6 +13,7 @@ func TestClassBuilder(t *testing.T) {
 		getClassWithExtendsAndInitialization(),
 		getClassWithoutExtendsAndInitialization(),
 		buildClassBuilderWithExistingClass(),
+		buildClassBuilderWithExistingClassAndInterface(),
 	}
 
 	api.IterateAndTest(table, t)
@@ -69,3 +70,23 @@ func buildClassBuilderWithExistingClass() *api.GeneralTest {
 
 	return api.NewGeneralTest(b.GetClass().String(), TestClass3)
 }
+
+func buildClassBuilderWithExistingClassAndInterface() *api.GeneralTest {
+	assigmentSS := api2.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
+	//assigmentSS2 := core.TabbedUnit(core.NewSimpleStatement("$this->query = $query"))
+	functionBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
+		AddArgument("string $fullyQualifiedModel").
+		AddStatement(&assigmentSS)
+
+	member := api2.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
+
+	klass := core.NewClass()
+	klass.Name = "Hello"
+	klass.Package = "Test"
+
+	b := builder.NewClassBuilderFromClass(klass).AddFunction(functionBuilder.GetFunction()).AddMember(&member).
+		SetPackage("Test").AddInterface("Runnable")
+
+	return api.NewGeneralTest(b.GetClass().String(), TestClass4)
+}
+
