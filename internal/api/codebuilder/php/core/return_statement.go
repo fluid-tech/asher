@@ -5,15 +5,15 @@ import (
 	"strings"
 )
 
-type ReturnStatement struct{
+type ReturnStatement struct {
 	TabbedUnit
-	tabs int
+	tabs      int
 	statement string
 }
 
 func NewReturnStatement(stmt string) *ReturnStatement {
 	return &ReturnStatement{
-		statement:  stmt,
+		statement: stmt,
 	}
 }
 
@@ -27,6 +27,6 @@ func (r *ReturnStatement) Id() string {
 
 func (r *ReturnStatement) String() string {
 	var builder strings.Builder
-	fmt.Fprint(&builder, TabbedString(uint(r.tabs)), "return ", r.statement, ";\n")
+	fmt.Fprint(&builder, TabbedString(uint(r.tabs)), "return ", r.statement, ";")
 	return builder.String()
 }
