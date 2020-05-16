@@ -1,137 +1,73 @@
 package context
 
 import (
+	"asher/internal/api/codebuilder/php/core"
 	"asher/internal/impl/laravel/5.8/handler"
+	"asher/internal/impl/laravel/5.8/handler/context"
 	"asher/internal/models"
+	"reflect"
 	"testing"
 )
 
-
 func Test_Columns(t *testing.T) {
-	//var dataTable = []struct {
-	//	cols        models.Column
-	//	output		string
-	//}{
-	//	{ models.Column{Name: "id", ColType: "bigInteger", GenerationStrategy: "auto_increment", DefaultVal: "", Table: "", Validations: "", Index: false, Allowed: nil, Invisible: false, Fillable: false, Primary: true,}, "$table->bigIncrements('id')" },
-	//	{ models.Column{Name: "order_name", ColType: "string", GenerationStrategy: "", DefaultVal: "something", Table: "", Validations: "size:255|unique|nullable", Index: false, Allowed: nil, Invisible: false, Fillable: false, Primary: false,}, "$table->string('order_name)->default('something')" },
-	//	{ models.Column{Name: "", ColType: "", GenerationStrategy: "", DefaultVal: "", Table: "", Validations: "", Index: false, Allowed: nil, Invisible: false, Fillable: false, Primary: false,}, "" },
-	//	//{ models.Column{Name: "customer_id", ColType: "references", GenerationStrategy: "", DefaultVal: "", Table: "user:id", Validations: "exists:", Index: true, Allowed: nil, Invisible: false, Fillable: false, Primary: false,}, "" },
-	//	//{  models.Column{Name: "order_colType", ColType: "enum", GenerationStrategy: "", DefaultVal: "", Table: "", Validations: "", Index: false, Allowed: ["a", "b", "c"], Invisible: true, Fillable: false, Primary: false,}},
-	//}
 
-	//{
-	//Name: "", ColType: "", GenerationStrategy: "", DefaultVal: "", Table: "", Validations: "", Index: false, Allowed: nil, Hidden: false, Guarded: false, Primary: false, Unique: false, Nullable: false, OnDelete: "",
-	//},
-	var columnArray = []models.Column{
-
-		{
-			Name:               "id",
-			ColType:            "bigInteger",
-			GenerationStrategy: "auto_increment",
-			DefaultVal:         "",
-			Table:              "",
-			Validations:        "unique:id",
-			Index:              false,
-			Allowed:            nil,
-			Hidden:             true,
-			Guarded:            true,
-			Primary:            true,
-			Unique:             false,
-			Nullable:           false,
-			OnDelete:           "",
-		},
-		{
-			Name:               "id_2",
-			ColType:            "",
-			GenerationStrategy: "uuid",
-			DefaultVal:         "",
-			Table:              "",
-			Validations:        "unique:id",
-			Index:              false,
-			Allowed:            nil,
-			Hidden:             false,
-			Guarded:            true,
-			Primary:            true,
-			Unique:             false,
-			Nullable:           false,
-			OnDelete:           "",
-		},
-		{
-			Name:               "name",
-			ColType:            "string",
-			GenerationStrategy: "",
-			DefaultVal:         "",
-			Table:              "",
-			Validations:        "unique:id",
-			Index:              false,
-			Allowed:            nil,
-			Hidden:             true,
-			Guarded:            false,
-			Primary:            false,
-			Unique:             false,
-			Nullable:           false,
-			OnDelete:           "",
-		},
-		{
-			Name:               "description",
-			ColType:            "string",
-			GenerationStrategy: "",
-			DefaultVal:         "default description",
-			Table:              "",
-			Validations:        "unique:id",
-			Index:              false,
-			Allowed:            nil,
-			Hidden:             false,
-			Guarded:            false,
-			Primary:            false,
-			Unique:             true,
-			Nullable:           true,
-			OnDelete:           "",
-		},
-		{
-			Name:               "order_id",
-			ColType:            "bigInteger",
-			GenerationStrategy: "",
-			DefaultVal:         "0",
-			Table:              "orders:id",
-			Validations:        "exists:id",
-			Index:              true,
-			Allowed:            nil,
-			Hidden:             false,
-			Guarded:            false,
-			Primary:            false,
-			Unique:             true,
-			Nullable:           true,
-			OnDelete:           "cascade",
-		},
-		{
-			Name:               "dummy_column",
-			ColType:            "enum",
-			GenerationStrategy: "",
-			DefaultVal:         "",
-			Table:              "",
-			Validations:        "unique:id",
-			Index:              false,
-			Allowed: 			[]string{"a", "asas", "saDASD"},
-			Hidden:             false,
-			Guarded:            false,
-			Primary:            false,
-			Unique:             true,
-			Nullable:           true,
-			OnDelete:           "",
-		},
+	var columnTestObject = []*struct {
+		tableName              string
+		columnInputArray       []models.Column
+		expectedOutputFillable []string
+		expectedOutputHidden   []string
+	}{
+		{test_1_tableName, test_1_columnInputArray, test_1_fillableExpectedOutput, test_1_hiddenExpectedOutput},
+		{test_1_tableName, test_1_columnInputArray, test_1_fillableExpectedOutput, test_1_hiddenExpectedOutput},
 	}
-	
-	handler.NewColumnHandler().Handle("student_enrollments", columnArray)
-	t.Error("Unexpected data")
+	for _, obj := range columnTestObject {
+		ModelTester(t, obj.tableName, obj.columnInputArray, obj.expectedOutputFillable, obj.expectedOutputHidden)
+	}
 
+}
 
+func ModelTester(t *testing.T, tableName string, columnArray []models.Column, fillableExpectedOutput []string, hiddenExpectedOutput []string) {
 
+	handler.NewColumnHandler().Handle(tableName, columnArray)
 
-	//for _, element := range classes {
-	//	migration.AddToCtx(element.class.Name, element.class)
-	//	if migration.GetCtx(element.expectedName).(*context.MigrationInfo).Class.Name != element.expectedName {
-	//		t.Error("Unexpected data")
-	//	}
-	//}
+	modelClass := context.GetFromRegistry("model").GetCtx(tableName).(*core.Class)
+
+	var fillableData []string = getFillableRhs(modelClass, t)
+	var hiddenData []string = getHiddenRhs(modelClass, t)
+	arrayEquilizer(t, fillableData, fillableExpectedOutput)
+	arrayEquilizer(t, hiddenData, hiddenExpectedOutput)
+
+}
+
+func getFillableRhs(klass *core.Class, t *testing.T) []string {
+	element, err := klass.FindMember("fillable")
+	if err != nil {
+		t.Error("fillable not found in klass")
+	}
+	return (*element).(*core.ArrayAssignment).Rhs
+}
+
+func getHiddenRhs(klass *core.Class, t *testing.T) []string {
+	element, err := klass.FindMember("visible")
+	if err != nil {
+		t.Error("hidden not found in klass")
+	}
+	return (*element).(*core.ArrayAssignment).Rhs
+}
+
+func arrayEquilizer(t *testing.T, in []string, out []string) {
+	var table = []*struct {
+		in  []string
+		out []string
+	}{
+		{in, out},
+	}
+
+	for i, element := range table {
+		for j, inner := range element.in {
+			if !reflect.DeepEqual(inner, element.out[j]) {
+				t.Errorf("in test case %d , %d expected '%s' found '%s'", i, j, inner, element.out[j])
+			}
+		}
+	}
 }
