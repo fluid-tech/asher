@@ -35,6 +35,9 @@ Returns:
 	- instance of the generator object
  */
 func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, colRule string) *ModelGenerator {
+	if modelGenerator.createValidationRules == nil {
+		modelGenerator.createValidationRules = make(map[string]string)
+	}
 	modelGenerator.createValidationRules[colName] = colRule
 	return modelGenerator
 }
@@ -48,6 +51,9 @@ Returns:
 	- instance of the generator object
 */
 func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, colRule string) *ModelGenerator {
+	if modelGenerator.updateValidationRules == nil {
+		modelGenerator.updateValidationRules = make(map[string]string)
+	}
 	modelGenerator.updateValidationRules[colName] = colRule
 	return modelGenerator
 }
@@ -122,14 +128,14 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 	}
 
 	if len(modelGenerator.createValidationRules) > 0 {
-		returnArray := api.TabbedUnit( core.NewReturnArray(modelGenerator.createValidationRules) )
+		returnArray := api.TabbedUnit( core.NewReturnArrayFromMap(modelGenerator.createValidationRules) )
 		createFunction := builder.NewFunctionBuilder().SetName("createValidationRules").
 			SetVisibility("public").AddStatement(&returnArray).GetFunction()
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(createFunction)
 	}
 
 	if len(modelGenerator.updateValidationRules) > 0 {
-		returnArray := api.TabbedUnit( core.NewReturnArray(modelGenerator.updateValidationRules) )
+		returnArray := api.TabbedUnit( core.NewReturnArrayFromMap(modelGenerator.updateValidationRules) )
 		updateFunction := builder.NewFunctionBuilder().SetName("updateValidationRules").
 			SetVisibility("public").AddStatement(&returnArray).GetFunction()
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(updateFunction)

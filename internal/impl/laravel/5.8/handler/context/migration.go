@@ -1,7 +1,6 @@
 package context
 
 import (
-	"asher/internal/api/codebuilder/php/core"
 	"asher/internal/impl/laravel/5.8/handler/generator"
 )
 
@@ -27,7 +26,7 @@ func NewMigrationContext() *Migration {
 Store a MigrationInfo instance.
 */
 func (migration *Migration) AddToCtx(key string, value interface{}) {
-	migration.migrationContext[key] = &MigrationInfo{Class: value.(*core.Class), PrimaryKeyCol: []string{}}
+	migration.migrationContext[key] = &MigrationInfo{Class: value.(*generator.MigrationGenerator), PrimaryKeyCol: []string{}}
 }
 
 /**

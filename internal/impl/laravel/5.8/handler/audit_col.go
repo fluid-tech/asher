@@ -145,7 +145,7 @@ func getLaravelColString(userMigration *context.MigrationInfo) string {
 
 func getSchemaCreateMethod(migrationInfo *context.MigrationInfo) (*core.Function, error) {
 	migrationClass := migrationInfo.Class
-	function, err := migrationClass.FindFunction("up")
+	function, err := migrationClass.Build().FindFunction("up")
 	if err != nil {
 		return nil, err
 	}

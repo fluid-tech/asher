@@ -17,7 +17,7 @@ func TestMigrationContext(t *testing.T) {
 	}
 	for _, element := range classes {
 		migration.AddToCtx(element.class.Name, element.class)
-		if migration.GetCtx(element.expectedName).(*context.MigrationInfo).Class.Name != element.expectedName {
+		if migration.GetCtx(element.expectedName).(*context.MigrationInfo).Class.Build().Name != element.expectedName {
 			t.Error("Unexpected data")
 		}
 	}
