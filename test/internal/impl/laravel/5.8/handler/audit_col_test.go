@@ -102,7 +102,7 @@ func buildClassWithArrayDecl(className string) *core.Class {
 	member := core.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
 	rhs := []string{`"user_id"`, `"password"`}
 	arrayAssignmentMember := core.TabbedUnit(core.NewArrayAssignment("public", "fillable", rhs))
-	klass := builder.NewClassBubuilder().SetName(className).SetExtends("BaseMutator").
+	klass := builder.NewClassBuilder().SetName(className).SetExtends("BaseMutator").
 		AddFunction(functionBuilder.GetFunction()).AddMember(&member).AddMember(&arrayAssignmentMember).
 		SetPackage("App").AddImport(`Illuminate\Database\Eloquent\Model`).
 		AddFunction(getCreateRules.GetFunction()).AddFunction(getUpdateRules.GetFunction())
