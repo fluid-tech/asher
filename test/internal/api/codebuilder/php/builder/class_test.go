@@ -68,47 +68,6 @@ func buildClassBuilderWithExistingClass() *api.GeneralTest {
 	b := builder.NewClassBuilderFromClass(klass).AddFunction(functionBuilder.GetFunction()).AddMember(&member).
 		SetPackage("Test")
 
-	return api.NewGeneralTest(b.GetClass().String(), "class_builder/Exi")
+	return api.NewGeneralTest(b.GetClass().String(), TestClass3)
 }
-
-// INITIALIZATION AREA FOR CONSTANTS
-// REMEMBER TO USE SPACES INSTEAD OF TABS :(
-const TestClass string = `namespace App;
-
-use Illuminate\Database\Eloquent\Model;
-
-class TestMutator extends BaseMutator {
-    private $fullyQualifiedModel;
-    public function __construct(string $fullyQualifiedModel) {
-        $this->fullyQualifiedModel = $fullyQualifiedModel;
-    }
-
-
-}
-`
-const TestClass2 string = `namespace App;
-
-use Illuminate\Database\Eloquent\Model;
-
-class TestMutator {
-    private $fullyQualifiedModel;
-    public function __construct(string $fullyQualifiedModel) {
-        $this->fullyQualifiedModel = $fullyQualifiedModel;
-    }
-
-
-}
-`
-
-const TestClass3 string = `namespace Test;
-
-class Hello {
-    private $fullyQualifiedModel;
-    public function __construct(string $fullyQualifiedModel) {
-        $this->fullyQualifiedModel = $fullyQualifiedModel;
-    }
-
-
-}
-`
 
