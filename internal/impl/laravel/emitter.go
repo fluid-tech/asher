@@ -2,6 +2,7 @@ package laravel
 
 import (
 	"asher/internal/api"
+	"asher/internal/impl/laravel/5.8/handler/helper"
 	"asher/internal/models"
 )
 
@@ -28,7 +29,7 @@ func (e Emitter) Emit(value interface{}) {
 	//GetFromRegistry("relations").Handle(model.Name, model.Cols)
 	//GetFromRegistry("softDeletes").Handle(model.Name, model.SoftDeletes)
 	//GetFromRegistry("timestamps").Handle(model.Name, model.Timestamps)
-	GetFromRegistry("auditCols").Handle(model.Name, model.AuditCols)
+	GetFromRegistry("auditCols").Handle(model.Name, helper.NewAuditColInputFromType(model.AuditCols, model.SoftDeletes, model.Timestamps))
 
 }
 

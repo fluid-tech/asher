@@ -1,11 +1,14 @@
 package interfaces
 
-import "asher/internal/api/codebuilder/php/core"
+import (
+	"asher/internal/api"
+	"asher/internal/api/codebuilder/php/core"
+)
 
 type Class interface {
 	SetName(className string) Class
-	AddMembers(members []*core.TabbedUnit) Class
-	AddMember(member *core.TabbedUnit) Class
+	AddMembers(members []*api.TabbedUnit) Class
+	AddMember(member *api.TabbedUnit) Class
 	SetExtends(extendsClass string) Class
 	AddFunction(function *core.Function) Class
 	AddFunctions(functions []*core.Function) Class

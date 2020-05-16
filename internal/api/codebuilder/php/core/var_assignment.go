@@ -1,12 +1,13 @@
 package core
 
 import (
+	"asher/internal/api"
 	"fmt"
 	"strings"
 )
 
 type VarAssignment struct {
-	TabbedUnit
+	api.TabbedUnit
 	tabs       int
 	Visibility string
 	Identifier string
@@ -30,9 +31,9 @@ func (v *VarAssignment) Id() string {
 	return v.Identifier
 }
 
-func (v *VarAssignment) String() string  {
+func (v *VarAssignment) String() string {
 	var builder strings.Builder
-	fmt.Fprintf(&builder, TabbedString(uint(v.tabs)),
-		v.Visibility, " $", v.Identifier, " = ", v.Rhs, ";\n")
+	fmt.Fprintf(&builder, api.TabbedString(uint(v.tabs)),
+		v.Visibility, " $", v.Identifier, " = ", v.Rhs, ";")
 	return builder.String()
 }
