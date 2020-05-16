@@ -1,6 +1,7 @@
 package core
 
 import (
+	"asher/internal/api"
 	"errors"
 	"fmt"
 	"regexp"
@@ -8,12 +9,12 @@ import (
 )
 
 type Function struct{
-	TabbedUnit
+	api.TabbedUnit
 	tabs int
 	Name string
 	Visibility string
 	Arguments []string
-	Statements []*TabbedUnit
+	Statements []*api.TabbedUnit
 }
 
 func NewFunction() *Function {
@@ -23,7 +24,7 @@ func NewFunction() *Function {
 		Name:       "",
 		Visibility: "",
 		Arguments:  []string{},
-		Statements: []*TabbedUnit{},
+		Statements: []*api.TabbedUnit{},
 	}
 }
 
@@ -40,7 +41,7 @@ func (f *Function) Id() string {
 
 func (f *Function) String() string {
 	var builder strings.Builder
-	tabbedString :=  TabbedString(uint(f.tabs))
+	tabbedString :=  api.TabbedString(uint(f.tabs))
 	fmt.Fprint(&builder, tabbedString, f.Visibility, " function ", f.Name, "(")
 
 	fmt.Fprint(&builder, strings.Join(f.Arguments, ", "),") {\n")
@@ -55,7 +56,7 @@ func (f *Function) String() string {
 /**
 Finds a statement with a regex
  */
-func (f *Function) FindStatement(pattern string) (*TabbedUnit, error) {
+func (f *Function) FindStatement(pattern string) (*api.TabbedUnit, error) {
 	for _, element := range f.Statements {
 		found, err := regexp.Match(pattern, []byte((*element).Id()))
 		if  err == nil && found {
@@ -68,7 +69,7 @@ func (f *Function) FindStatement(pattern string) (*TabbedUnit, error) {
 /**
 Finds a tabbed unit by id
  */
-func (f *Function) FindById(id string) (*TabbedUnit, error) {
+func (f *Function) FindById(id string) (*api.TabbedUnit, error) {
 	for _, element := range f.Statements {
 		if  (*element).Id() == id {
 			return element, nil
@@ -80,6 +81,6 @@ func (f *Function) FindById(id string) (*TabbedUnit, error) {
 /**
 Append Statement
  */
-func (f *Function) AppendStatement(unit *TabbedUnit) {
+func (f *Function) AppendStatement(unit *api.TabbedUnit) {
 	f.Statements = append(f.Statements, unit)
 }

@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateStudentAllotmentsTable extends Migration {
     public function up() {
-        Schema::create(,  function (Blueprint $table) {
+        Schema::create('student_allotments',  function (Blueprint $table) {
 }
 
 );
@@ -14,8 +14,7 @@ class CreateStudentAllotmentsTable extends Migration {
 
 
     public function down() {
-        Schema::dropIfExists();
-
+        Schema::dropIfExists('student_allotments');
     }
 
 
@@ -28,11 +27,9 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateStudentAllotmentsTable extends Migration {
     public function up() {
-        Schema::create(,  function (Blueprint $table) {
+        Schema::create('student_allotments',  function (Blueprint $table) {
     $this->string('phone_number', 12)->unique();
-
     $this->string('phone_number', 12)->unique();
-
 }
 
 );
@@ -40,8 +37,7 @@ class CreateStudentAllotmentsTable extends Migration {
 
 
     public function down() {
-        Schema::dropIfExists();
-
+        Schema::dropIfExists('student_allotments');
     }
 
 

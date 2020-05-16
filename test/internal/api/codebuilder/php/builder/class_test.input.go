@@ -8,7 +8,6 @@ class TestMutator extends BaseMutator {
     private $fullyQualifiedModel;
     public function __construct(string $fullyQualifiedModel) {
         $this->fullyQualifiedModel = $fullyQualifiedModel;
-
     }
 
 
@@ -22,7 +21,6 @@ class TestMutator {
     private $fullyQualifiedModel;
     public function __construct(string $fullyQualifiedModel) {
         $this->fullyQualifiedModel = $fullyQualifiedModel;
-
     }
 
 
@@ -35,7 +33,6 @@ class Hello {
     private $fullyQualifiedModel;
     public function __construct(string $fullyQualifiedModel) {
         $this->fullyQualifiedModel = $fullyQualifiedModel;
-
     }
 
 

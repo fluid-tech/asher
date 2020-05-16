@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"asher/internal/api"
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/builder/interfaces"
 	"asher/internal/api/codebuilder/php/core"
@@ -29,9 +30,10 @@ func NewMigrationGenerator() *MigrationGenerator {
  Returns:
 	- instance of the migration generator object.
 */
-func (migrationGenerator *MigrationGenerator) SetName(columnName string) *MigrationGenerator {
-	className := "Create" + strcase.ToCamel(columnName) + "Table"
+func (migrationGenerator *MigrationGenerator) SetName(tableName string) *MigrationGenerator {
+	className := "Create" + strcase.ToCamel(tableName) + "Table"
 	migrationGenerator.classBuilder.SetName(className)
+	migrationGenerator.tableName = tableName
 	return migrationGenerator
 }
 
@@ -68,20 +70,20 @@ func (migrationGenerator *MigrationGenerator) AddColumns(columns []core.SimpleSt
  */
 func (migrationGenerator *MigrationGenerator) Build() *core.Class {
 	// Preparing the arguments for up function
-	arg1 := core.TabbedUnit(core.NewArgument(migrationGenerator.tableName))
+	arg1 := api.TabbedUnit(core.NewParameter("'" + migrationGenerator.tableName + "'"))
 	closure := builder.NewFunctionBuilder().AddArgument("Blueprint $table")
 	for _, stmt := range migrationGenerator.columns {
-		tabbedStatement := core.TabbedUnit(&stmt)
+		tabbedStatement := api.TabbedUnit(&stmt)
 		closure.AddStatement(&tabbedStatement)
 	}
-	arg2 := core.TabbedUnit(closure.GetFunction())
+	arg2 := api.TabbedUnit(closure.GetFunction())
 
 	// Preparing the statements for up function
-	schemaBlock := core.TabbedUnit(core.NewFunctionCall("Schema::create").AddArg(&arg1).AddArg(&arg2))
+	schemaBlock := api.TabbedUnit(core.NewFunctionCall("Schema::create").AddArg(&arg1).AddArg(&arg2))
 	upFunction := builder.NewFunctionBuilder().SetName("up").SetVisibility("public").AddStatement(&schemaBlock).GetFunction()
 
 	// Preparing the statements for down function
-	dropStatement := core.TabbedUnit(core.NewSimpleStatement("Schema::dropIfExists(" + migrationGenerator.tableName + ")"))
+	dropStatement := api.TabbedUnit(core.NewSimpleStatement("Schema::dropIfExists('" + migrationGenerator.tableName + "')"))
 	downFunction := builder.NewFunctionBuilder().SetName("down").SetVisibility("public").AddStatement(&dropStatement).GetFunction()
 
 	migrationGenerator.classBuilder.AddImports([]string{

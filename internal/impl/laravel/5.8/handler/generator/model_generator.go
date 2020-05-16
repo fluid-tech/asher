@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"asher/internal/api"
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/builder/interfaces"
 	"asher/internal/api/codebuilder/php/core"
@@ -104,31 +105,31 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 	}).SetExtends("Model")
 
 	if len(modelGenerator.fillables) > 0 {
-		fillableArray := core.TabbedUnit(core.NewArrayAssignment("protected", "fillable",
+		fillableArray := api.TabbedUnit(core.NewArrayAssignment("protected", "fillable",
 			modelGenerator.fillables))
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddMember(&fillableArray)
 	}
 
 	if len(modelGenerator.hidden) > 0 {
-		hiddenArray := core.TabbedUnit(core.NewArrayAssignment("protected", "visible",
+		hiddenArray := api.TabbedUnit(core.NewArrayAssignment("protected", "visible",
 			modelGenerator.hidden))
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddMember(&hiddenArray)
 	}
 
 	if modelGenerator.timestamps {
-		timestamps := core.TabbedUnit(core.NewVarAssignment("public","timestamps", "true"))
+		timestamps := api.TabbedUnit(core.NewVarAssignment("public","timestamps", "true"))
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddMember(&timestamps)
 	}
 
 	if len(modelGenerator.createValidationRules) > 0 {
-		returnArray := core.TabbedUnit( core.NewReturnArrayFromMap(modelGenerator.createValidationRules) )
+		returnArray := api.TabbedUnit( core.NewReturnArray(modelGenerator.createValidationRules) )
 		createFunction := builder.NewFunctionBuilder().SetName("createValidationRules").
 			SetVisibility("public").AddStatement(&returnArray).GetFunction()
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(createFunction)
 	}
 
 	if len(modelGenerator.updateValidationRules) > 0 {
-		returnArray := core.TabbedUnit( core.NewReturnArrayFromMap(modelGenerator.updateValidationRules) )
+		returnArray := api.TabbedUnit( core.NewReturnArray(modelGenerator.updateValidationRules) )
 		updateFunction := builder.NewFunctionBuilder().SetName("updateValidationRules").
 			SetVisibility("public").AddStatement(&returnArray).GetFunction()
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(updateFunction)
