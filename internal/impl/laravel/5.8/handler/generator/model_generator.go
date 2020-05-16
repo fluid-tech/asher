@@ -103,7 +103,7 @@ func (modelGenerator *ModelGenerator) SetTimestamps(flag bool) *ModelGenerator {
 func (modelGenerator *ModelGenerator) Build() *core.Class {
 	modelGenerator.class = modelGenerator.class.SetPackage("App").AddImports([]string{
 		`Illuminate\Database\Eloquent\Model`,
-	})
+	}).SetExtends("Model")
 
 	if len(modelGenerator.fillables) > 0 {
 		fillableArray := core.TabbedUnit(core.NewArrayAssignment("protected", "fillable",
