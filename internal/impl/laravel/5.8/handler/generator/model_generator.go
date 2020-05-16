@@ -16,10 +16,8 @@ type ModelGenerator struct {
 	updateValidationRules []string
 }
 
-// TODO : Add a method to edit/append to an existing core.Class
-
 /**
- Creates a new instance of this builder with a new core.Class
+ Creates a new instance of this generator with a new interfaces.Class
  */
 func NewModelGenerator() *ModelGenerator {
 	return &ModelGenerator{
@@ -60,7 +58,6 @@ func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, co
 
 /**
  Set's the name of the model class.
->>>>>>> 2830a83d4a0742f69251978521ea0d60c2e269c3
  Parameters:
 	- tableName: the name of table specified in asher config.
  Returns:
