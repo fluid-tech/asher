@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"asher/internal/api"
 	"asher/internal/api/codebuilder/php/builder/interfaces"
 	"asher/internal/api/codebuilder/php/core"
 )
@@ -39,14 +40,14 @@ func (klass *Class) SetName(name string) interfaces.Class {
 /**
 Add a TabbedUnit to this this class's members list
 */
-func (klass *Class) AddMember(unit *core.TabbedUnit) interfaces.Class {
-	return klass.AddMembers([]*core.TabbedUnit{unit})
+func (klass *Class) AddMember(unit *api.TabbedUnit) interfaces.Class {
+	return klass.AddMembers([]*api.TabbedUnit{unit})
 }
 
 /**
 Adds a list of TabbedUnit to this class's members list
 */
-func (klass *Class) AddMembers(units []*core.TabbedUnit) interfaces.Class {
+func (klass *Class) AddMembers(units []*api.TabbedUnit) interfaces.Class {
 	klass.class.Members = append(klass.class.Members, units...)
 	return klass
 }
