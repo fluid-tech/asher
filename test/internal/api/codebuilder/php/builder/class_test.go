@@ -1,12 +1,12 @@
 package builder
 
 import (
+	api2 "asher/internal/api"
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/core"
 	"asher/test/api"
 	"testing"
 )
-
 
 func TestClassBuilder(t *testing.T) {
 	var table = []*api.GeneralTest{
@@ -19,13 +19,13 @@ func TestClassBuilder(t *testing.T) {
 }
 
 func getClassWithoutExtendsAndInitialization() *api.GeneralTest {
-	assigmentSS := core.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
+	assigmentSS := api2.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
 	//assigmentSS2 := core.TabbedUnit(core.NewSimpleStatement("$this->query = $query"))
 	functionBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
 		AddArgument("string $fullyQualifiedModel").
 		AddStatement(&assigmentSS)
 
-	member := core.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
+	member := api2.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
 
 	klass := builder.NewClassBuilder().SetName("TestMutator").
 		AddFunction(functionBuilder.GetFunction()).AddMember(&member).
@@ -37,13 +37,13 @@ func getClassWithoutExtendsAndInitialization() *api.GeneralTest {
 
 
 func getClassWithExtendsAndInitialization() *api.GeneralTest {
-	assigmentSS := core.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
+	assigmentSS := api2.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
 	//assigmentSS2 := core.TabbedUnit(core.NewSimpleStatement("$this->query = $query"))
 	functionBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
 		AddArgument("string $fullyQualifiedModel").
 		AddStatement(&assigmentSS)
 
-	member := core.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
+	member := api2.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
 
 	klass := builder.NewClassBuilder().SetName("TestMutator").SetExtends("BaseMutator").
 		AddFunction(functionBuilder.GetFunction()).AddMember(&member).
@@ -52,13 +52,13 @@ func getClassWithExtendsAndInitialization() *api.GeneralTest {
 }
 
 func buildClassBuilderWithExistingClass() *api.GeneralTest {
-	assigmentSS := core.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
+	assigmentSS := api2.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
 	//assigmentSS2 := core.TabbedUnit(core.NewSimpleStatement("$this->query = $query"))
 	functionBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
 		AddArgument("string $fullyQualifiedModel").
 		AddStatement(&assigmentSS)
 
-	member := core.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
+	member := api2.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
 
 	klass := core.NewClass()
 	klass.Name = "Hello"
@@ -69,4 +69,3 @@ func buildClassBuilderWithExistingClass() *api.GeneralTest {
 
 	return api.NewGeneralTest(b.GetClass().String(), TestClass3)
 }
-
