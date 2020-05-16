@@ -21,6 +21,12 @@ func (t *testEmitter) GetFileMap() map[string]*api.EmitterFile {
 	return t.FileMap
 }
 
+type testHandler struct{
+	api.Handler
+	handleCalled bool
+
+}
+
 func TestAsherWalker(t *testing.T) {
 	var table = []struct {
 		out        *testEmitter
