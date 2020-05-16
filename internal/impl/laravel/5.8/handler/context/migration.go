@@ -2,6 +2,7 @@ package context
 
 import (
 	"asher/internal/api/codebuilder/php/core"
+	"asher/internal/impl/laravel/5.8/handler/generator"
 )
 
 type Migration struct {
@@ -10,7 +11,7 @@ type Migration struct {
 }
 
 type MigrationInfo struct {
-	Class         *core.Class
+	Class         *generator.MigrationGenerator
 	PrimaryKeyCol []string
 }
 
