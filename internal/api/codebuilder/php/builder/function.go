@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"asher/internal/api"
 	"asher/internal/api/codebuilder/php/builder/interfaces"
 	"asher/internal/api/codebuilder/php/core"
 )
@@ -39,11 +40,11 @@ func (f *Function) AddArguments(args []string) interfaces.Function {
 	return f
 }
 
-func (f *Function) AddStatement(statement *core.TabbedUnit) interfaces.Function {
-	return f.AddStatements([]*core.TabbedUnit{statement})
+func (f *Function) AddStatement(statement *api.TabbedUnit) interfaces.Function {
+	return f.AddStatements([]*api.TabbedUnit{statement})
 }
 
-func (f *Function) AddStatements(statements []*core.TabbedUnit) interfaces.Function {
+func (f *Function) AddStatements(statements []*api.TabbedUnit) interfaces.Function {
 	f.function.Statements = append(f.function.Statements, statements...)
 	return f
 }
