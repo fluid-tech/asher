@@ -68,7 +68,7 @@ func buildClassBuilderWithExistingClass() *api.GeneralTest {
 	b := builder.NewClassBuilderFromClass(klass).AddFunction(functionBuilder.GetFunction()).AddMember(&member).
 		SetPackage("Test")
 
-	return api.NewGeneralTest(b.GetClass().String(), TestClass3)
+	return api.NewGeneralTest(b.GetClass().String(), "class_builder/Exi")
 }
 
 // INITIALIZATION AREA FOR CONSTANTS
