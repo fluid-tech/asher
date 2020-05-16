@@ -23,10 +23,10 @@ func (t *testEmitter) GetFileMap() map[string]*api.EmitterFile {
 
 func TestAsherWalker(t *testing.T) {
 	var table = []struct {
-		out *testEmitter
+		out        *testEmitter
 		emitCalled bool
-		className string
-		fileType int
+		className  string
+		fileType   int
 	}{
 		{genTest("Test", 1), true, "Test", 1},
 		{genTest("Hello", 2), true, "Hello", 2},
@@ -34,11 +34,10 @@ func TestAsherWalker(t *testing.T) {
 
 	for _, element := range table {
 		emittedFile := element.out.FileMap[element.className]
-		if  emittedFile == nil || emittedFile.FileType != element.fileType || element.out.EmitCalled != element.emitCalled || emittedFile.Klass.Name != element.className {
+		if emittedFile == nil || emittedFile.FileType != element.fileType || element.out.EmitCalled != element.emitCalled || emittedFile.Klass.Name != element.className {
 			t.Error("emitted file doesnt match input")
 		}
 	}
-
 
 }
 
