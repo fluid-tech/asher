@@ -29,7 +29,6 @@ func (e Emitter) Emit(value interface{}) {
 	//GetFromRegistry("softDeletes").Handle(model.Name, model.SoftDeletes)
 	//GetFromRegistry("timestamps").Handle(model.Name, model.Timestamps)
 	GetFromRegistry("auditCols").Handle(model.Name, model.AuditCols)
-	GetFromRegistry("controller").handle("Order", model.Controller)
 
 
 }
