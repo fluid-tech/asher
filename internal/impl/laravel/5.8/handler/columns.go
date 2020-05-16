@@ -2,13 +2,11 @@ package handler
 
 import (
 	"asher/internal/api"
-	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/core"
 	"asher/internal/impl/laravel/5.8/handler/context"
 	"asher/internal/impl/laravel/5.8/handler/generator"
 	"asher/internal/models"
 	"fmt"
-	"github.com/iancoleman/strcase"
 	"strings"
 )
 
@@ -53,9 +51,10 @@ func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr
 	}
 
 	fmt.Println("Going to generate class")
-	klass := generateMigrationTemplate(identifier, statementsArr)
+	migrationGenerator := generator.NewMigrationGenerator().SetName(identifier).AddColumns(statementsArr)
+	klass := migrationGenerator.Build()
 	fmt.Println(klass)
-	context.GetFromRegistry("migration").AddToCtx(identifier, klass)
+	context.GetFromRegistry("migration").AddToCtx(identifier, migrationGenerator)
 
 	return nil
 }
@@ -215,34 +214,4 @@ func (columnHandler *ColumnHandler) ColTypeSwitcher(colType string, colName stri
 		// TODO: Log this error and replace it with formatted error message.
 		panic("not supported or wrong input in ColTypeSwitcher" + colType)
 	}
-}
-
-func generateMigrationTemplate(migrationClassName string, columns []core.SimpleStatement) *core.Class {
-	// Preparing the arguments for up function
-	className := "Create" + strcase.ToCamel(migrationClassName) + "Table"
-	tableName := "'" + migrationClassName + "'"
-	arg1 := core.TabbedUnit(core.NewArgument(tableName))
-	closure := builder.NewFunctionBuilder().AddArgument("Blueprint $table")
-	for _, stmt := range columns {
-		tabbedStatement := core.TabbedUnit(&stmt)
-		closure.AddStatement(&tabbedStatement)
-	}
-	arg2 := core.TabbedUnit(closure.GetFunction())
-
-	// Preparing the statements for up function
-	schemaBlock := core.TabbedUnit(core.NewFunctionCall("Schema::create").AddArg(&arg1).AddArg(&arg2))
-	upFunction := builder.NewFunctionBuilder().SetName("up").SetVisibility("public").AddStatement(&schemaBlock).GetFunction()
-
-	// Preparing the statements for down function
-	dropStatement := core.TabbedUnit(core.NewSimpleStatement("Schema::dropIfExists(" + tableName + ")"))
-	downFunction := builder.NewFunctionBuilder().SetName("down").SetVisibility("public").AddStatement(&dropStatement).GetFunction()
-
-	klass := builder.NewClassBuilder()
-	klass.AddImports([]string{
-		`Illuminate\Database\Migrations\Migration`,
-		`Illuminate\DatabaseSchema\Blueprint`,
-		`Illuminate\Support\Facades\Schema`,
-	}).SetName(className).SetExtends("Migration").AddFunction(upFunction).AddFunction(downFunction)
-
-	return klass.GetClass()
 }
