@@ -62,6 +62,7 @@ func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr
 
 func (columnHandler *ColumnHandler) handleValidation(modelGenerator *generator.ModelGenerator, validations string, colName string) error{
 	modelGenerator.AddCreateValidationRule(colName, validations)
+	modelGenerator.AddUpdateValidationRule(colName, validations)
 	return nil
 }
 
