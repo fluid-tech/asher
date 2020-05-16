@@ -1,12 +1,13 @@
 package core
 
 import (
+	"asher/internal/api"
 	"fmt"
 	"strings"
 )
 
 type ReturnArray struct {
-	TabbedUnit
+	api.TabbedUnit
 	tabs       int
 	Statements []string
 }
@@ -27,7 +28,7 @@ func (r *ReturnArray) Id() string {
 
 func (r *ReturnArray) String() string {
 	var builder strings.Builder
-	fmt.Fprint(&builder, TabbedString(uint(r.tabs)), "return [\n", strings.Join(r.Statements, ",\n"), "];")
+	fmt.Fprint(&builder, api.TabbedString(uint(r.tabs)), "return [\n", strings.Join(r.Statements, ",\n"), "];")
 	return builder.String()
 }
 

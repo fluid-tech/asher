@@ -1,8 +1,9 @@
 package core
 
+import "asher/internal/api"
 
 type Argument struct{
-	TabbedUnit
+	api.TabbedUnit
 	tabs int
 	value string
 }
