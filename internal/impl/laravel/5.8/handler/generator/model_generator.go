@@ -12,8 +12,8 @@ type ModelGenerator struct {
 	fillables []string
 	hidden []string
 	timestamps bool
-	createValidationRules []string
-	updateValidationRules []string
+	createValidationRules map[string]string
+	updateValidationRules map[string]string
 }
 
 /**
@@ -34,8 +34,7 @@ Returns:
 	- instance of the generator object
  */
 func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, colRule string) *ModelGenerator {
-	midStageString := colName + " => \"" + colRule + "\""
-	modelGenerator.createValidationRules = append(modelGenerator.createValidationRules, midStageString)
+	modelGenerator.createValidationRules[colName] = colRule
 	return modelGenerator
 }
 
@@ -48,8 +47,7 @@ Returns:
 	- instance of the generator object
 */
 func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, colRule string) *ModelGenerator {
-	midStageString := colName + " => \"" + colRule + "\""
-	modelGenerator.updateValidationRules = append(modelGenerator.createValidationRules, midStageString)
+	modelGenerator.updateValidationRules[colName] = colRule
 	return modelGenerator
 }
 
@@ -123,14 +121,14 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 	}
 
 	if len(modelGenerator.createValidationRules) > 0 {
-		returnArray := core.TabbedUnit( core.NewReturnArray(modelGenerator.createValidationRules) )
+		returnArray := core.TabbedUnit( core.NewReturnArrayFromMap(modelGenerator.createValidationRules) )
 		createFunction := builder.NewFunctionBuilder().SetName("createValidationRules").
 			SetVisibility("public").AddStatement(&returnArray).GetFunction()
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(createFunction)
 	}
 
 	if len(modelGenerator.updateValidationRules) > 0 {
-		returnArray := core.TabbedUnit( core.NewReturnArray(modelGenerator.updateValidationRules) )
+		returnArray := core.TabbedUnit( core.NewReturnArrayFromMap(modelGenerator.updateValidationRules) )
 		updateFunction := builder.NewFunctionBuilder().SetName("updateValidationRules").
 			SetVisibility("public").AddStatement(&returnArray).GetFunction()
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(updateFunction)
