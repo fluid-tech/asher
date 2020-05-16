@@ -3,6 +3,7 @@ package api
 import (
 	"asher/internal/api"
 	"asher/internal/api/codebuilder/php/builder"
+	"asher/internal/api/codebuilder/php/core"
 	"asher/internal/models"
 	"testing"
 )
@@ -21,12 +22,6 @@ func (t *testEmitter) GetFileMap() map[string]*api.EmitterFile {
 	return t.FileMap
 }
 
-type testHandler struct{
-	api.Handler
-	handleCalled bool
-
-}
-
 func TestAsherWalker(t *testing.T) {
 	var table = []struct {
 		out        *testEmitter
@@ -40,9 +35,12 @@ func TestAsherWalker(t *testing.T) {
 
 	for _, element := range table {
 		emittedFile := element.out.FileMap[element.className]
-		if emittedFile == nil || emittedFile.FileType != element.fileType || element.out.EmitCalled != element.emitCalled || emittedFile.Klass.Name != element.className {
+		phpFile := (*emittedFile).(*core.PhpEmitterFile)
+		klass := (*phpFile.Content()[0]).(*core.Class)
+		if emittedFile == nil || phpFile.FileType() != element.fileType || element.out.EmitCalled != element.emitCalled || klass.Name != element.className {
 			t.Error("emitted file doesnt match input")
 		}
+
 	}
 
 }
@@ -53,7 +51,9 @@ func genTest(className string, fileType int) *testEmitter {
 		FileMap:    map[string]*api.EmitterFile{},
 	}
 	klass := builder.NewClassBuilder().SetName(className).GetClass()
-	te.FileMap[className] = api.NewEmitterFile(className, "App/", klass, fileType)
+	klassTabbedUnit := api.TabbedUnit(klass)
+	emFile:= api.EmitterFile(core.NewPhpEmitterFile(className, "App/", []*api.TabbedUnit{&klassTabbedUnit}, fileType))
+	te.FileMap[className] = &emFile
 	model := models.Model{
 		Name: className,
 	}
