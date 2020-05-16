@@ -32,6 +32,9 @@ func (f *Function) SetNumTabs(tabs int){
 }
 
 func (f *Function) Id() string {
+	if f.Name == "" {
+		return "anon"
+	}
 	return f.Name
 }
 
@@ -53,14 +56,13 @@ func (f *Function) String() string {
 Finds a statement with a regex
  */
 func (f *Function) FindStatement(pattern string) (*TabbedUnit, error) {
-	var err error
 	for _, element := range f.Statements {
 		found, err := regexp.Match(pattern, []byte((*element).Id()))
 		if  err == nil && found {
 			return element, nil
 		}
 	}
-	return nil, err
+	return nil, errors.New("couldnt find pattern")
 }
 
 /**
@@ -73,4 +75,11 @@ func (f *Function) FindById(id string) (*TabbedUnit, error) {
 		}
 	}
 	return nil, errors.New(fmt.Sprintf("cant find statement with identifier %s", id))
+}
+
+/**
+Append Statement
+ */
+func (f *Function) AppendStatement(unit *TabbedUnit) {
+	f.Statements = append(f.Statements, unit)
 }

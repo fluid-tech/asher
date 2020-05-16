@@ -1,6 +1,7 @@
 package core
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -12,7 +13,7 @@ type FunctionCall struct {
 	Args []*TabbedUnit
 }
 
-func NewClosure(def string) *FunctionCall {
+func NewFunctionCall(def string) *FunctionCall {
 	return &FunctionCall{
 		Def:        def,
 		Args:       []*TabbedUnit{},
@@ -34,6 +35,15 @@ Returns the current instance so that you can chain it
 func (c *FunctionCall) AddArg(unit *TabbedUnit) *FunctionCall {
 	c.Args = append(c.Args, unit)
 	return c
+}
+
+func (c *FunctionCall) FindById(id string) (*TabbedUnit, error) {
+	for _, element := range c.Args {
+		if  (*element).Id() == id {
+			return element, nil
+		}
+	}
+	return nil, errors.New(fmt.Sprintf("cant find statement with identifier %s", id))
 }
 
 func (c *FunctionCall) String() string {

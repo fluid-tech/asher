@@ -9,9 +9,11 @@ import (
 
 type ModelGenerator struct {
 	classBuilder interfaces.Class
-	fillables    []string
-	hidden       []string
-	timestamps   bool
+	fillables []string
+	hidden []string
+	timestamps bool
+	createValidationRules []string
+	updateValidationRules []string
 }
 
 // TODO : Add a method to edit/append to an existing core.Class
@@ -26,7 +28,39 @@ func NewModelGenerator() *ModelGenerator {
 }
 
 /**
+<<<<<<< HEAD
  Set's the name of the model classBuilder.
+=======
+Adds the validation rule in createValidationRules array which will is in form of associative array.
+Parameters:
+	- colName: this will be the Name of Column
+	- colRule: This will be rule/constraint imposed on the specified passed column.
+Returns:
+	- instance of the generator object
+ */
+func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, colRule string) *ModelGenerator {
+	midStageString := colName + " => \"" + colRule + "\""
+	modelGenerator.createValidationRules = append(modelGenerator.createValidationRules, midStageString)
+	return modelGenerator
+}
+
+/**
+Adds the validation rule in updateValidationRules array which will is in form of associative array.
+Parameters:
+	- colName: this will be the Name of Column
+	- colRule: This will be rule/constraint imposed on the specified passed column.
+Returns:
+	- instance of the generator object
+*/
+func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, colRule string) *ModelGenerator {
+	midStageString := colName + " => \"" + colRule + "\""
+	modelGenerator.updateValidationRules = append(modelGenerator.createValidationRules, midStageString)
+	return modelGenerator
+}
+
+/**
+ Set's the name of the model class.
+>>>>>>> 2830a83d4a0742f69251978521ea0d60c2e269c3
  Parameters:
 	- tableName: the name of table specified in asher config.
  Returns:
@@ -75,7 +109,7 @@ func (modelGenerator *ModelGenerator) SetTimestamps(flag bool) *ModelGenerator {
 func (modelGenerator *ModelGenerator) Build() *core.Class {
 	modelGenerator.classBuilder = modelGenerator.classBuilder.SetPackage("App").AddImports([]string{
 		`Illuminate\Database\Eloquent\Model`,
-	})
+	}).SetExtends("Model")
 
 	if len(modelGenerator.fillables) > 0 {
 		fillableArray := core.TabbedUnit(core.NewArrayAssignment("protected", "fillable",
@@ -92,6 +126,20 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 	if modelGenerator.timestamps {
 		timestamps := core.TabbedUnit(core.NewVarAssignment("public","timestamps", "true"))
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddMember(&timestamps)
+	}
+
+	if len(modelGenerator.createValidationRules) > 0 {
+		returnArray := core.TabbedUnit( core.NewReturnArray(modelGenerator.createValidationRules) )
+		createFunction := builder.NewFunctionBuilder().SetName("createValidationRules").
+			SetVisibility("public").AddStatement(&returnArray).GetFunction()
+		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(createFunction)
+	}
+
+	if len(modelGenerator.updateValidationRules) > 0 {
+		returnArray := core.TabbedUnit( core.NewReturnArray(modelGenerator.updateValidationRules) )
+		updateFunction := builder.NewFunctionBuilder().SetName("updateValidationRules").
+			SetVisibility("public").AddStatement(&returnArray).GetFunction()
+		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(updateFunction)
 	}
 
 	return modelGenerator.classBuilder.GetClass()
