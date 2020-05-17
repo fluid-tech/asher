@@ -6,27 +6,18 @@ import (
 
 type Migration struct {
 	BaseContext
-	migrationContext map[string]*MigrationInfo
-}
-
-type MigrationInfo struct {
-	Class         *generator.MigrationGenerator
-	PrimaryKeyCol []string
-}
-
-func (info *MigrationInfo) AppendToPk(col string) {
-	info.PrimaryKeyCol = append(info.PrimaryKeyCol, col)
+	migrationGenerator map[string]*generator.MigrationGenerator
 }
 
 func NewMigrationContext() *Migration {
-	return &Migration{migrationContext: make(map[string]*MigrationInfo)}
+	return &Migration{migrationGenerator: make(map[string]*generator.MigrationGenerator)}
 }
 
 /**
 Store a MigrationInfo instance.
 */
 func (migration *Migration) AddToCtx(key string, value interface{}) {
-	migration.migrationContext[key] = &MigrationInfo{Class: value.(*generator.MigrationGenerator), PrimaryKeyCol: []string{}}
+	migration.migrationGenerator[key] = value.(*generator.MigrationGenerator)
 }
 
 /**
@@ -34,5 +25,5 @@ Fetches a MigrationInfo instance
 The user of this method must cast and fetch appropriate data
 */
 func (migration *Migration) GetCtx(key string) interface{} {
-	return migration.migrationContext[key]
+	return migration.migrationGenerator[key]
 }
