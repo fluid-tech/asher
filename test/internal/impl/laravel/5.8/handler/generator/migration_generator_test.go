@@ -9,26 +9,22 @@ import (
 
 func TestMigrationGenerator(t *testing.T) {
 	var table = []*api.GeneralTest{
-		getEmptyMigrationWithName(),
-		getMigrationWithColumns(),
+		createMigrationGeneratorTest("student_allotments", []core.SimpleStatement{}, EmptyMigrationWithName),
+		createMigrationGeneratorTest("student_allotments", []core.SimpleStatement {
+			*core.NewSimpleStatement("$this->string('name')"),
+			*core.NewSimpleStatement("$this->string('phone_number', 12)->unique()"),
+		}, MigrationWithColumns),
 	}
 	//fmt.Println(table)
 	api.IterateAndTest(table, t)
 }
 
-func getEmptyMigrationWithName() *api.GeneralTest {
-	migrationGenerator := generator.NewMigrationGenerator().SetName("student_allotments")
-
-	return api.NewGeneralTest(migrationGenerator.Build().String(), EmptyMigrationWithName)
-}
-
-func getMigrationWithColumns() *api.GeneralTest {
-	columns := []core.SimpleStatement {
-		*core.NewSimpleStatement("$this->string('name')"),
-		*core.NewSimpleStatement("$this->string('phone_number', 12)->unique()"),
-	}
-	migrationGenerator := generator.NewMigrationGenerator().SetName("student_allotments").
+/**
+ An internal function to create general test cases for MigrationGenerator
+ */
+func createMigrationGeneratorTest(name string, columns []core.SimpleStatement, expectedCode string) *api.GeneralTest {
+	migrationGenerator := generator.NewMigrationGenerator().SetName(name).
 		AddColumns(columns)
 
-	return api.NewGeneralTest(migrationGenerator.Build().String(), MigrationWithColumns)
+	return api.NewGeneralTest(migrationGenerator.Build().String(), expectedCode)
 }
