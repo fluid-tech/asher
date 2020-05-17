@@ -22,7 +22,7 @@ func (columnHandler *ColumnHandler) Handle(modelName string, colsArr interface{}
 
 	myColsArray := colsArr.([]models.Column)
 
-	columnHandler.handleMigration(modelName, myColsArray)
+	//columnHandler.handleMigration(modelName, myColsArray)
 	columnHandler.handleModel(modelName, myColsArray)
 
 	return []*api.EmitterFile{}, nil
@@ -38,10 +38,10 @@ func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []model
 		columnHandler.handleValidation(modelGenerator, singleColumn.Validations, singleColumn.Name)
 	}
 	//fmt.Print(modelGenerator.Build().String())
-	context.GetFromRegistry("model").AddToCtx(modelName, modelGenerator.Build())
+	context.GetFromRegistry("model").AddToCtx(modelName, modelGenerator)
 }
 
-func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr []models.Column) error {
+func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr []models.Column) {
 	var statementsArr []core.SimpleStatement
 	for _, singleColumn := range columnArr {
 		statementsArr = append(
@@ -50,31 +50,28 @@ func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr
 		)
 	}
 
-	fmt.Println("Going to generate class")
 	migrationGenerator := generator.NewMigrationGenerator().SetName(identifier).AddColumns(statementsArr)
 	klass := migrationGenerator.Build()
 	fmt.Println(klass)
 	context.GetFromRegistry("migration").AddToCtx(identifier, migrationGenerator)
 
-	return nil
 }
 
-func (columnHandler *ColumnHandler) handleValidation(modelGenerator *generator.ModelGenerator, validations string, colName string) error{
+func (columnHandler *ColumnHandler) handleValidation(modelGenerator *generator.ModelGenerator, validations string, colName string) {
 	if validations != "" {
 		modelGenerator.AddCreateValidationRule(colName, validations)
 		modelGenerator.AddUpdateValidationRule(colName, validations)
 	}
-	return nil
 }
 
 func (columnHandler *ColumnHandler) handleSingleColumn(modelName string, column models.Column) core.SimpleStatement {
 
 	if column.Primary {
 		//Handle PrimaryKey
-		return columnHandler.handlePrimary(column)
+		return columnHandler.handlePrimary(column.ColType, column.Name, column.GenerationStrategy)
 	} else if column.ColType == "reference" {
 		// Handle ForeignKey
-		return columnHandler.handleForeign(column)
+		return columnHandler.handleForeign(column.Name, column.Table, column.OnDelete)
 	} else {
 		// Handle Other Columns
 		return columnHandler.handleOther(column)
@@ -82,33 +79,28 @@ func (columnHandler *ColumnHandler) handleSingleColumn(modelName string, column 
 
 }
 
-func (columnHandler *ColumnHandler) handleHidden(modelGenerator *generator.ModelGenerator, isHidden bool, colName string) error {
+func (columnHandler *ColumnHandler) handleHidden(modelGenerator *generator.ModelGenerator, isHidden bool, colName string) {
 	if isHidden {
 		modelGenerator.AddHiddenField(colName)
 	}
-	return nil
 }
 
-func (columnHandler *ColumnHandler) handleGuarded(modelGenerator *generator.ModelGenerator, isGuarded bool, colName string) error {
+func (columnHandler *ColumnHandler) handleGuarded(modelGenerator *generator.ModelGenerator, isGuarded bool, colName string) {
 	if isGuarded {
 		modelGenerator.AddFillable(colName)
 	}
-	return nil
 }
 
-func (columnHandler *ColumnHandler) handlePrimary(column models.Column) core.SimpleStatement {
+func (columnHandler *ColumnHandler) handlePrimary(colType string, colName string, genStrat string) core.SimpleStatement {
 	var generatedLine string
-	if column.GenerationStrategy == "auto_increment" {
-		generatedLine = "$table->"
-		generatedLine += columnHandler.primaryKeyMethodNameGenerator(column.ColType)
-		generatedLine += "('"
-		generatedLine += column.Name
-		generatedLine += "')"
-	} else if column.GenerationStrategy == "uuid" {
+	if genStrat == "auto_increment" {
+		primaryKeyMethodName := columnHandler.primaryKeyMethodNameGenerator(colType)
+		generatedLine = fmt.Sprintf("$table->%s('%s')", primaryKeyMethodName, colName)
+	} else if genStrat == "uuid" {
 		//$table->uuid('id')->primary();
-		generatedLine = "$table->uuid('" + column.Name + "')->primary()"
+		generatedLine = fmt.Sprintf("$table->uuid('%s')->primary()", colName)
 	} else {
-		panic("Input Error")
+		panic("input Type does not match with the defined keywords (uuid, auto_increment)")
 	}
 	return core.SimpleStatement{
 		SimpleStatement: generatedLine,
@@ -118,27 +110,26 @@ func (columnHandler *ColumnHandler) handlePrimary(column models.Column) core.Sim
 
 func (columnHandler *ColumnHandler) handleOther(column models.Column) core.SimpleStatement {
 	var generatedLine string
-	generatedLine = "$table->" + columnHandler.ColTypeSwitcher(column.ColType, column.Name, column.Allowed)
-	generatedLine += columnHandler.handleDefaultValue(column.DefaultVal) + columnHandler.handleNullable(column.Nullable) + columnHandler.handleUnique(column.Unique) + columnHandler.handleIndex(column.Index)
+	colTypeVal := columnHandler.ColTypeSwitcher(column.ColType, column.Name, column.Allowed)
+	defaultVal := columnHandler.handleDefaultValue(column.DefaultVal)
+	nullableVal := columnHandler.handleNullable(column.Nullable)
+	uniqueVal := columnHandler.handleUnique(column.Unique)
+	indexVal := columnHandler.handleIndex(column.Index)
+	generatedLine = fmt.Sprintf("$table->%s%s%s%s%s", colTypeVal, defaultVal, nullableVal, uniqueVal, indexVal)
 	return core.SimpleStatement{
 		SimpleStatement: generatedLine,
 	}
 }
 
-func (columnHandler *ColumnHandler) handleForeign(column models.Column) core.SimpleStatement {
+func (columnHandler *ColumnHandler) handleForeign(colName string, colTable string, colOnDelete string) core.SimpleStatement {
 	//$table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 	var sb string
-	sb += "$table->foreign('"
-	sb += column.Name
-	sb += "')"
-	//var tableName, columnName string
 	var splitedArr []string
-	splitedArr = strings.Split(column.Table, ":")
-	sb += "->references('" + splitedArr[1] + "')"
-	sb += "->on('" + splitedArr[0] + "')"
-	sb += "->onDelete('" + column.OnDelete + "')"
+	splitedArr = strings.Split(colTable, ":")
+	sb = fmt.Sprintf("$table->foreign('%s')->references('%s')->on('%s')->onDelete('%s')", colName, splitedArr[1], splitedArr[0], colOnDelete)
+
 	// TODO: check if the onDelete Value is sanitized of not
-	// TODO: do more research on cascade ondelete
+	// TODO: do more research on cascade ondelete will it be mandatory or not
 	return core.SimpleStatement{
 		SimpleStatement: sb,
 	}
@@ -189,7 +180,7 @@ func (columnHandler *ColumnHandler) primaryKeyMethodNameGenerator(colType string
 	}
 }
 
-func (ColumnHandler *ColumnHandler) handleAllowedKeywordsToString(allowed []string) string {
+func (columnHandler *ColumnHandler) handleAllowedKeywordsToString(allowed []string) string {
 	bldr := "'" + strings.Join(allowed, "', '") + "'"
 	return "[" + bldr + "]"
 }
