@@ -39,8 +39,8 @@ func Test_Columns(t *testing.T) {
 	}
 	for _, obj := range columnTestObject {
 		handler.NewColumnHandler().Handle(obj.in.tableName, obj.in.columnInputArray)
-		//ModelTester(t, obj.in.tableName, obj.in.columnInputArray, obj.out.expectedOutputFillable, obj.out.expectedOutputHidden)
-		MigrationTester(t, obj.in.tableName, obj.in.columnInputArray, obj.out.expectedOutputFillable, obj.out.expectedOutputHidden)
+		ModelTester(t, obj.in.tableName, obj.in.columnInputArray, obj.out.expectedOutputFillable, obj.out.expectedOutputHidden)
+		//MigrationTester(t, obj.in.tableName, obj.in.columnInputArray, obj.out.expectedOutputFillable, obj.out.expectedOutputHidden)
 	}
 
 }
