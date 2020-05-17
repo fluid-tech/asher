@@ -9,6 +9,7 @@ import (
 )
 
 type MigrationGenerator struct {
+	api.Generator
 	classBuilder interfaces.Class
 	tableName string
 	columns []core.SimpleStatement
