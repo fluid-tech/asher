@@ -54,7 +54,8 @@ use Illuminate\Database\Eloquent\Model;
 class StudentAllotments extends Model {
     public function updateValidationRules() {
         return [
-phone_number => "string|max:12|unique:users"];
+phone_number => "string|max:12|unique:users",
+name => "string|max:255|unique:users"];
     }
 
 
