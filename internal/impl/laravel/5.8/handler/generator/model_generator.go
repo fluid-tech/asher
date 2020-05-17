@@ -24,6 +24,11 @@ Creates a new instance of this generator with a new interfaces.Class
 func NewModelGenerator() *ModelGenerator {
 	return &ModelGenerator{
 		classBuilder: builder.NewClassBuilder(),
+		fillables: []string{},
+		hidden: []string{},
+		timestamps: false,
+		createValidationRules: map[string]string{},
+		updateValidationRules: map[string]string{},
 	}
 }
 
@@ -38,9 +43,7 @@ Sample Usage:
 	- AddCreateValidationRule('student_name', 'max:255|string')
 */
 func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, colRule string) *ModelGenerator {
-	if modelGenerator.createValidationRules == nil {
-		modelGenerator.createValidationRules = make(map[string]string)
-	}
+	modelGenerator.createValidationRules = make(map[string]string)
 	modelGenerator.createValidationRules[colName] = colRule
 	return modelGenerator
 }
@@ -54,9 +57,7 @@ Returns:
 	- instance of the generator object
 */
 func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, colRule string) *ModelGenerator {
-	if modelGenerator.updateValidationRules == nil {
-		modelGenerator.updateValidationRules = make(map[string]string)
-	}
+	modelGenerator.updateValidationRules = make(map[string]string)
 	modelGenerator.updateValidationRules[colName] = colRule
 	return modelGenerator
 }
