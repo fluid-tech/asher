@@ -29,7 +29,7 @@ const Sidebar = [
             },
             {
                 title: 'Models',
-                link: '/'
+                link: '/basics/model'
             },
             {
                 title: 'Mutators',
