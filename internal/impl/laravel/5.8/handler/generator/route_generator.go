@@ -7,25 +7,13 @@ import (
 	"strings"
 )
 
-const apiRouteFileName = "asherapi.php"
-const webRouteFileName = "asherweb.php"
-const routeFilePath = "routes/"
-
 type RouteGenerator struct {
-	imports   []*api.TabbedUnit
-	RouteFile *core.PhpEmitterFile
-	routes    []*core.FunctionCall
+	imports []*api.TabbedUnit
+	routes  []*core.FunctionCall
 }
 
-func NewRouteGenerator(routeType string) *RouteGenerator {
-	if routeType == "api" {
-		temp:=make([]*api.TabbedUnit,1)
-		return &RouteGenerator{
-			RouteFile: core.NewPhpEmitterFile(apiRouteFileName, routeFilePath,temp, 1),
-		}
-	} else {
-		return nil
-	}
+func NewRouteGenerator() *RouteGenerator {
+	return &RouteGenerator{}
 }
 
 func (routeGenerator *RouteGenerator) Routes() []*core.FunctionCall {
@@ -41,15 +29,15 @@ func (routeGenerator *RouteGenerator) AddResourceRoutes(modelName string) *Route
 	}
 
 	var apiRouteConfig = []RouteConfig{
+		{actionFunction: "get-by-id", method: "get", subURI: "get-by-id/{id}"},
+		{actionFunction: "get-all", method: "get", subURI: "get-all"},
 		{actionFunction: "create", method: "post", subURI: "create"},
 		{actionFunction: "edit", method: "post", subURI: "edit/{id}"},
 		{actionFunction: "delete", method: "post", subURI: "delete/{id}"},
-		{actionFunction: "get-by-id", method: "get", subURI: "get-by-id/{id}"},
-		{actionFunction: "get-all", method: "get", subURI: "get-all"},
 	}
 
 	for _, routeConfig := range apiRouteConfig {
-		uri := "/" + strings.ToLower(modelName) + routeConfig.subURI
+		uri := "/" + strings.ToLower(modelName) + "/" + routeConfig.subURI
 		action := modelName + "Controller" + "@" + routeConfig.actionFunction
 		routeGenerator.AddRoute(routeConfig.method, uri, action)
 	}
@@ -59,35 +47,36 @@ func (routeGenerator *RouteGenerator) AddResourceRoutes(modelName string) *Route
 
 func (routeGenerator *RouteGenerator) AddRoute(method string, uri string, action string) *RouteGenerator {
 	route := core.NewFunctionCall("Route::" + method)
-	uriTabbedUnit := api.TabbedUnit(core.NewSimpleStatement(uri))
-	actionTabbedUnit := api.TabbedUnit(core.NewSimpleStatement(action))
+	uriTabbedUnit := api.TabbedUnit(core.NewParameter(uri))
+	actionTabbedUnit := api.TabbedUnit(core.NewParameter(action))
 	route.AddArg(&uriTabbedUnit).AddArg(&actionTabbedUnit)
-	routeGenerator.routes =append(routeGenerator.Routes(), route)
+	routeGenerator.routes = append(routeGenerator.Routes(), route)
 	return routeGenerator
 }
 
-func (routeGenerator *RouteGenerator) Build() *core.PhpEmitterFile {
-	content := routeGenerator.RouteFile.Content()
-
+func (routeGenerator *RouteGenerator) Build() []*api.TabbedUnit {
+	var buildedRouteFile []*api.TabbedUnit
 
 	importStmt := api.TabbedUnit(core.NewSimpleStatement(`use Illuminate\Support\Facades\Route`))
-	content = append(content, &importStmt)
-
-	fmt.Print("helloWorld")
-
-	for _, value := range routeGenerator.RouteFile.Content() {
-		fmt.Print(*value)
-	}
+	buildedRouteFile = append(buildedRouteFile, &importStmt)
 
 	/*ADD ALL FUNCTION CALLS*/
 	for _, functionCall := range routeGenerator.routes {
 		funCall := api.TabbedUnit(functionCall)
-		content = append(content, &funCall)
+		buildedRouteFile = append(buildedRouteFile, &funCall)
 	}
 
-	for _, value := range routeGenerator.RouteFile.Content() {
-		fmt.Print(*value)
+	return buildedRouteFile
+}
+
+func (routeGenerator *RouteGenerator) String() string {
+	var builder strings.Builder
+
+	builderRouteFile := routeGenerator.Build()
+
+	for _, element := range builderRouteFile {
+		fmt.Fprint(&builder, *element, "\n")
 	}
 
-	return routeGenerator.RouteFile
+	return builder.String()
 }

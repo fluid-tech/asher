@@ -6,14 +6,11 @@ import (
 	"testing"
 )
 
+//Route::get('/user', 'UserController@index');
 func TestRouteGenerator(t *testing.T) {
 	apiGenerator:=generator.NewRouteGenerator("api")
 	apiGenerator.AddResourceRoutes("Order")
-	emmitterFile:=apiGenerator.Build()
-	if len(apiGenerator.Routes()) == 0 {
-		t.Error("Values not inserted")
-	}
-	fmt.Print(emmitterFile.String())
+	fmt.Print(apiGenerator)
 }
 
 func testGenResourceRoute(t *testing.T){
