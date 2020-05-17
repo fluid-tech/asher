@@ -1,6 +1,8 @@
 package models
 
 type Pattern struct {
-	Type      string   `json:"type"`
-	ExtraInfo []string `json:"extraInfo"`
+	PatternType string   `json:"patternType"`
+	Protected   bool     `json:"bool"` // wrap with auth middleware
+	NestedWith  []string `json:"nestedWith"`
+	Type        string   `json:"type"` // default, file etc
 }

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"asher/internal/api"
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/core"
 	"asher/internal/impl/laravel/5.8/handler"
@@ -86,22 +87,22 @@ func getFillableRhs(klass *core.Class, t *testing.T) []string {
 }
 
 func buildClassWithArrayDecl(className string) *core.Class {
-	assigmentSS := core.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
+	assigmentSS := api.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
 	functionBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
 		AddArgument("string $fullyQualifiedModel").
 		AddStatement(&assigmentSS)
 
-	returnArray := core.TabbedUnit(core.NewReturnArray([]string{`"user_id" => "required|exists:users,id"`, `"password" => "min:8|max20"`}))
-	returnArray2 := core.TabbedUnit(core.NewReturnArray([]string{`"user_id" => "required|exists:users,id"`, `"password" => "min:8|max20"`}))
+	returnArray := api.TabbedUnit(core.NewReturnArray([]string{`"user_id" => "required|exists:users,id"`, `"password" => "min:8|max20"`}))
+	returnArray2 := api.TabbedUnit(core.NewReturnArray([]string{`"user_id" => "required|exists:users,id"`, `"password" => "min:8|max20"`}))
 	getCreateRules := builder.NewFunctionBuilder().SetVisibility("public").SetName("getCreateValidationRules").
 		AddStatement(&returnArray)
 
 	getUpdateRules := builder.NewFunctionBuilder().SetVisibility("public").SetName("getUpdateValidationRules").
 		AddStatement(&returnArray2)
 
-	member := core.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
+	member := api.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
 	rhs := []string{`"user_id"`, `"password"`}
-	arrayAssignmentMember := core.TabbedUnit(core.NewArrayAssignment("public", "fillable", rhs))
+	arrayAssignmentMember := api.TabbedUnit(core.NewArrayAssignment("public", "fillable", rhs))
 	klass := builder.NewClassBuilder().SetName(className).SetExtends("BaseMutator").
 		AddFunction(functionBuilder.GetFunction()).AddMember(&member).AddMember(&arrayAssignmentMember).
 		SetPackage("App").AddImport(`Illuminate\Database\Eloquent\Model`).
@@ -182,10 +183,10 @@ Returns a half baked migration class with up method only
 */
 func genMigrationClass(id string) *core.Class {
 
-	stmt := core.TabbedUnit(core.NewSimpleStatement("$table->bigIncrements('id')"))
-	anon := core.TabbedUnit(builder.NewFunctionBuilder().AddArgument("Blueprint $table").
+	stmt := api.TabbedUnit(core.NewSimpleStatement("$table->bigIncrements('id')"))
+	anon := api.TabbedUnit(builder.NewFunctionBuilder().AddArgument("Blueprint $table").
 		AddStatement(&stmt).GetFunction())
-	funcCall := core.TabbedUnit(core.NewFunctionCall("Schema::create").AddArg(&anon))
+	funcCall := api.TabbedUnit(core.NewFunctionCall("Schema::create").AddArg(&anon))
 
 	funcBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("up").
 		AddStatement(&funcCall)

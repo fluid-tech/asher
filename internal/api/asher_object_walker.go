@@ -2,7 +2,6 @@ package api
 
 import (
 	"asher/internal/models"
-	"fmt"
 )
 
 type AsherObjectWalker struct {
@@ -22,9 +21,9 @@ Walks over the asher object provided and triggers callbacks
 */
 func (walker AsherObjectWalker) Walk() {
 	walker.walkModels()
-	fileData := walker.emitter.GetFileMap()
+	_ = walker.emitter.GetFileMap()
 	// todo write to file
-	fmt.Print(fileData)
+
 }
 
 func (walker AsherObjectWalker) walkModels() {

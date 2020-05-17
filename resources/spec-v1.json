@@ -54,16 +54,10 @@
         "controller": {
           "rest": true,
           "pattern": {
-            "type": "transactor",
-            "extraInfo": [
-              "fileTransactor"
-            ],
-            "auth": {
-              "strategy": "jwt",
-              "extras": {
-                "jwt-expiry": 213123
-              }
-            }
+            "patternType": "transactor",
+            "protected": true,
+            "nestedWith": ["OrderProduct"],
+            "type": "default"
           }
         }
       }

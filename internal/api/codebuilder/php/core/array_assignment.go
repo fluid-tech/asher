@@ -1,12 +1,13 @@
 package core
 
 import (
+	"asher/internal/api"
 	"fmt"
 	"strings"
 )
 
 type ArrayAssignment struct {
-	TabbedUnit
+	api.TabbedUnit
 	tabs       int
 	Visibility string
 	Identifier string
@@ -31,7 +32,7 @@ func (arr *ArrayAssignment) Id() string {
 
 func (arr *ArrayAssignment) String() string {
 	var builder strings.Builder
-	fmt.Fprint(&builder, TabbedString(uint(arr.tabs)),
+	fmt.Fprint(&builder, api.TabbedString(uint(arr.tabs)),
 		arr.Visibility, " $", arr.Identifier, " = [", strings.Join(arr.Rhs, ", \n"), "\n];\n")
 	return builder.String()
 }

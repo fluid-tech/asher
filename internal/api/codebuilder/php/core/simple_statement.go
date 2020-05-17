@@ -1,12 +1,13 @@
 package core
 
 import (
+	"asher/internal/api"
 	"fmt"
 	"strings"
 )
 
 type SimpleStatement struct {
-	TabbedUnit
+	api.TabbedUnit
 	numTabs         int
 	SimpleStatement string
 }
@@ -27,6 +28,6 @@ func (stmt *SimpleStatement) Id() string {
 
 func (stmt *SimpleStatement) String() string {
 	var builder strings.Builder
-	fmt.Fprint(&builder, TabbedString(uint(stmt.numTabs)), stmt.SimpleStatement, ";")
+	fmt.Fprint(&builder, api.TabbedString(uint(stmt.numTabs)), stmt.SimpleStatement, ";")
 	return builder.String()
 }

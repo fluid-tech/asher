@@ -54,7 +54,7 @@ func (auditColHandler *AuditCol) handleModel(identifier string, input *helper.Au
 func (auditColHandler *AuditCol) handleTimestamp(modelClass *core.Class, isTimeStampSet bool) {
 	// adding timestamps true
 	if isTimeStampSet {
-		tab := core.TabbedUnit(core.NewVarAssignment("public", "timestamps", "true"))
+		tab := api.TabbedUnit(core.NewVarAssignment("public", "timestamps", "true"))
 		modelClass.AppendMember(&tab)
 	}
 }
@@ -62,7 +62,7 @@ func (auditColHandler *AuditCol) handleTimestamp(modelClass *core.Class, isTimeS
 func (auditColHandler *AuditCol) handleSoftDeletes(modelClass *core.Class, isSoftDeleteSet bool) {
 	// adding use SoftDeletes
 	if isSoftDeleteSet {
-		tab := core.TabbedUnit(core.NewSimpleStatement("use SoftDeletes"))
+		tab := api.TabbedUnit(core.NewSimpleStatement("use SoftDeletes"))
 		modelClass.AppendMember(&tab)
 	}
 }
@@ -128,7 +128,7 @@ func (auditColHandler *AuditCol) appendToFunction(function *core.Function, audit
 	if err != nil {
 		// no record of statement found inserting
 		simple := core.NewSimpleStatement(auditColStr)
-		stmt := core.TabbedUnit(simple)
+		stmt := api.TabbedUnit(simple)
 		function.AppendStatement(&stmt)
 	}
 }
