@@ -52,8 +52,6 @@ func (c *FunctionCall) String() string {
 	fmt.Fprint(&builder, api.TabbedString(uint(c.tabs)), c.Def, "(")
 	argLen := len(c.Args)
 	for i, element := range c.Args{
-		//fmt.Println(reflect.ValueOf((*element).(*Function)).)
-
 		fmt.Fprintf(&builder , (*element).String())
 		if i != argLen - 1 {
 			fmt.Fprint(&builder, ", ")
