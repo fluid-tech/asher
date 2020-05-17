@@ -145,7 +145,6 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 	return modelGenerator.classBuilder.GetClass()
 }
 
-
 func (modelGenerator *ModelGenerator) String() string {
 	return modelGenerator.Build().String()
 }
