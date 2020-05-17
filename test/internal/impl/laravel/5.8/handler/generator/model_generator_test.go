@@ -33,6 +33,9 @@ func TestModelGenerator(t *testing.T) {
 	api.IterateAndTest(table, t)
 }
 
+/**
+ A helper function to generate GeneralTest cases for ModelGenerator
+ */
 func genModelGeneratorTest(name string, fillables []string, hiddenFields []string, createRules map[string]string,
 	updateRules map[string]string, expectedCode string) *api.GeneralTest {
 	modelGenerator := generator.NewModelGenerator().SetName(name)

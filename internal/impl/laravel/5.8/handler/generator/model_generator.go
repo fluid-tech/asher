@@ -123,8 +123,7 @@ func (modelGenerator *ModelGenerator) SetTimestamps(flag bool) *ModelGenerator {
 
 /**
  Builds the corresponding model from the given ingredients of input.
- Note:
-	- It returns a new core.Class object every time it's called.
+ Note: It returns a new core.Class object every time it's called.
  Returns:
  	- The corresponding model core.Class from the given ingredients of input.
  */
@@ -151,16 +150,14 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 	}
 
 	if len(modelGenerator.createValidationRules) > 0 {
-		returnArray := api.TabbedUnit(core.NewReturnArrayFromMap(modelGenerator.createValidationRules))
-		createFunction := builder.NewFunctionBuilder().SetName("createValidationRules").
-			SetVisibility("public").AddStatement(&returnArray).GetFunction()
+		createFunction := getValidationRulesFunction("createValidationRules",
+			modelGenerator.createValidationRules)
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(createFunction)
 	}
 
 	if len(modelGenerator.updateValidationRules) > 0 {
-		returnArray := api.TabbedUnit(core.NewReturnArrayFromMap(modelGenerator.updateValidationRules))
-		updateFunction := builder.NewFunctionBuilder().SetName("updateValidationRules").
-			SetVisibility("public").AddStatement(&returnArray).GetFunction()
+		updateFunction := getValidationRulesFunction("updateValidationRules",
+			modelGenerator.updateValidationRules)
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(updateFunction)
 	}
 
@@ -174,4 +171,22 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
  */
 func (modelGenerator *ModelGenerator) String() string {
 	return modelGenerator.Build().String()
+}
+
+
+/**
+ A helper function to generate a ReturnArray for rules with the given method name.
+ Parameters:
+	- functionName: name of the function that returns these validation rules.
+	- rules: a map of columns and their validation rules.
+ Returns:
+	- instance of core.Function for the given input.
+ Example:
+	- getValidationRulesFunction('createValidationRules', map[string]string{'name':'max:255'})
+*/
+func getValidationRulesFunction(functionName string, rules map[string]string) *core.Function {
+	returnArray := api.TabbedUnit(core.NewReturnArrayFromMap(rules))
+	function := builder.NewFunctionBuilder().SetName(functionName).
+		SetVisibility("public").AddStatement(&returnArray).GetFunction()
+	return function
 }
