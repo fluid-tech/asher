@@ -34,6 +34,8 @@ Parameters:
 	- colRule: This will be rule/constraint imposed on the specified passed column.
 Returns:
 	- instance of the generator object
+Sample Usage:
+	- AddCreateValidationRule('student_name', 'max:255|string')
 */
 func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, colRule string) *ModelGenerator {
 	if modelGenerator.createValidationRules == nil {

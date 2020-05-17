@@ -16,7 +16,7 @@ func NewMigrationContext() *Migration {
 /**
 Store a MigrationInfo instance.
 */
-func (migration *Migration) AddToCtx(key string, value interface{}) {
+func (migration *Migration) AddToCtx(key string, generator *generator.MigrationGenerator) {
 	migration.migrationGenerator[key] = value.(*generator.MigrationGenerator)
 }
 
