@@ -9,20 +9,42 @@ import (
 	"testing"
 )
 
+type IN struct {
+	tableName        string
+	columnInputArray []models.Column
+}
+
+type OUT struct {
+	expectedOutputFillable []string
+	expectedOutputHidden   []string
+}
+
+func getInput(tableName string, columnInputArray []models.Column) IN {
+	return IN{tableName, columnInputArray}
+}
+
+func expectedOutput(fillableExpected []string, hiddenExpected []string) OUT {
+	return OUT{fillableExpected, hiddenExpected}
+}
+
 func Test_Columns(t *testing.T) {
 
 	var columnTestObject = []*struct {
-		tableName              string
-		columnInputArray       []models.Column
-		expectedOutputFillable []string
-		expectedOutputHidden   []string
+		in  IN
+		out OUT
 	}{
-		{test_1_tableName, test_1_columnInputArray, test_1_fillableExpectedOutput, test_1_hiddenExpectedOutput},
-		{test_1_tableName, test_1_columnInputArray, test_1_fillableExpectedOutput, test_1_hiddenExpectedOutput},
+		{getInput(test_1_tableName, test_1_columnInputArray), expectedOutput(test_1_fillableExpectedOutput, test_1_hiddenExpectedOutput)},
 	}
 	for _, obj := range columnTestObject {
-		ModelTester(t, obj.tableName, obj.columnInputArray, obj.expectedOutputFillable, obj.expectedOutputHidden)
+		//ModelTester(t, obj.in.tableName, obj.in.columnInputArray, obj.out.expectedOutputFillable, obj.out.expectedOutputHidden)
+		MigrationTester(t, obj.in.tableName, obj.in.columnInputArray, obj.out.expectedOutputFillable, obj.out.expectedOutputHidden)
 	}
+
+}
+
+func MigrationTester(t *testing.T, tableName string, array []models.Column, fillable []string, hidden []string) {
+	migrationInfo := context.GetFromRegistry("migration").GetCtx(tableName).(*context.MigrationInfo)
+	println(migrationInfo)
 
 }
 
@@ -32,8 +54,8 @@ func ModelTester(t *testing.T, tableName string, columnArray []models.Column, fi
 
 	modelClass := context.GetFromRegistry("model").GetCtx(tableName).(*core.Class)
 
-	var fillableData []string = getFillableRhs(modelClass, t)
-	var hiddenData []string = getHiddenRhs(modelClass, t)
+	var fillableData = getFillableRhs(modelClass, t)
+	var hiddenData = getHiddenRhs(modelClass, t)
 	arrayEquilizer(t, fillableData, fillableExpectedOutput)
 	arrayEquilizer(t, hiddenData, hiddenExpectedOutput)
 
