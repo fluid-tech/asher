@@ -96,3 +96,7 @@ func (migrationGenerator *MigrationGenerator) Build() *core.Class {
 
 	return migrationGenerator.classBuilder.GetClass()
 }
+
+func (migrationGenerator *MigrationGenerator) String() string {
+	return migrationGenerator.Build().String()
+}
