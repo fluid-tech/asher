@@ -22,26 +22,28 @@ func (columnHandler *ColumnHandler) Handle(modelName string, colsArr interface{}
 
 	myColsArray := colsArr.([]models.Column)
 
-	//columnHandler.handleMigration(modelName, myColsArray)
-	columnHandler.handleModel(modelName, myColsArray)
+	tempMigration := api.EmitterFile(columnHandler.handleMigration(modelName, myColsArray))
+	tempModel := api.EmitterFile(columnHandler.handleModel(modelName, myColsArray))
 
-	return []*api.EmitterFile{}, nil
+	return []*api.EmitterFile{&tempMigration, &tempModel}, nil
 }
 
-func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []models.Column) {
-	var modelGenerator = generator.NewModelGenerator()
+func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []models.Column) *core.PhpEmitterFile {
+	var modelGenerator = generator.NewModelGenerator().SetName(modelName)
 
 	for _, singleColumn := range colArr {
-		modelGenerator.SetName(modelName)
 		columnHandler.handleHidden(modelGenerator, singleColumn.Hidden, singleColumn.Name)
 		columnHandler.handleGuarded(modelGenerator, singleColumn.Guarded, singleColumn.Name)
 		columnHandler.handleValidation(modelGenerator, singleColumn.Validations, singleColumn.Name)
 	}
 	//fmt.Print(modelGenerator.Build().String())
 	context.GetFromRegistry("model").AddToCtx(modelName, modelGenerator)
+	modelGeneratorRef := api.Generator(modelGenerator)
+	phpEmitter := core.NewPhpEmitterFile(modelName, api.MODEL_PATH, &modelGeneratorRef, api.MODEL)
+	return phpEmitter
 }
 
-func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr []models.Column) {
+func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr []models.Column) api.EmitterFile {
 	var statementsArr []core.SimpleStatement
 	for _, singleColumn := range columnArr {
 		statementsArr = append(
@@ -54,7 +56,9 @@ func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr
 	klass := migrationGenerator.Build()
 	fmt.Println(klass)
 	context.GetFromRegistry("migration").AddToCtx(identifier, migrationGenerator)
-
+	modelGeneratorRef := api.Generator(migrationGenerator)
+	phpEmitter := core.NewPhpEmitterFile(identifier, api.MODEL_PATH, &modelGeneratorRef, api.MODEL)
+	return phpEmitter
 }
 
 func (columnHandler *ColumnHandler) handleValidation(modelGenerator *generator.ModelGenerator, validations string, colName string) {

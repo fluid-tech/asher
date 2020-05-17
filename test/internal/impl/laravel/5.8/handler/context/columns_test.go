@@ -4,7 +4,9 @@ import (
 	"asher/internal/api/codebuilder/php/core"
 	"asher/internal/impl/laravel/5.8/handler"
 	"asher/internal/impl/laravel/5.8/handler/context"
+	"asher/internal/impl/laravel/5.8/handler/generator"
 	"asher/internal/models"
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -36,6 +38,7 @@ func Test_Columns(t *testing.T) {
 		{getInput(test_1_tableName, test_1_columnInputArray), expectedOutput(test_1_fillableExpectedOutput, test_1_hiddenExpectedOutput)},
 	}
 	for _, obj := range columnTestObject {
+		handler.NewColumnHandler().Handle(obj.in.tableName, obj.in.columnInputArray)
 		//ModelTester(t, obj.in.tableName, obj.in.columnInputArray, obj.out.expectedOutputFillable, obj.out.expectedOutputHidden)
 		MigrationTester(t, obj.in.tableName, obj.in.columnInputArray, obj.out.expectedOutputFillable, obj.out.expectedOutputHidden)
 	}
@@ -43,16 +46,19 @@ func Test_Columns(t *testing.T) {
 }
 
 func MigrationTester(t *testing.T, tableName string, array []models.Column, fillable []string, hidden []string) {
-	migrationInfo := context.GetFromRegistry("migration").GetCtx(tableName).(*context.MigrationInfo)
-	println(migrationInfo)
+
+	migrationInfo := context.GetFromRegistry("migration").GetCtx(tableName).(*generator.MigrationGenerator).Build()
+	upFunc, _ := migrationInfo.FindFunction("up")
+
+	for _, j := range upFunc.Statements {
+		fmt.Println(j)
+	}
 
 }
 
 func ModelTester(t *testing.T, tableName string, columnArray []models.Column, fillableExpectedOutput []string, hiddenExpectedOutput []string) {
 
-	handler.NewColumnHandler().Handle(tableName, columnArray)
-
-	modelClass := context.GetFromRegistry("model").GetCtx(tableName).(*core.Class)
+	modelClass := context.GetFromRegistry("model").GetCtx(tableName).(*generator.ModelGenerator).Build()
 
 	var fillableData = getFillableRhs(modelClass, t)
 	var hiddenData = getHiddenRhs(modelClass, t)
