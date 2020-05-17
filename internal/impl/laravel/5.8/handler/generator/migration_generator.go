@@ -58,7 +58,7 @@ func (migrationGenerator *MigrationGenerator) AddColumn(column core.SimpleStatem
 */
 func (migrationGenerator *MigrationGenerator) AddColumns(columns []core.SimpleStatement) *MigrationGenerator {
 	for _, statement := range columns {
-		migrationGenerator.AddColumn(statement)
+		migrationGenerator.columns = append(migrationGenerator.columns, statement)
 	}
 	return migrationGenerator
 }
