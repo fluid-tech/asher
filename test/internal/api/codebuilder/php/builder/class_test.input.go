@@ -38,3 +38,15 @@ class Hello {
 
 }
 `
+
+const TestClass4 string = `namespace Test;
+
+class Hello implements Runnable {
+    private $fullyQualifiedModel;
+    public function __construct(string $fullyQualifiedModel) {
+        $this->fullyQualifiedModel = $fullyQualifiedModel;
+    }
+
+
+}
+`
