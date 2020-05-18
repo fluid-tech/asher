@@ -45,7 +45,6 @@ Example:
 	- AddCreateValidationRule('student_name', 'max:255|string')
 */
 func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, colRule string) *ModelGenerator {
-	modelGenerator.createValidationRules = make(map[string]string)
 	modelGenerator.createValidationRules[colName] = colRule
 	return modelGenerator
 }
@@ -61,7 +60,6 @@ Example:
 	- AddUpdateValidationRule('student_name', 'string|max:255')
 */
 func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, colRule string) *ModelGenerator {
-	modelGenerator.updateValidationRules = make(map[string]string)
 	modelGenerator.updateValidationRules[colName] = colRule
 	return modelGenerator
 }
@@ -122,11 +120,11 @@ func (modelGenerator *ModelGenerator) SetTimestamps(flag bool) *ModelGenerator {
 }
 
 /**
- Builds the corresponding model from the given ingredients of input.
- Note: It returns a new core.Class object every time it's called.
- Returns:
- 	- The corresponding model core.Class from the given ingredients of input.
- */
+Builds the corresponding model from the given ingredients of input.
+Note: It returns a new core.Class object every time it's called.
+Returns:
+	- The corresponding model core.Class from the given ingredients of input.
+*/
 func (modelGenerator *ModelGenerator) Build() *core.Class {
 	modelGenerator.classBuilder = modelGenerator.classBuilder.SetPackage("App").AddImports([]string{
 		`Illuminate\Database\Eloquent\Model`,
@@ -168,11 +166,10 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
  Implementation of the base Generator to return string of this model.
  Returns:
 	- string representation of this mode.
- */
+*/
 func (modelGenerator *ModelGenerator) String() string {
 	return modelGenerator.Build().String()
 }
-
 
 /**
  A helper function to generate a ReturnArray for rules with the given method name.
