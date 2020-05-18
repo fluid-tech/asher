@@ -50,8 +50,7 @@ func (migrationGenerator *MigrationGenerator) SetName(tableName string) *Migrati
 	- AddColumn(core.NewSimpleStatement('$this->string('name')->unique()'))
  */
 func (migrationGenerator *MigrationGenerator) AddColumn(column core.SimpleStatement) *MigrationGenerator {
-	migrationGenerator.columns = append(migrationGenerator.columns, column)
-	return migrationGenerator
+	return migrationGenerator.AddColumns([]core.SimpleStatement{column})
 }
 
 /**
@@ -67,9 +66,7 @@ func (migrationGenerator *MigrationGenerator) AddColumn(column core.SimpleStatem
 	  })
 */
 func (migrationGenerator *MigrationGenerator) AddColumns(columns []core.SimpleStatement) *MigrationGenerator {
-	for _, statement := range columns {
-		migrationGenerator.columns = append(migrationGenerator.columns, statement)
-	}
+	migrationGenerator.columns = append(migrationGenerator.columns, columns...)
 	return migrationGenerator
 }
 
