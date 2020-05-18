@@ -15,7 +15,6 @@ func TestMigrationGenerator(t *testing.T) {
 			*core.NewSimpleStatement("$this->string('phone_number', 12)->unique()"),
 		}, MigrationWithColumns),
 	}
-	//fmt.Println(table)
 	api.IterateAndTest(table, t)
 }
 
