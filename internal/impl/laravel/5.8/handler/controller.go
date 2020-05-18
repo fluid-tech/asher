@@ -5,6 +5,7 @@ import (
 	"asher/internal/api/codebuilder/php/core"
 	"asher/internal/impl/laravel/5.8/handler/context"
 	"asher/internal/impl/laravel/5.8/handler/generator"
+	"asher/internal/models"
 )
 
 type ControllerHandler struct {
@@ -38,7 +39,8 @@ func (controllerHandler *ControllerHandler) HandleQuery(identifier string, value
 }
 
 func (controllerHandler *ControllerHandler) HandleRoutes(identifier string, value interface{}) ([]*api.EmitterFile, error) {
-	var emitFiles []*api.EmitterFile
+	var filesToEmit []*api.EmitterFile
+	//controller := value.(models.Controller)
 	addRouteToEmmitFiles := false
 	gen := context.GetFromRegistry("route").GetCtx("api")
 	if gen == nil{
@@ -50,10 +52,11 @@ func (controllerHandler *ControllerHandler) HandleRoutes(identifier string, valu
 	apiGenerator.AddDefaultRestRoutes(identifier)
 
 	if addRouteToEmmitFiles {
-		emitFiles=append(emitFiles,core.NewPhpEmitterFile("","",nil,1))
+		emitFile:= api.EmitterFile(core.NewPhpEmitterFile("asher_api.php","/routes",nil,1))
+		filesToEmit=append(filesToEmit,&emitFile)
 	}
 
-	return emitFiles, nil
+	return filesToEmit, nil
 }
 
 
