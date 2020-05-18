@@ -1,5 +1,13 @@
 # The Transactor Pattern
 ## Why and what is it ?
+Our team wrote backends in spring boot before switching over to Laravel. We were fans of the DAO service pattern and 
+implemented something very similar in Laravel. 
+Laravel offered us an ORM out of the box. So we didnt necessarily have to build the Repository layer. We just wrapped our 
+queries in service methods, including create and update. This was called in our controllers. We had several MVC and 
+RESTful project, sometimes both. This seemed to be a good approach, with all our queries and persistence login written 
+in one central place until the service class became really fat.
+
+
 The transactor pattern takes heavy inspiration from the CQRS design pattern for distributed systems. We essentially wanted
 to build that for monoliths. We also liked the persistence validation that rails' ActiveRecord provides. Laravel performs
 validations on the controller with FormRequests, which is, imo an anti-pattern. We wanted to perform persistence validations,
@@ -32,13 +40,13 @@ necessary.
 **Queries** Class that contains all your read queries.
  
  For visual aid
- ![image](https://drive.google.com/uc?export=view&id=1feXRRJbvQThx8KF9hkrFvNc2wh3nZxHL)
+ ![image](https://drive.google.com/uc?export=view&id=1FCiPFjxNxx-X8P8An_qD1RTIobBDAeS-)
  
-###How is this similar to CQRS ?
+### How is this similar to CQRS ?
 Since Transactors handle the *Commands*, (Create, Update and Delete) and *Queries* handle the Query, we have technically
 the DNA of this pattern. All we need is a event bus and 2 separate databases.
-
-##Our Implementation
+ 
+## Our Implementation
 **This implementation is PHP SPECIFIC**
 We have a BaseMutator class that takes the fully qualified name of the model as input and defines create, update and 
 delete methods.
