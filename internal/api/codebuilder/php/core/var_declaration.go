@@ -13,7 +13,7 @@ type VarDeclaration struct {
 	Identifier string
 }
 
-func GetVarDeclaration(visibility string, id string) *VarDeclaration {
+func NewVarDeclaration(visibility string, id string) *VarDeclaration {
 	return &VarDeclaration{
 		tabs:       0,
 		Visibility: visibility,

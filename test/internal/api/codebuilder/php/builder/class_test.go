@@ -28,7 +28,7 @@ func getClassWithoutExtendsAndInitialization() *api.GeneralTest {
 		AddArgument("string $fullyQualifiedModel").
 		AddStatement(&assigmentSS)
 
-	member := api2.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
+	member := api2.TabbedUnit(core.NewVarDeclaration("private", "fullyQualifiedModel"))
 
 	klass := builder.NewClassBuilder().SetName("TestMutator").
 		AddFunction(functionBuilder.GetFunction()).AddMember(&member).
@@ -44,7 +44,7 @@ func getClassWithExtendsAndInitialization() *api.GeneralTest {
 		AddArgument("string $fullyQualifiedModel").
 		AddStatement(&assigmentSS)
 
-	member := api2.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
+	member := api2.TabbedUnit(core.NewVarDeclaration("private", "fullyQualifiedModel"))
 
 	klass := builder.NewClassBuilder().SetName("TestMutator").SetExtends("BaseMutator").
 		AddFunction(functionBuilder.GetFunction()).AddMember(&member).
@@ -59,7 +59,7 @@ func buildClassBuilderWithExistingClass() *api.GeneralTest {
 		AddArgument("string $fullyQualifiedModel").
 		AddStatement(&assigmentSS)
 
-	member := api2.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
+	member := api2.TabbedUnit(core.NewVarDeclaration("private", "fullyQualifiedModel"))
 
 	klass := core.NewClass()
 	klass.Name = "Hello"
@@ -78,7 +78,7 @@ func buildClassBuilderWithExistingClassAndInterface() *api.GeneralTest {
 		AddArgument("string $fullyQualifiedModel").
 		AddStatement(&assigmentSS)
 
-	member := api2.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
+	member := api2.TabbedUnit(core.NewVarDeclaration("private", "fullyQualifiedModel"))
 
 	klass := core.NewClass()
 	klass.Name = "Hello"
