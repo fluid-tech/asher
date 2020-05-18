@@ -13,7 +13,10 @@ type RouteGenerator struct {
 }
 
 func NewRouteGenerator() *RouteGenerator {
-	return &RouteGenerator{}
+	return &RouteGenerator{
+		imports:	[]*api.TabbedUnit{},
+		routes: 	[]*core.FunctionCall{},
+	}
 }
 
 /**
@@ -49,11 +52,12 @@ func (routeGenerator *RouteGenerator) AddDefaultRestRoutes(modelName string) *Ro
 	}
 
 	var apiRouteConfig = []RouteConfig{
-		{actionFunction: "get-by-id", method: "get", subURI: "get-by-id/{id}"},
-		{actionFunction: "get-all", method: "get", subURI: "get-all"},
+		{actionFunction: "get-by-id", method: "get", subURI: "{id}"},
+		{actionFunction: "all", method: "get", subURI: "all"},
 		{actionFunction: "create", method: "post", subURI: "create"},
-		{actionFunction: "edit", method: "post", subURI: "edit/{id}"},
-		{actionFunction: "delete", method: "post", subURI: "delete/{id}"},
+		{actionFunction: "edit", method: "patch", subURI: "edit/{id}"},
+		{actionFunction: "delete", method: "delete", subURI: "delete/{id}"},
+
 	}
 
 	for _, routeConfig := range apiRouteConfig {
@@ -92,18 +96,18 @@ Returns:
 	- array of tabbed units
 */
 func (routeGenerator *RouteGenerator) Build() []*api.TabbedUnit {
-	var buildedRouteFile []*api.TabbedUnit
+	var builtRouteFile []*api.TabbedUnit
 
 	importStmt := api.TabbedUnit(core.NewSimpleStatement(`use Illuminate\Support\Facades\Route`))
-	buildedRouteFile = append(buildedRouteFile, &importStmt)
+	builtRouteFile = append(builtRouteFile, &importStmt)
 
 	/*ADD ALL FUNCTION CALLS*/
 	for _, functionCall := range routeGenerator.routes {
 		funCall := api.TabbedUnit(functionCall)
-		buildedRouteFile = append(buildedRouteFile, &funCall)
+		builtRouteFile = append(builtRouteFile, &funCall)
 	}
 
-	return buildedRouteFile
+	return builtRouteFile
 }
 
 /**
