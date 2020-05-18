@@ -16,7 +16,7 @@ func NewRouteContext() *Route {
 /**
 Store a MigrationInfo instance.
 */
-func (route *Route) AddToCtx(key string, value interface{}) interface{} {
+func (route *Route) AddToCtx(key string, value interface{})  {
 	route.routeGenerators[key] = value.(*generator.RouteGenerator)
 }
 
