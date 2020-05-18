@@ -20,10 +20,17 @@ type ModelGenerator struct {
 
 /**
 Creates a new instance of this generator with a new interfaces.Class
+Returns:
+	- instance of generator object
 */
 func NewModelGenerator() *ModelGenerator {
 	return &ModelGenerator{
-		classBuilder: builder.NewClassBuilder(),
+		classBuilder:          builder.NewClassBuilder(),
+		fillables:             []string{},
+		hidden:                []string{},
+		timestamps:            false,
+		createValidationRules: map[string]string{},
+		updateValidationRules: map[string]string{},
 	}
 }
 
@@ -34,11 +41,11 @@ Parameters:
 	- colRule: This will be rule/constraint imposed on the specified passed column.
 Returns:
 	- instance of the generator object
+Example:
+	- AddCreateValidationRule('student_name', 'max:255|string')
 */
 func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, colRule string) *ModelGenerator {
-	if modelGenerator.createValidationRules == nil {
-		modelGenerator.createValidationRules = make(map[string]string)
-	}
+	modelGenerator.createValidationRules = make(map[string]string)
 	modelGenerator.createValidationRules[colName] = colRule
 	return modelGenerator
 }
@@ -50,11 +57,11 @@ Parameters:
 	- colRule: This will be rule/constraint imposed on the specified passed column.
 Returns:
 	- instance of the generator object
+Example:
+	- AddUpdateValidationRule('student_name', 'string|max:255')
 */
 func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, colRule string) *ModelGenerator {
-	if modelGenerator.updateValidationRules == nil {
-		modelGenerator.updateValidationRules = make(map[string]string)
-	}
+	modelGenerator.updateValidationRules = make(map[string]string)
 	modelGenerator.updateValidationRules[colName] = colRule
 	return modelGenerator
 }
@@ -65,6 +72,8 @@ func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, co
 	- tableName: the name of table specified in asher config.
  Returns:
 	- instance of the generator object
+ Example:
+	- SetName('student_allotments')
 */
 func (modelGenerator *ModelGenerator) SetName(tableName string) *ModelGenerator {
 	className := strcase.ToCamel(tableName)
@@ -78,6 +87,8 @@ func (modelGenerator *ModelGenerator) SetName(tableName string) *ModelGenerator 
 	- columnName: the name of the column to add
  Returns:
 	- instance of the generator object
+ Example:
+	- AddFillable('student_name')
 */
 func (modelGenerator *ModelGenerator) AddFillable(columnName string) *ModelGenerator {
 	modelGenerator.fillables = append(modelGenerator.fillables, `"`+columnName+`"`)
@@ -90,6 +101,8 @@ func (modelGenerator *ModelGenerator) AddFillable(columnName string) *ModelGener
 	- columnName: the name of the column to add
  Returns:
 	- instance of the generator object
+ Example:
+	- AddHiddenField('student_name')
 */
 func (modelGenerator *ModelGenerator) AddHiddenField(columnName string) *ModelGenerator {
 	modelGenerator.hidden = append(modelGenerator.hidden, `"`+columnName+`"`)
@@ -100,12 +113,20 @@ func (modelGenerator *ModelGenerator) AddHiddenField(columnName string) *ModelGe
  Control whether to set timestamps in the model of not
  Returns:
 	- instance of the generator object
+ Example:
+	- SetTimestamps(true)
 */
 func (modelGenerator *ModelGenerator) SetTimestamps(flag bool) *ModelGenerator {
 	modelGenerator.timestamps = flag
 	return modelGenerator
 }
 
+/**
+ Builds the corresponding model from the given ingredients of input.
+ Note: It returns a new core.Class object every time it's called.
+ Returns:
+ 	- The corresponding model core.Class from the given ingredients of input.
+ */
 func (modelGenerator *ModelGenerator) Build() *core.Class {
 	modelGenerator.classBuilder = modelGenerator.classBuilder.SetPackage("App").AddImports([]string{
 		`Illuminate\Database\Eloquent\Model`,
@@ -129,22 +150,43 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 	}
 
 	if len(modelGenerator.createValidationRules) > 0 {
-		returnArray := api.TabbedUnit(core.NewReturnArrayFromMap(modelGenerator.createValidationRules))
-		createFunction := builder.NewFunctionBuilder().SetName("createValidationRules").
-			SetVisibility("public").AddStatement(&returnArray).GetFunction()
+		createFunction := getValidationRulesFunction("createValidationRules",
+			modelGenerator.createValidationRules)
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(createFunction)
 	}
 
 	if len(modelGenerator.updateValidationRules) > 0 {
-		returnArray := api.TabbedUnit(core.NewReturnArrayFromMap(modelGenerator.updateValidationRules))
-		updateFunction := builder.NewFunctionBuilder().SetName("updateValidationRules").
-			SetVisibility("public").AddStatement(&returnArray).GetFunction()
+		updateFunction := getValidationRulesFunction("updateValidationRules",
+			modelGenerator.updateValidationRules)
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(updateFunction)
 	}
 
 	return modelGenerator.classBuilder.GetClass()
 }
 
+/**
+ Implementation of the base Generator to return string of this model.
+ Returns:
+	- string representation of this mode.
+ */
 func (modelGenerator *ModelGenerator) String() string {
 	return modelGenerator.Build().String()
+}
+
+
+/**
+ A helper function to generate a ReturnArray for rules with the given method name.
+ Parameters:
+	- functionName: name of the function that returns these validation rules.
+	- rules: a map of columns and their validation rules.
+ Returns:
+	- instance of core.Function for the given input.
+ Example:
+	- getValidationRulesFunction('createValidationRules', map[string]string{'name':'max:255'})
+*/
+func getValidationRulesFunction(functionName string, rules map[string]string) *core.Function {
+	returnArray := api.TabbedUnit(core.NewReturnArrayFromMap(rules))
+	function := builder.NewFunctionBuilder().SetName(functionName).
+		SetVisibility("public").AddStatement(&returnArray).GetFunction()
+	return function
 }

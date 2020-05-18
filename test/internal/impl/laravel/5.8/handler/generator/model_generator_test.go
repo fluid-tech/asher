@@ -7,44 +7,49 @@ import (
 )
 
 func TestModelGenerator(t *testing.T) {
+	var emptyArr []string
+	emptyMap := map[string]string{}
+	fillableArr := []string{"name", "phone_number"}
+	hiddenFields := []string{"password", "gender"}
+	createRules := map[string]string {
+		"name": "string|max:255|unique:users",
+		"phone_number": "string|max:12|unique:users",
+	}
+	updateRules := map[string]string {
+		"name": "string|max:255|unique:users",
+		"phone_number": "string|max:12|unique:users",
+	}
+
 	var table = []*api.GeneralTest{
-		getEmptyModel(),
-		getModelWithFillable(),
-		getModelWithHiddenFields(),
-		getModelWithCreateValidationRules(),
-		getModelWithUpdateValidationRules(),
+		genModelGeneratorTest("student_allotments", emptyArr, emptyArr, emptyMap, emptyMap, EmptyModel),
+		genModelGeneratorTest("student_allotments", fillableArr, emptyArr, emptyMap, emptyMap, ModelWithFillable),
+		genModelGeneratorTest("student_allotments", emptyArr, hiddenFields, emptyMap, emptyMap, ModelWithHidden),
+		genModelGeneratorTest("student_allotments", emptyArr, emptyArr, createRules, emptyMap,
+			ModelWithCreateValidationRules),
+		genModelGeneratorTest("student_allotments", emptyArr, emptyArr, emptyMap, updateRules,
+			ModelWithUpdateValidationRules),
 	}
 
 	api.IterateAndTest(table, t)
 }
 
-func getEmptyModel() *api.GeneralTest {
-	modelGenerator := generator.NewModelGenerator().SetName("student_allotments")
-	return api.NewGeneralTest(modelGenerator.Build().String(), EmptyModel)
-}
-
-func getModelWithFillable() *api.GeneralTest {
-	modelGenerator := generator.NewModelGenerator().SetName("student_allotments").
-		AddFillable("name").AddFillable("phone_number")
-	return api.NewGeneralTest(modelGenerator.Build().String(), ModelWithFillable)
-}
-
-func getModelWithHiddenFields() *api.GeneralTest {
-	modelGenerator := generator.NewModelGenerator().SetName("student_allotments").
-		AddHiddenField("password").AddHiddenField("gender")
-	return api.NewGeneralTest(modelGenerator.Build().String(), ModelWithHidden)
-}
-
-func getModelWithCreateValidationRules() *api.GeneralTest {
-	modelGenerator := generator.NewModelGenerator().SetName("student_allotments").
-		AddCreateValidationRule("name", "string|max:255|unique:users").
-		AddCreateValidationRule("phone_number", "string|max:12|unique:users")
-	return api.NewGeneralTest(modelGenerator.Build().String(), ModelWithCreateValidationRules)
-}
-
-func getModelWithUpdateValidationRules() *api.GeneralTest {
-	modelGenerator := generator.NewModelGenerator().SetName("student_allotments").
-		AddUpdateValidationRule("name", "string|max:255|unique:users").
-		AddUpdateValidationRule("phone_number", "string|max:12|unique:users")
-	return api.NewGeneralTest(modelGenerator.Build().String(), ModelWithUpdateValidationRules)
+/**
+ A helper function to generate GeneralTest cases for ModelGenerator
+ */
+func genModelGeneratorTest(name string, fillables []string, hiddenFields []string, createRules map[string]string,
+	updateRules map[string]string, expectedCode string) *api.GeneralTest {
+	modelGenerator := generator.NewModelGenerator().SetName(name)
+	for _, fillable := range fillables {
+		modelGenerator.AddFillable(fillable)
+	}
+	for _, hiddenField := range hiddenFields {
+		modelGenerator.AddHiddenField(hiddenField)
+	}
+	for column, rules := range createRules {
+		modelGenerator.AddCreateValidationRule(column, rules)
+	}
+	for column, rules := range updateRules {
+		modelGenerator.AddUpdateValidationRule(column, rules)
+	}
+	return api.NewGeneralTest(modelGenerator.Build().String(), expectedCode)
 }

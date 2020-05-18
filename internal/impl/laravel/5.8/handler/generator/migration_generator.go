@@ -30,6 +30,8 @@ func NewMigrationGenerator() *MigrationGenerator {
 	- tableName: the name of table specified in asher config.
  Returns:
 	- instance of the migration generator object.
+ Example:
+	- SetName('product_categories')
 */
 func (migrationGenerator *MigrationGenerator) SetName(tableName string) *MigrationGenerator {
 	className := "Create" + strcase.ToCamel(tableName) + "Table"
@@ -44,6 +46,8 @@ func (migrationGenerator *MigrationGenerator) SetName(tableName string) *Migrati
 	- column: core.SimpleStatement of the column to add.
  Returns:
 	- instance of the migration generator object.
+ Example:
+	- AddColumn(core.NewSimpleStatement('$this->string('name')->unique()'))
  */
 func (migrationGenerator *MigrationGenerator) AddColumn(column core.SimpleStatement) *MigrationGenerator {
 	migrationGenerator.columns = append(migrationGenerator.columns, column)
@@ -56,6 +60,11 @@ func (migrationGenerator *MigrationGenerator) AddColumn(column core.SimpleStatem
 	- columns: A list of core.SimpleStatement of the columns to add.
  Returns:
 	- instance of the migration generator object.
+ Example:
+	- AddColumns([]core.SimpleStatement{
+		core.NewSimpleStatement('$this->string('name')->unique()')
+		core.NewSimpleStatement('$this->string('phone_number', 12)->unique()')
+	  })
 */
 func (migrationGenerator *MigrationGenerator) AddColumns(columns []core.SimpleStatement) *MigrationGenerator {
 	for _, statement := range columns {
@@ -95,4 +104,13 @@ func (migrationGenerator *MigrationGenerator) Build() *core.Class {
 	    AddFunction(downFunction)
 
 	return migrationGenerator.classBuilder.GetClass()
+}
+
+/**
+ Implementation of the base Generator to return this migration's corresponding string.
+ Returns:
+	- string representation of this migration.
+ */
+func (migrationGenerator *MigrationGenerator) String() string {
+	return migrationGenerator.Build().String()
 }
