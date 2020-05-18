@@ -3,6 +3,7 @@ package context
 var registry = map[string]BaseContext{
 	"migration": NewMigrationContext(),
 	"model" : NewModelContext(),
+	"route" : NewRouteContext(),
 }
 
 /*

@@ -47,3 +47,4 @@ func (p *PhpEmitterFile) String() string {
 	}
 	return builder.String()
 }
+

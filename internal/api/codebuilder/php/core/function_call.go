@@ -57,7 +57,6 @@ func (c *FunctionCall) String() string {
 		if i != argLen - 1 {
 			fmt.Fprint(&builder, ", ")
 		}
-		fmt.Fprintf(&builder, "\n")
 	}
 	fmt.Fprintf(&builder, ");")
 	return builder.String()
