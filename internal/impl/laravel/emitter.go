@@ -30,6 +30,7 @@ func (e Emitter) Emit(value interface{}) {
 	//GetFromRegistry("softDeletes").Handle(model.Name, model.SoftDeletes)
 	//GetFromRegistry("timestamps").Handle(model.Name, model.Timestamps)
 	GetFromRegistry("auditCols").Handle(model.Name, helper.NewAuditColInputFromType(model.AuditCols, model.SoftDeletes, model.Timestamps))
+	GetFromRegistry("controller").Handle(model.Name, model.Controller)
 
 
 }

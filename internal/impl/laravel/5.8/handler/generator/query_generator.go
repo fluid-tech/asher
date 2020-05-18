@@ -6,7 +6,6 @@ import (
 )
 
 type QueryGenerator struct {
-
 }
 
 func NewQueryGenerator() *QueryGenerator {

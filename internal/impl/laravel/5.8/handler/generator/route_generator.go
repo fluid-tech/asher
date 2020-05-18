@@ -16,11 +16,31 @@ func NewRouteGenerator() *RouteGenerator {
 	return &RouteGenerator{}
 }
 
+/**
+Returns the array of functional calls for every model to add their routes
+Returns:
+	- array of *core.FunctionCall
+*/
 func (routeGenerator *RouteGenerator) Routes() []*core.FunctionCall {
 	return routeGenerator.routes
 }
 
-func (routeGenerator *RouteGenerator) AddResourceRoutes(modelName string) *RouteGenerator {
+/**
+Add the predefined sets of rest routes for the specific model in the generator routes array
+Parameters:
+	- modelName: name of the model for which routes are to be generated
+Returns:
+	- instance of the generator object
+Sample Usage:
+	- AddDefaultRestRoutes('Order')
+	routes generated for the above call are
+	Route::get(/order/get-by-id/{id}, OrderController@get-by-id);
+	Route::get(/order/get-all, OrderController@get-all);
+	Route::post(/order/create, OrderController@create);
+	Route::post(/order/edit/{id}, OrderController@edit);
+	Route::post(/order/delete/{id}, OrderController@delete);
+*/
+func (routeGenerator *RouteGenerator) AddDefaultRestRoutes(modelName string) *RouteGenerator {
 
 	type RouteConfig struct {
 		method         string
@@ -45,6 +65,18 @@ func (routeGenerator *RouteGenerator) AddResourceRoutes(modelName string) *Route
 	return routeGenerator
 }
 
+/**
+Adds the specific routes to the routes array of generator
+Parameters:
+	- method: http methods like get,post,delete...
+	- uri: uri to perform the action
+	-action: ControllerName@functionName
+Returns:
+	- instance of the generator object
+Sample Usage:
+	- AddRoute("post","/order/create","OrderController@create")
+	Route::post(/order/create, OrderController@create);
+*/
 func (routeGenerator *RouteGenerator) AddRoute(method string, uri string, action string) *RouteGenerator {
 	route := core.NewFunctionCall("Route::" + method)
 	uriTabbedUnit := api.TabbedUnit(core.NewParameter(uri))
@@ -54,6 +86,11 @@ func (routeGenerator *RouteGenerator) AddRoute(method string, uri string, action
 	return routeGenerator
 }
 
+/**
+Returns the array of tabbedUnits in which the imports array is followed by routes array
+Returns:
+	- array of tabbed units
+*/
 func (routeGenerator *RouteGenerator) Build() []*api.TabbedUnit {
 	var buildedRouteFile []*api.TabbedUnit
 
@@ -69,6 +106,18 @@ func (routeGenerator *RouteGenerator) Build() []*api.TabbedUnit {
 	return buildedRouteFile
 }
 
+/**
+Returns:
+	- contents of route file in string file
+Sample Usage:
+	-eg.output:
+	use Illuminate\Support\Facades\Route;
+	Route::get(/order/get-by-id/{id}, OrderController@get-by-id);
+	Route::get(/order/get-all, OrderController@get-all);
+	Route::post(/order/create, OrderController@create);
+	Route::post(/order/edit/{id}, OrderController@edit);
+	Route::post(/order/delete/{id}, OrderController@delete);
+*/
 func (routeGenerator *RouteGenerator) String() string {
 	var builder strings.Builder
 
