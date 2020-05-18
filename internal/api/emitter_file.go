@@ -8,21 +8,21 @@ type EmitterFile interface {
 }
 
 const (
-	MIGRATION  = 0
-	MODEL      = 1
-	MUTATOR    = 2
-	TRANSACTOR = 3
+	Migration  = 0
+	Model      = 1
+	Mutator    = 2
+	Transactor = 3
 
-	CONTROLLER = 5
-	ROUTEFILE  = 6
+	Controller = 5
+	RouterFile  = 6
 )
 
 const (
-	MIGRATION_PATH  = ""
-	MODEL_PATH      = ""
-	MUTATOR_PATH    = ""
-	TRANSACTOR_PATH = ""
+	MigrationPath  = `database/migrations`
+	ModelPath      = `app/`
+	MutatorPath    = `app/Http/Mutators`
+	TransactorPath = `app/Http/Transactors`
 
-	CONTROLLER_PATH = ""
-	ROUTEFILE_PATH  = ""
+	ControllerPath = `app/Http/Controllers`
+	RouteFilePath  = `routes/`
 )
