@@ -100,7 +100,7 @@ func buildClassWithArrayDecl(className string) *core.Class {
 	getUpdateRules := builder.NewFunctionBuilder().SetVisibility("public").SetName("getUpdateValidationRules").
 		AddStatement(&returnArray2)
 
-	member := api.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
+	member := api.TabbedUnit(core.NewVarDeclaration("private", "fullyQualifiedModel"))
 	rhs := []string{`"user_id"`, `"password"`}
 	arrayAssignmentMember := api.TabbedUnit(core.NewArrayAssignment("public", "fillable", rhs))
 	klass := builder.NewClassBuilder().SetName(className).SetExtends("BaseMutator").
