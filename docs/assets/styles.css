@@ -1,0 +1,11 @@
+.features {
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+}
+.feature-wrapper {
+    display: inline-block;
+    padding: 5% 3%;
+    display: flex;
+    flex-direction: column;
+}

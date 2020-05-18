@@ -1,7 +1,7 @@
 const Sidebar = [
     {
-        title: "Introduction",
-        link: '/introduction'
+        title: "Home",
+        link: '/'
     },
     {
         title: 'Getting Started',
