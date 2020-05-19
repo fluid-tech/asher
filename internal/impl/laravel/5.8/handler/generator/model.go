@@ -18,6 +18,8 @@ type ModelGenerator struct {
 	createValidationRules map[string]string
 	updateValidationRules map[string]string
 	relationshipDetails   []*helper.RelationshipDetail
+	softDeletes           bool
+	auditCols             bool
 }
 
 /**
@@ -34,6 +36,8 @@ func NewModelGenerator() *ModelGenerator {
 		createValidationRules: map[string]string{},
 		updateValidationRules: map[string]string{},
 		relationshipDetails:   []*helper.RelationshipDetail{},
+		softDeletes:           false,
+		auditCols:             false,
 	}
 }
 
@@ -136,6 +140,33 @@ func (modelGenerator *ModelGenerator) AddRelationship(detail *helper.Relationshi
 }
 
 /**
+ Sets the soft deletes field of this generator. During build adds the string `Use SoftDeletes;`
+ to the model.
+ Returns:
+	- instance of the generator object
+ Example:
+	- builder.SetSoftDeletes(true)
+*/
+func (modelGenerator *ModelGenerator) SetSoftDeletes(softDeletes bool) *ModelGenerator {
+	modelGenerator.softDeletes = softDeletes
+	return modelGenerator
+}
+
+/**
+ Sets the auditCol field of this generator. If true, during build, it adds created_by and updated_by
+ cols to fillables arr. It also adds created_by to createValidationRules and updated_by to
+ updateValidationRules.
+ Returns:
+	- instance of the generator object
+ Example:
+	- builder.SetAuditCols(true)
+*/
+func (modelGenerator *ModelGenerator) SetAuditCols(auditCols bool) *ModelGenerator {
+	modelGenerator.auditCols = auditCols
+	return modelGenerator
+}
+
+/**
 Builds the corresponding model from the given ingredients of input.
 Note: It returns a new core.Class object every time it's called.
 Returns:
@@ -146,38 +177,50 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 		`Illuminate\Database\Eloquent\Model`,
 	}).SetExtends("Model")
 
+	if modelGenerator.softDeletes {
+		tabbedUnit := api.TabbedUnit(core.NewSimpleStatement("use SoftDeletes"))
+		modelGenerator.classBuilder.AddMember(&tabbedUnit)
+		modelGenerator.AddFillable("deleted_at")
+	}
+
+	if modelGenerator.auditCols {
+		modelGenerator.AddCreateValidationRule("created_by", "exists:users,id")
+		modelGenerator.AddUpdateValidationRule("updated_by", "exists:users,id")
+		modelGenerator.AddFillable("created_by").AddFillable("updated_by")
+	}
+
 	if len(modelGenerator.fillables) > 0 {
 		fillableArray := api.TabbedUnit(core.NewArrayAssignment("protected", "fillable",
 			modelGenerator.fillables))
-		modelGenerator.classBuilder = modelGenerator.classBuilder.AddMember(&fillableArray)
+		modelGenerator.classBuilder.AddMember(&fillableArray)
 	}
 
 	if len(modelGenerator.hidden) > 0 {
 		hiddenArray := api.TabbedUnit(core.NewArrayAssignment("protected", "visible",
 			modelGenerator.hidden))
-		modelGenerator.classBuilder = modelGenerator.classBuilder.AddMember(&hiddenArray)
+		modelGenerator.classBuilder.AddMember(&hiddenArray)
 	}
 
 	if modelGenerator.timestamps {
 		timestamps := api.TabbedUnit(core.NewVarAssignment("public", "timestamps", "true"))
-		modelGenerator.classBuilder = modelGenerator.classBuilder.AddMember(&timestamps)
+		modelGenerator.classBuilder.AddMember(&timestamps)
 	}
 
 	if len(modelGenerator.createValidationRules) > 0 {
 		createFunction := getValidationRulesFunction("createValidationRules",
 			modelGenerator.createValidationRules)
-		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(createFunction)
+		modelGenerator.classBuilder.AddFunction(createFunction)
 	}
 
 	if len(modelGenerator.updateValidationRules) > 0 {
 		updateFunction := getValidationRulesFunction("updateValidationRules",
 			modelGenerator.updateValidationRules)
-		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(updateFunction)
+		modelGenerator.classBuilder.AddFunction(updateFunction)
 	}
 
 	if len(modelGenerator.relationshipDetails) > 0 {
 		for _, relnFunc := range modelGenerator.relationshipDetails {
-			modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(relnFunc.Function)
+		modelGenerator.classBuilder.AddFunction(relnFunc.Function)
 		}
 	}
 
