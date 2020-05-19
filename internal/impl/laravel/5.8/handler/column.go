@@ -114,7 +114,7 @@ func (columnHandler *ColumnHandler) handlePrimary(colType string, colName string
 
 func (columnHandler *ColumnHandler) handleOther(column models.Column) *core.SimpleStatement {
 	var generatedLine string
-	colTypeVal := columnHandler.ColTypeSwitcher(column.ColType, column.Name, column.Allowed)
+	colTypeVal := helper.ColTypeSwitcher(column.ColType, column.Name, column.Allowed)
 	defaultVal := columnHandler.handleDefaultValue(column.DefaultVal)
 	nullableVal := columnHandler.handleNullable(column.Nullable)
 	uniqueVal := columnHandler.handleUnique(column.Unique)
@@ -184,47 +184,4 @@ func (columnHandler *ColumnHandler) primaryKeyMethodNameGenerator(colType string
 	}
 }
 
-/*
-	This method will have all the keys defined by asher as valid input value and return
-	its respective laravel method name
-*/
-func (columnHandler *ColumnHandler) ColTypeSwitcher(colType string, colName string, allowed []string) string {
-	switch colType {
-	// TODO : Add more column types here
-	case "unsignedBigInteger":
-		return helper.UnsignedBigInteger(colName)
-	case "bigInteger":
-		return helper.BigInteger(colName)
-	case "unsignedInteger":
-		return helper.UnsignedInteger(colName)
-	case "integer":
-		return helper.Integer(colName)
-	case "unsignedTinyInteger":
-		return helper.UnsignedTinyInteger(colName)
-	case "tinyInteger":
-		return helper.TinyInteger(colName)
-	case "unsignedMediumInteger":
-		return helper.UnsignedMediumInteger(colName)
-	case "mediumInteger":
-		return helper.MediumInteger(colName)
-	case "string":
-		return helper.String(colName)
-	case "boolean":
-		return helper.Boolean(colName)
-	case "char":
-		return helper.Char(colName)
-	case "date":
-		return helper.Date(colName)
-	case "double":
-		return helper.Double(colName)
-	case "float":
-		return helper.Float(colName)
-	case "enum":
-		return helper.Enum(colName, allowed)
-	case "set":
-		return helper.Set(colName, allowed)
-	default:
-		// TODO: Log this error and replace it with formatted error message.
-		panic("not supported or wrong input in ColTypeSwitcher :- " + colType)
-	}
-}
+
