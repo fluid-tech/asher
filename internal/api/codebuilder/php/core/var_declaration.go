@@ -1,18 +1,19 @@
 package core
 
 import (
+	"asher/internal/api"
 	"fmt"
 	"strings"
 )
 
 type VarDeclaration struct {
-	TabbedUnit
+	api.TabbedUnit
 	tabs       int
 	Visibility string
 	Identifier string
 }
 
-func GetVarDeclaration(visibility string, id string) *VarDeclaration {
+func NewVarDeclaration(visibility string, id string) *VarDeclaration {
 	return &VarDeclaration{
 		tabs:       0,
 		Visibility: visibility,
@@ -30,7 +31,7 @@ func (v *VarDeclaration) Id() string {
 
 func (v *VarDeclaration) String() string {
 	var builder strings.Builder
-	fmt.Fprint(&builder, TabbedString(uint(v.tabs)),
+	fmt.Fprint(&builder, api.TabbedString(uint(v.tabs)),
 		v.Visibility, " $", v.Identifier, ";")
 	return builder.String()
 }

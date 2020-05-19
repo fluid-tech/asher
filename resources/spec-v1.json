@@ -54,10 +54,10 @@
         "controller": {
           "rest": true,
           "pattern": {
-            "type": "transactor",
-            "extraInfo": [
-              "fileTransactor"
-            ]
+            "patternType": "transactor",
+            "protected": true,
+            "nestedWith": ["OrderProduct"],
+            "type": "default"
           }
         }
       }

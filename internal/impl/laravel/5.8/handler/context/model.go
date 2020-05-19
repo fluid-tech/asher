@@ -1,18 +1,20 @@
 package context
 
-import "asher/internal/api/codebuilder/php/core"
+import (
+	"asher/internal/impl/laravel/5.8/handler/generator"
+)
 
 type Model struct {
 	BaseContext
-	modelMap map[string]*core.Class
+	modelMap map[string]*generator.ModelGenerator
 }
 
 func NewModelContext() *Model {
-	return &Model{modelMap: make(map[string]*core.Class)}
+	return &Model{modelMap: make(map[string]*generator.ModelGenerator)}
 }
 
 func (m *Model) AddToCtx(key string, value interface{}) {
-	m.modelMap[key] = value.(*core.Class)
+	m.modelMap[key] = value.(*generator.ModelGenerator)
 }
 
 func (m *Model) GetCtx(key string) interface{} {
