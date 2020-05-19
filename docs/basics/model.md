@@ -7,14 +7,14 @@ code, so you can focus on the business logic.
 #### Table of content
 * [Basic Usage](/basics/model#configuration) 
 * [Example](/basics/model#example)
-* [Audit Columns](#)
-* [Time stamps](#) 
-* [Soft Deletes](#) 
+* [Audit Columns](/basics/model#audit-columns)
+* [Timestamps](/basics/model#timestamps) 
+* [Soft Deletes](/basics/model#soft-deletes) 
 * [Columns](/basics/model#columns)
     * [Validations](/basics/model#validations)
-    * [Fillable](#) 
-    * [Hidden](#) 
-    * [Column Types](#)
+    * [Fillable](/basics/model#fillable) 
+    * [Hidden](/basics/model#hidden) 
+    * [Column Types & Default Value](/basics/model#column-types--default-value)
 
 ### Basic Usage
 To scaffold a model, the first thing you need to do is specify the details of your model in `config.asher`
@@ -82,6 +82,72 @@ $ asher scaffold
 ```
 
 That's it! Asher will now generate the following Model and Migration files for the specified model.
+
+
+### Audit Columns
+
+There are some situation where you need to track the user who created/updated a particular row in a table. To implement 
+this functionality we recommend adding 4 meta columns `created_at`, `created_by`, `updated_at` & `updated_by` in the 
+table we need to track. The columns `created_at`, `updated_at` are timestamps of when the user created/updated that 
+column and `created_by`, `updated_by` store the `id` of the user who created/update that column.
+
+Asher adds these audit columns for you, all you need to do is set the property `auditCols` as `true` under the object of 
+that model in the configuration file. 
+
+##### Example
+```json
+{
+  "models": [{
+    "name": "users",
+    "cols": [{
+      "name": "user_email",
+      "colType": "string"
+    }],
+    "auditCols": "true"
+  }]
+}
+```
+
+
+### Timestamps
+
+To add the timestamp columns to the model, you just need set the property `timestamps` as `true` under the object of 
+that model. Asher will add these columns to the migration and will configure its Model to auto update the columns 
+whenever a row is inserted/updated.
+
+##### Example
+```json
+  {
+    "models": [{
+      "name": "users",
+      "cols": [{
+        "name": "user_email",
+        "colType": "string"
+      }],
+      "timestamps": "true"
+    }]
+  }
+```
+
+### Soft Deletes
+
+Asher also allows you to configure soft deletes in your model. You just need to set the property `softDeletes` as `true` 
+under the object of that model and asher will add the required columns to your migration and model. Asher internally uses 
+laravel [Soft Deletes](https://laravel.com/docs/7.x/eloquent#soft-deleting).   
+
+##### Example
+```json
+  {
+    "models": [{
+      "name": "users",
+      "cols": [{
+        "name": "user_email",
+        "colType": "string"
+      }],
+      "softDeletes": "true"
+    }]
+  }
+```
 
 ### Columns
 #### Validations
