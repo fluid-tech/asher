@@ -4,48 +4,11 @@ const Sidebar = [
         link: '/introduction'
     },
     {
-        title: 'Getting Started',
+        title: 'Laravel',
         children: [
             {
-                title: 'Installation',
-                link: '/'
-            },
-            {
-                title: 'Customization',
-                link: '/guide/customization'
-            },
-        ]
-    },
-    {
-        title: 'The basics',
-        children: [
-            {
-                title: 'Configuration',
-                link: '/'
-            },
-            {
-                title: 'Migrations',
-                link: '/'
-            },
-            {
-                title: 'Models',
+                title: '1. Models & Migrations',
                 link: '/basics/model'
-            },
-            {
-                title: 'Mutators',
-                link: '/'
-            },
-            {
-                title: 'Transactors',
-                link: '/'
-            },
-            {
-                title: 'Controllers',
-                link: '/'
-            },
-            {
-                title: 'Customization',
-                link: '/guide/customization'
             },
         ]
     },
