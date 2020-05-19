@@ -52,12 +52,10 @@ func (c *FunctionCall) String() string {
 	fmt.Fprint(&builder, api.TabbedString(uint(c.tabs)), c.Def, "(")
 	argLen := len(c.Args)
 	for i, element := range c.Args{
-		(*element).SetNumTabs(c.tabs + 1)
 		fmt.Fprintf(&builder , (*element).String())
 		if i != argLen - 1 {
 			fmt.Fprint(&builder, ", ")
 		}
-		fmt.Fprintf(&builder, "\n")
 	}
 	fmt.Fprintf(&builder, ");")
 	return builder.String()
