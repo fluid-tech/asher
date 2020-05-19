@@ -5,6 +5,7 @@ import (
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/builder/interfaces"
 	"asher/internal/api/codebuilder/php/core"
+	"asher/internal/impl/laravel/5.8/handler/helper"
 	"github.com/iancoleman/strcase"
 )
 
@@ -16,6 +17,7 @@ type ModelGenerator struct {
 	timestamps            bool
 	createValidationRules map[string]string
 	updateValidationRules map[string]string
+	relationshipDetails   []*helper.RelationshipDetail
 }
 
 /**
@@ -31,6 +33,7 @@ func NewModelGenerator() *ModelGenerator {
 		timestamps:            false,
 		createValidationRules: map[string]string{},
 		updateValidationRules: map[string]string{},
+		relationshipDetails:   []*helper.RelationshipDetail{},
 	}
 }
 
@@ -120,6 +123,19 @@ func (modelGenerator *ModelGenerator) SetTimestamps(flag bool) *ModelGenerator {
 }
 
 /**
+ Adds Relationship method of various tables inside the model
+ Returns:
+	- instance of the generator object
+ Example:
+	details := helper.RelationshipDetail{1, <object of function>}
+	- AddRelationship(details)
+*/
+func (modelGenerator *ModelGenerator) AddRelationship(detail *helper.RelationshipDetail) *ModelGenerator {
+	modelGenerator.relationshipDetails = append(modelGenerator.relationshipDetails, detail)
+	return modelGenerator
+}
+
+/**
 Builds the corresponding model from the given ingredients of input.
 Note: It returns a new core.Class object every time it's called.
 Returns:
@@ -157,6 +173,12 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 		updateFunction := getValidationRulesFunction("updateValidationRules",
 			modelGenerator.updateValidationRules)
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(updateFunction)
+	}
+
+	if len(modelGenerator.relationshipDetails) > 0 {
+		for _, relnFunc := range modelGenerator.relationshipDetails {
+			modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(relnFunc.Function)
+		}
 	}
 
 	return modelGenerator.classBuilder.GetClass()
