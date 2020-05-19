@@ -6,10 +6,15 @@ code, so you can focus on the business logic.
 
 #### Table of content
 * [Basic Usage](/basics/model#configuration) 
-* [Example](/basics/model#example) 
-* [Soft Deletes](#) 
-* [Audit Columns](#) 
+* [Example](/basics/model#example)
+* [Audit Columns](#)
 * [Time stamps](#) 
+* [Soft Deletes](#) 
+* [Columns](/basics/model#columns)
+    * [Validations](/basics/model#validations)
+    * [Fillable](#) 
+    * [Hidden](#) 
+    * [Column Types](#)
 
 ### Basic Usage
 To scaffold a model, the first thing you need to do is specify the details of your model in `config.asher`
@@ -77,3 +82,118 @@ $ asher scaffold
 ```
 
 That's it! Asher will now generate the following Model and Migration files for the specified model.
+
+### Columns
+#### Validations
+One of the most important part of an application is validation of the data. To make sure that the input data provided by
+the user is correct and would not affect the consistency of our database. Asher provides validation of the columns too, 
+according to our [Transactor Pattern]() we recommend storing the validations of each column in the model itself. 
+This helps asher in generating the basic CRUD methods for your model.
+
+Every `cols` object in a model has 2 keys `createRules` and `updateRules` that accepts a string specifying the rules for
+that column. As shown below:
+```json
+{
+  "models": [{
+    "name": "model_name",
+    "cols": [{
+      "name": "column_name",
+      "createRules": "validation_rules",
+      "updateRules": "validation_rules"
+    }]
+  }]
+}
+```
+Asher supports all the validation rules provided by laravel. You just need to provide a string of all the 
+rules to `createRules` and `updateRules`. You can view all the available rules [here](https://laravel.com/docs/7.x/validation#available-validation-rules).
+
+##### Example
+Here's an example configuration column `email` that must be unique string with a max size of 255.
+```json
+{
+  "models": [{
+    "name": "users",
+    "cols": [{
+      "name": "user_email",   
+      "colType": "string",
+      "createRules": "string|max:255|unique:users",
+      "updateRules": "string|max:255|unique:users"
+    }]
+  }]
+}
+```  
+
+
+#### Fillable
+To generate the CRUD methods for your model, you must specify asher about the columns that are expected in the input.
+You can do this by setting the property `fillable` as `true` under the object of the respective column. Asher adds these
+list of columns to the fillable array of that Model, so you can perform create/update operations on that column.
+
+##### Example 
+```json
+{
+  "models": [{
+    "name": "users",
+    "cols": [{
+      "name": "user_email",
+      "colType": "string",
+      "fillable": "true"
+    }]
+  }]
+}
+```
+
+#### Hidden
+Sometimes you need to hide the values of some columns from users as they may consider sensitive information 
+(E.g: passwords). Asher allows you to configure these columns so that they are hidden in the response. You can do this 
+by simply setting the property `hidden` as `true under the object of the respective column.
+
+##### Example
+```json
+{
+  "models": [{
+    "name": "users",
+    "cols": [{
+      "name": "user_email",
+      "colType": "string",
+      "hidden": "true"
+    }]
+  }]
+}
+```
+
+#### Column Types / Default Value
+You can specify the type of your column using the property `colType` under each object of the respective column. Each
+column must specify its type. The `cols` object has another property `defaultVal` that lets you specify the default 
+value of that column.
+
+To specify the **size** of a column, you need to add a createValidation rule `max:size` describing the required size.  
+
+##### Example
+Here's an example of column `email` of type string of size 255 with default value of `example@gmail.com` 
+```json
+{
+  "models": [{
+    "name": "users",
+    "cols": [{
+      "name": "user_email",
+      "colType": "string",
+      "createRules": "max:255",
+      "defaultVal": "example@gmail.com"
+    }]
+  }]
+}
+```
+
+##### Supported list of columns
+Asher currently supports the following data types of columns.
+
+
+| Type                | Description                                                                                    |
+|---------------------|------------------------------------------------------------------------------------------------|
+| `string`            | VARCHAR equivalent of column.                                                                  |  
+| `integer`           | INTEGER equivalent column.                                                                     |
+| `boolean`           | BOOLEAN equivalent column.                                                                     |
+| `bigInteger`        | BIGINT equivalent column.                                                                      |
+| `date`              | DATE equivalent column.                                                                        |
+| `enum`              | ENUM equivalent column. To specify the allowed values in a enum, you can use the `allowed` property under a object of `cols`|
