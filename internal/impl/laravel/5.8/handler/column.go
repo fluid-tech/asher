@@ -55,8 +55,6 @@ func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr
 	}
 
 	migrationGenerator := generator.NewMigrationGenerator().SetName(identifier).AddColumns(statementsArr)
-	klass := migrationGenerator.Build()
-	fmt.Println(klass)
 	context.GetFromRegistry("migration").AddToCtx(identifier, migrationGenerator)
 	modelGeneratorRef := api.Generator(migrationGenerator)
 	phpEmitter := core.NewPhpEmitterFile(identifier, api.ModelPath, &modelGeneratorRef, api.Model)
