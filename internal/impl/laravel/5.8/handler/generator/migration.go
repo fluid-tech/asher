@@ -11,12 +11,12 @@ import (
 type MigrationGenerator struct {
 	api.Generator
 	classBuilder interfaces.Class
-	tableName string
-	columns []core.SimpleStatement
+	tableName    string
+	columns      []*core.SimpleStatement
 }
 
 /**
- Creates a new instance of this generator with a new interfaces.Class
+Creates a new instance of this generator with a new interfaces.Class
 */
 func NewMigrationGenerator() *MigrationGenerator {
 	return &MigrationGenerator{
@@ -48,9 +48,9 @@ func (migrationGenerator *MigrationGenerator) SetName(tableName string) *Migrati
 	- instance of the migration generator object.
  Example:
 	- AddColumn(core.NewSimpleStatement('$this->string('name')->unique()'))
- */
+*/
 func (migrationGenerator *MigrationGenerator) AddColumn(column core.SimpleStatement) *MigrationGenerator {
-	return migrationGenerator.AddColumns([]core.SimpleStatement{column})
+	return migrationGenerator.AddColumns([]*core.SimpleStatement{&column})
 }
 
 /**
@@ -65,7 +65,7 @@ func (migrationGenerator *MigrationGenerator) AddColumn(column core.SimpleStatem
 		core.NewSimpleStatement('$this->string('phone_number', 12)->unique()')
 	  })
 */
-func (migrationGenerator *MigrationGenerator) AddColumns(columns []core.SimpleStatement) *MigrationGenerator {
+func (migrationGenerator *MigrationGenerator) AddColumns(columns []*core.SimpleStatement) *MigrationGenerator {
 	migrationGenerator.columns = append(migrationGenerator.columns, columns...)
 	return migrationGenerator
 }
@@ -74,15 +74,16 @@ func (migrationGenerator *MigrationGenerator) AddColumns(columns []core.SimpleSt
  Generates corresponding core.Class from the given parameters of this migration.
  Returns:
 	- a pointer to the corresponding core.Class of this migration
- */
+*/
 func (migrationGenerator *MigrationGenerator) Build() *core.Class {
 	// Preparing the arguments for up function
 	arg1 := api.TabbedUnit(core.NewParameter("'" + migrationGenerator.tableName + "'"))
 	closure := builder.NewFunctionBuilder().AddArgument("Blueprint $table")
-	for _, stmt := range migrationGenerator.columns {
-		tabbedStatement := api.TabbedUnit(&stmt)
-		closure.AddStatement(&tabbedStatement)
+	for _, element := range migrationGenerator.columns {
+		tu := api.TabbedUnit(element)
+		closure.AddStatement(&tu)
 	}
+
 	arg2 := api.TabbedUnit(closure.GetFunction())
 
 	// Preparing the statements for up function
@@ -98,7 +99,7 @@ func (migrationGenerator *MigrationGenerator) Build() *core.Class {
 		`Illuminate\DatabaseSchema\Blueprint`,
 		`Illuminate\Support\Facades\Schema`,
 	}).SetExtends("Migration").AddFunction(upFunction).
-	    AddFunction(downFunction)
+		AddFunction(downFunction)
 
 	return migrationGenerator.classBuilder.GetClass()
 }
@@ -107,7 +108,7 @@ func (migrationGenerator *MigrationGenerator) Build() *core.Class {
  Implementation of the base Generator to return this migration's corresponding string.
  Returns:
 	- string representation of this migration.
- */
+*/
 func (migrationGenerator *MigrationGenerator) String() string {
 	return migrationGenerator.Build().String()
 }
