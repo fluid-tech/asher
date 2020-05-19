@@ -220,7 +220,7 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 
 	if len(modelGenerator.relationshipDetails) > 0 {
 		for _, relnFunc := range modelGenerator.relationshipDetails {
-		modelGenerator.classBuilder.AddFunction(relnFunc.Function)
+			modelGenerator.classBuilder.AddFunction(relnFunc.Function)
 		}
 	}
 
