@@ -191,7 +191,8 @@ func (columnHandler *ColumnHandler) primaryKeyMethodNameGenerator(colType string
 	its respective laravel method name
 */
 func (columnHandler *ColumnHandler) ColTypeSwitcher(colType string, colName string, allowed []string) string {
-	switch colType {
+	colDataType := strings.Split(colType, "|")[0]
+	switch colDataType {
 	// TODO : Add more column types here
 	case "unsignedBigInteger":
 		return helper.UnsignedBigInteger(colName)
@@ -210,17 +211,17 @@ func (columnHandler *ColumnHandler) ColTypeSwitcher(colType string, colName stri
 	case "mediumInteger":
 		return helper.MediumInteger(colName)
 	case "string":
-		return helper.String(colName)
+		return helper.String(colName, colType)
 	case "boolean":
 		return helper.Boolean(colName)
 	case "char":
-		return helper.Char(colName)
+		return helper.Char(colName, colType)
 	case "date":
 		return helper.Date(colName)
 	case "double":
-		return helper.Double(colName)
+		return helper.Double(colName, colType)
 	case "float":
-		return helper.Float(colName)
+		return helper.Float(colName, colType)
 	case "enum":
 		return helper.Enum(colName, allowed)
 	case "set":

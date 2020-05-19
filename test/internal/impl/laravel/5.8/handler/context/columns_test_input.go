@@ -169,7 +169,7 @@ var test_1_columnInputArray = []models.Column{
 	},
 	{
 		Name:               "description",
-		ColType:            "string",
+		ColType:            "string|255",
 		GenerationStrategy: "",
 		DefaultVal:         "default description",
 		Table:              "",
