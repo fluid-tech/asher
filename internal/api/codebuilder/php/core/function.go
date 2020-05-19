@@ -84,3 +84,10 @@ Append Statement
 func (f *Function) AppendStatement(unit *api.TabbedUnit) {
 	f.Statements = append(f.Statements, unit)
 }
+
+/**
+Appends Argument
+ */
+func (f *Function) AppendArgument(unit string)  {
+	f.Arguments = append(f.Arguments, unit)
+}

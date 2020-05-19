@@ -6,7 +6,7 @@ import (
 
 type Route struct {
 	BaseContext
-	routeGenerators map[string]*generator.RouteGenerator
+	routeGenerators map[string]*generator.QueryGenerator
 }
 
 func NewRouteContext() *Route {
@@ -16,8 +16,8 @@ func NewRouteContext() *Route {
 /**
 Store a MigrationInfo instance.
 */
-func (route *Route) AddToCtx(key string, value interface{}) interface{} {
-	route.routeGenerators[key] = value.(*generator.RouteGenerator)
+func (route *Route) AddToCtx(key string, value interface{})  {
+	route.routeGenerators[key] = value.(*generator.QueryGenerator)
 }
 
 /**

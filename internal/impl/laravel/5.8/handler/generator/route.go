@@ -57,8 +57,8 @@ func (routeGenerator *RouteGenerator) AddDefaultRestRoutes(modelName string) *Ro
 	}
 
 	for _, routeConfig := range apiRouteConfig {
-		uri := "/" + strings.ToLower(modelName) + "/" + routeConfig.subURI
-		action := modelName + "Controller" + "@" + routeConfig.actionFunction
+		uri := `"`+"/" + strings.ToLower(modelName) + "/" + routeConfig.subURI+`"`
+		action := `"`+modelName + "Controller" + "@" + routeConfig.actionFunction+`"`
 		routeGenerator.AddRoute(routeConfig.method, uri, action)
 	}
 

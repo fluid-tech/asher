@@ -14,7 +14,7 @@ func TestRouteGenerator(t *testing.T) {
 	apiGenerator.AddDefaultRestRoutes("Order")
 
 	/*ADDS A SPECIFIC ROUTE*/
-	apiGenerator.AddRoute("get", "/order-products", "OrderController@getAll")
+	apiGenerator.AddRoute("get", `"/order-products"`, "OrderController@getAll")
 	apiGenerator.AddRoute("get", "/order-products", "OrderController@getAll")
 	apiGenerator.AddRoute("get", "/order-products", "OrderController@getAll")
 
