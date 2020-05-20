@@ -42,9 +42,11 @@ func (routeGenerator *RouteGenerator) Routes() []*core.FunctionCall {
 Add the predefined sets of rest routes for the specific model in the generator routes array
 Parameters:
 	- modelName: name of the model for which routes are to be generated
+	-controller : configuration for controller
 Returns:
 	- instance of the generator object
 Sample Usage:
+	Only that routes will be added thet are in the supported methods array of controller config
 	- AddDefaultRestRoutes('Order')
 	routes generated for the above call are
 	Route::get(/order/get-by-id/{id}, OrderController@get-by-id);
