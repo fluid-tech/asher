@@ -7,19 +7,19 @@ type Transactor struct {
 	transactorGenerators map[string]*generator.TransactorGenerator
 }
 
-func NewTransactorContext() *Controller {
-	return &Controller{}
+func NewTransactorContext() *Transactor {
+	return &Transactor{}
 }
 
 /**
-Store a ControllerInfo instance.
+Store a TransactorInfo instance.
 */
 func (transactor *Transactor) AddToCtx(key string, value interface{})  {
 	transactor.transactorGenerators[key] = value.(*generator.TransactorGenerator)
 }
 
 /**
-Fetches a ControllerInfo instance
+Fetches a TransactorInfo instance
 The user of this method must cast and fetch appropriate data
 */
 func (transactor *Transactor) GetCtx(key string) interface{} {
