@@ -113,7 +113,8 @@ func ColTypeSwitcher(colType string, colName string, allowed []string) string {
 
 	default:
 		// TODO: Log this error and replace it with formatted error message.
-		panic("not supported or wrong input in ColTypeSwitcher :- " + colType)
+		//panic("not supported or wrong input in ColTypeSwitcher :- " + colType)
+		return "unsupported datatype"
 	}
 }
 
@@ -337,7 +338,11 @@ func normalStringDataProcessor(colFunctionName string, colName string) string {
 }
 
 func dataArrayProcessor(colName string, allowed []string, functionName string) string {
-	return fmt.Sprintf("%s('%s', %s)", functionName, colName, handleAllowedKeywordsToString(allowed))
+	if len(allowed) > 0 {
+		return fmt.Sprintf("%s('%s', %s)", functionName, colName, handleAllowedKeywordsToString(allowed))
+	}
+	return fmt.Sprintf("%s('%s')", functionName, colName)
+
 }
 
 func multiParamColumnProcessor(functionName string, colName string, args []string) string {
