@@ -12,6 +12,12 @@ type ReturnArray struct {
 	Statements []string
 }
 
+func NewReturnArrayFromMapRaw(arr map[string]string) *ReturnArray {
+	return &ReturnArray{
+		Statements: rawConvertMapToStringAssociativeArray(arr),
+	}
+}
+
 func NewReturnArrayFromMap(arr map[string]string) *ReturnArray {
 	return &ReturnArray{
 		Statements: convertMapToStringAssociativeArray(arr),
@@ -49,6 +55,14 @@ func convertMapToStringAssociativeArray(rulesMap map[string]string) []string {
 	var returnVal []string
 	for colName, colRule := range rulesMap {
 		returnVal = append(returnVal, colName+" => \""+colRule+"\"")
+	}
+	return returnVal
+}
+
+func rawConvertMapToStringAssociativeArray(rulesMap map[string]string) []string {
+	var returnVal []string
+	for colName, colRule := range rulesMap {
+		returnVal = append(returnVal, `'` + colName + "' => " + colRule)
 	}
 	return returnVal
 }

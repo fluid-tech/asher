@@ -25,7 +25,6 @@ func (columnHandler *ColumnHandler) Handle(modelName string, colsArr interface{}
 
 	tempMigration := api.EmitterFile(columnHandler.handleMigration(modelName, myColsArray))
 	tempModel := api.EmitterFile(columnHandler.handleModel(modelName, myColsArray))
-
 	return []*api.EmitterFile{&tempMigration, &tempModel}, nil
 }
 
@@ -35,8 +34,9 @@ func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []model
 	for _, singleColumn := range colArr {
 		columnHandler.handleHidden(modelGenerator, singleColumn.Hidden, singleColumn.Name)
 		columnHandler.handleGuarded(modelGenerator, singleColumn.Guarded, singleColumn.Name)
-		columnHandler.handleValidation(modelGenerator, singleColumn.Validations, singleColumn.Name)
+		columnHandler.handleValidation(modelGenerator, singleColumn.Validations, singleColumn.Name, modelName)
 	}
+	fmt.Println(modelGenerator.String())
 	//fmt.Print(modelGenerator.Build().String())
 	context.GetFromRegistry("model").AddToCtx(modelName, modelGenerator)
 	modelGeneratorRef := api.Generator(modelGenerator)
@@ -63,10 +63,10 @@ func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr
 	return phpEmitter
 }
 
-func (columnHandler *ColumnHandler) handleValidation(modelGenerator *generator.ModelGenerator, validations string, colName string) {
+func (columnHandler *ColumnHandler) handleValidation(modelGenerator *generator.ModelGenerator, validations string, colName string, modelName string) {
 	if validations != "" {
-		modelGenerator.AddCreateValidationRule(colName, validations)
-		modelGenerator.AddUpdateValidationRule(colName, validations)
+		modelGenerator.AddCreateValidationRule(colName, validations, modelName)
+		modelGenerator.AddUpdateValidationRule(colName, validations, modelName)
 	}
 }
 
