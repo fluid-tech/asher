@@ -19,6 +19,7 @@ func NewControllerHandler() *ControllerHandler {
 
 func (controllerHandler *ControllerHandler) Handle(
 	identifier string, value interface{}) ([]*api.EmitterFile, error) {
+
 	tempValue := value.(models.Controller)
 	if tempValue.Rest {
 		controllerHandler.HandleRestController(identifier, value)
@@ -49,10 +50,33 @@ func (controllerHandler *ControllerHandler) HandleMutator(
 }
 
 func (controllerHandler *ControllerHandler) HandleQuery(
-	identifier string, value interface{}) ([]*api.EmitterFile, error) {
-	return nil,nil
+	identifier string, value interface{}) ([]api.EmitterFile, error) {
+
+	var filesToEmit []api.EmitterFile
+
+	queryGenerator:= generator.NewQueryGenerator(identifier,true)
+
+	context.GetFromRegistry("query").AddToCtx(identifier, queryGenerator)
+
+
+	emitFile:= core.NewPhpEmitterFile(identifier+"Query.php","/app/query",queryGenerator.String(),1))
+	filesToEmit=append(filesToEmit,emitFile)
+
+
+	return filesToEmit, nil
+
 }
 
+/**
+Checks if the asher_api.php is created or not
+if it is not created this method will create it and will add it to the context to be used by other controllers
+to add their routes
+Parameters:
+	- identifier: name of the model for which controller is generator
+Returns:
+	- if asher_api.php file already exists it returns blank *api.EmitterFile array
+		else it will create and return the file in the array
+*/
 func (controllerHandler *ControllerHandler) HandleRoutes(identifier string, value interface{}) ([]*api.EmitterFile, error) {
 	var filesToEmit []*api.EmitterFile
 	//controller := value.(models.Controller)

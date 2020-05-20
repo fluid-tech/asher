@@ -8,11 +8,23 @@ import (
 
 type QueryGenerator struct {
 	Class *builder.Class
-	imports []*api.TabbedUnit
+	imports []api.TabbedUnit
 	modelName string
 	relation bool
 }
 
+
+/**
+Get the new instance of query Generator ,Query is a part of transactor pattern which handles the read operations
+like getById , paginate for various frameworks like datatables.net
+Parameters:
+	- modelName: name of the model for which queries is to be generated
+	-relation : for future use to handle nested queries
+Returns:
+	- instance of the generator object
+Sample Usage:
+	- AddDefaultRestRoutes('Order',{{Relation parameter is yet to defined }})
+*/
 func NewQueryGenerator(modelName string, relation bool) *QueryGenerator {
 	classBuilder := builder.NewClassBuilder()
 	classBuilder.SetName(modelName+"Query")
@@ -21,18 +33,19 @@ func NewQueryGenerator(modelName string, relation bool) *QueryGenerator {
 }
 
 /**
-Returns the array of functional calls for every model to add their routes
+Returns the class builder object of the models query class
 Returns:
-	- array of *core.FunctionCall
+	- *builder.Class
 */
 func (queryGenerator *QueryGenerator) GetClass() *builder.Class {
 	return queryGenerator.Class
 }
 
 /**
-Returns the array of tabbedUnits in which the imports array is followed by routes array
+Builds the query class by adding imports and call to the constructor of base class (BaseQuery)
+passing the fullyQualified Name as the parameter to the super call
 Returns:
-	- array of tabbed units
+	- *core.Class (class object of the the query class)
 */
 func (queryGenerator *QueryGenerator) Build() *core.Class {
 	/*IMPORTS*/
@@ -44,10 +57,9 @@ func (queryGenerator *QueryGenerator) Build() *core.Class {
 	/*CONSTRUCTOR*/
 	constructor := builder.NewFunctionBuilder()
 	constructor.SetName("__construct").SetVisibility("public")
-	fullyQualifiedModelArg:= api.TabbedUnit(core.NewParameter(`"App\`+queryGenerator.modelName+`"`))
-	functionCall := core.NewFunctionCall("parent::__construct").AddArg(&fullyQualifiedModelArg)
-	callToSuperConstructor := api.TabbedUnit(functionCall)
-	constructor.AddStatement(&callToSuperConstructor)
+	fullyQualifiedModelArg:= core.NewParameter(`"App\`+queryGenerator.modelName+`"`)
+	callToSuperConstructor := core.NewFunctionCall("parent::__construct").AddArg(fullyQualifiedModelArg)
+	constructor.AddStatement(callToSuperConstructor)
 	queryGenerator.GetClass().AddFunction(constructor.GetFunction())
 
 	return queryGenerator.Class.GetClass()
@@ -55,15 +67,25 @@ func (queryGenerator *QueryGenerator) Build() *core.Class {
 
 /**
 Returns:
-	- contents of route file in string file
+	- contents of Query Class in string
 Sample Usage:
+	-eg.input :if called for category model
 	-eg.output:
-	use Illuminate\Support\Facades\Route;
-	Route::get(/order/get-by-id/{id}, OrderController@get-by-id);
-	Route::get(/order/get-all, OrderController@get-all);
-	Route::post(/order/create, OrderController@create);
-	Route::post(/order/edit/{id}, OrderController@edit);
-	Route::post(/order/delete/{id}, OrderController@delete);
+	namespace App\Queries;
+
+
+	use App\Category;
+
+	class CategoryQuery extends BaseQuery
+	{
+		public function __construct()
+		{
+			parent::__construct("App\Category");
+		}
+
+	}
+
+
 */
 func (queryGenerator *QueryGenerator) String() string {
 	queryClass := queryGenerator.Build()

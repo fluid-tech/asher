@@ -8,12 +8,15 @@ import (
 )
 
 type RouteGenerator struct {
-	imports []*api.TabbedUnit
-	//routes  []core.FunctionCall
+	imports []api.TabbedUnit
+	routes  []*core.FunctionCall
 }
 
 func NewRouteGenerator() *RouteGenerator {
-	return &RouteGenerator{}
+	return &RouteGenerator{
+		imports:	[]api.TabbedUnit{},
+		routes: 	[]*core.FunctionCall{},
+	}
 }
 
 /**
@@ -21,9 +24,9 @@ Returns the array of functional calls for every model to add their routes
 Returns:
 	- array of *core.FunctionCall
 */
-//func (routeGenerator *RouteGenerator) Routes() []*core.FunctionCall {
-//	return routeGenerator.routes
-//}
+func (routeGenerator *RouteGenerator) Routes() []*core.FunctionCall {
+	return routeGenerator.routes
+}
 
 /**
 Add the predefined sets of rest routes for the specific model in the generator routes array
@@ -40,51 +43,50 @@ Sample Usage:
 	Route::post(/order/edit/{id}, OrderController@edit);
 	Route::post(/order/delete/{id}, OrderController@delete);
 */
-//func (routeGenerator *RouteGenerator) AddDefaultRestRoutes(modelName string) *RouteGenerator {
-//
-//	type RouteConfig struct {
-//		method         string
-//		actionFunction string
-//		subURI         string
-//	}
-//
-//	var apiRouteConfig = []RouteConfig{
-//		{actionFunction: "get-by-id", method: "get", subURI: "get-by-id/{id}"},
-//		{actionFunction: "get-all", method: "get", subURI: "get-all"},
-//		{actionFunction: "create", method: "post", subURI: "create"},
-//		{actionFunction: "edit", method: "post", subURI: "edit/{id}"},
-//		{actionFunction: "delete", method: "post", subURI: "delete/{id}"},
-//	}
-//
-//	for _, routeConfig := range apiRouteConfig {
-//		uri := `"`+"/" + strings.ToLower(modelName) + "/" + routeConfig.subURI+`"`
-//		action := `"`+modelName + "Controller" + "@" + routeConfig.actionFunction+`"`
-//		routeGenerator.AddRoute(routeConfig.method, uri, action)
-//	}
-//
-//	return routeGenerator
-//}
-//
-///**
-//Adds the specific routes to the routes array of generator
-//Parameters:
-//	- method: http methods like get,post,delete...
-//	- uri: uri to perform the action
-//	-action: ControllerName@functionName
-//Returns:
-//	- instance of the generator object
-//Sample Usage:
-//	- AddRoute("post","/order/create","OrderController@create")
-//	Route::post(/order/create, OrderController@create);
-//*/
-//func (routeGenerator *RouteGenerator) AddRoute(method string, uri string, action string) *RouteGenerator {
-//	route := core.NewFunctionCall("Route::" + method)
-//	uriTabbedUnit := api.TabbedUnit(core.NewParameter(uri))
-//	actionTabbedUnit := api.TabbedUnit(core.NewParameter(action))
-//	route.AddArg(&uriTabbedUnit).AddArg(&actionTabbedUnit)
-//	routeGenerator.routes = append(routeGenerator.Routes(), route)
-//	return routeGenerator
-//}
+func (routeGenerator *RouteGenerator) AddDefaultRestRoutes(modelName string) *RouteGenerator {
+
+	type RouteConfig struct {
+		method         string
+		actionFunction string
+		subURI         string
+	}
+
+	var apiRouteConfig = []RouteConfig{
+		{actionFunction: "get-by-id", method: "get", subURI: "{id}"},
+		{actionFunction: "all", method: "get", subURI: "all"},
+		{actionFunction: "create", method: "post", subURI: "create"},
+		{actionFunction: "edit", method: "patch", subURI: "edit/{id}"},
+		{actionFunction: "delete", method: "delete", subURI: "delete/{id}"},
+
+	}
+
+	for _, routeConfig := range apiRouteConfig {
+		uri := "/" + strings.ToLower(modelName) + "/" + routeConfig.subURI
+		action := modelName + "Controller" + "@" + routeConfig.actionFunction
+		routeGenerator.AddRoute(routeConfig.method, uri, action)
+	}
+
+	return routeGenerator
+}
+
+/**
+Adds the specific routes to the routes array of generator
+Parameters:
+	- method: http methods like get,post,delete...
+	- uri: uri to perform the action
+	-action: ControllerName@functionName
+Returns:
+	- instance of the generator object
+Sample Usage:
+	- AddRoute("post","/order/create","OrderController@create")
+	Route::post(/order/create, OrderController@create);
+*/
+func (routeGenerator *RouteGenerator) AddRoute(method string, uri string, action string) *RouteGenerator {
+	route := core.NewFunctionCall("Route::" + method)
+	route.AddArg(core.NewParameter(uri)).AddArg(core.NewParameter(action))
+	routeGenerator.routes = append(routeGenerator.Routes(), route)
+	return routeGenerator
+}
 
 /**
 Returns the array of tabbedUnits in which the imports array is followed by routes array
@@ -92,20 +94,17 @@ Returns:
 	- array of tabbed units
 */
 func (routeGenerator *RouteGenerator) Build() []api.TabbedUnit {
-	var buildedRouteFile []api.TabbedUnit
+	var builtRouteFile []api.TabbedUnit
 
 	importStmt := core.NewSimpleStatement(`use Illuminate\Support\Facades\Route`)
-	importStmt2 := core.NewSimpleStatement(`use Illuminate\Support\Facades\Route111111111111`)
-	buildedRouteFile = append(buildedRouteFile, importStmt)
-	buildedRouteFile = append(buildedRouteFile, importStmt2)
+	builtRouteFile = append(builtRouteFile, importStmt)
 
-	///*ADD ALL FUNCTION CALLS*/
-	//for _, functionCall := range routeGenerator.routes {
-	//	funCall := api.TabbedUnit(functionCall)
-	//	buildedRouteFile = append(buildedRouteFile, &funCall)
-	//}
+	/*ADD ALL FUNCTION CALLS*/
+	for _, functionCall := range routeGenerator.routes {
+		builtRouteFile = append(builtRouteFile, functionCall)
+	}
 
-	return buildedRouteFile
+	return builtRouteFile
 }
 
 /**
