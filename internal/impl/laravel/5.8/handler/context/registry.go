@@ -4,6 +4,7 @@ var registry = map[string]BaseContext{
 	"migration": NewMigrationContext(),
 	"model" : NewModelContext(),
 	"route" : NewRouteContext(),
+	"controller" : NewControllerContext(),
 }
 
 /*
