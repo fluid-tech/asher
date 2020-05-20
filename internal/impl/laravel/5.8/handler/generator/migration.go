@@ -63,7 +63,7 @@ func (migrationGenerator *MigrationGenerator) SetName(tableName string) *Migrati
  Returns:
 	- instance of the migration generator object.
  Example:
-	- AddColumn(core.NewSimpleStatement('$this->string('name')->unique()'))
+	- AddColumn(core.NewSimpleStatement(`$this->string("name")->unique()`))
 */
 func (migrationGenerator *MigrationGenerator) AddColumn(column core.SimpleStatement) *MigrationGenerator {
 	return migrationGenerator.AddColumns([]*core.SimpleStatement{&column})
@@ -77,8 +77,8 @@ func (migrationGenerator *MigrationGenerator) AddColumn(column core.SimpleStatem
 	- instance of the migration generator object.
  Example:
 	- AddColumns([]core.SimpleStatement{
-		core.NewSimpleStatement('$this->string('name')->unique()')
-		core.NewSimpleStatement('$this->string('phone_number', 12)->unique()')
+		core.NewSimpleStatement(`$this->string('name')->unique()`),
+		core.NewSimpleStatement(`$this->string('phone_number', 12)->unique()`)
 	  })
 */
 func (migrationGenerator *MigrationGenerator) AddColumns(columns []*core.SimpleStatement) *MigrationGenerator {
