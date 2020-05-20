@@ -14,7 +14,7 @@ type Function struct{
 	Name string
 	Visibility string
 	Arguments []string
-	Statements []*api.TabbedUnit
+	Statements []api.TabbedUnit
 }
 
 func NewFunction() *Function {
