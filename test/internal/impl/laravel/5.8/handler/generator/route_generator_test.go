@@ -10,13 +10,13 @@ import (
 func TestRouteGenerator(t *testing.T) {
 	apiGenerator:=generator.NewRouteGenerator()
 
-	/*ADDS SET OF DEFAULT API ROUTES*/
-	apiGenerator.AddDefaultRestRoutes("Order")
-
-	/*ADDS A SPECIFIC ROUTE*/
-	apiGenerator.AddRoute("get", `"/order-products"`, "OrderController@getAll")
-	apiGenerator.AddRoute("get", "/order-products", "OrderController@getAll")
-	apiGenerator.AddRoute("get", "/order-products", "OrderController@getAll")
+	///*ADDS SET OF DEFAULT API ROUTES*/
+	//apiGenerator.AddDefaultRestRoutes("Order")
+	//
+	///*ADDS A SPECIFIC ROUTE*/
+	//apiGenerator.AddRoute("get", `"/order-products"`, "OrderController@getAll")
+	//apiGenerator.AddRoute("get", "/order-products", "OrderController@getAll")
+	//apiGenerator.AddRoute("get", "/order-products", "OrderController@getAll")
 
 	fmt.Print(apiGenerator)
 }
