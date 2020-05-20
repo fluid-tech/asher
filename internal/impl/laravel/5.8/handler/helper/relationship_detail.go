@@ -11,6 +11,7 @@ const (
 
 type RelationshipDetail struct {
 	relationshipType int
+
 	Function         *core.Function
 }
 
@@ -19,4 +20,8 @@ func NewRelationshipDetail(relationShipType int) *RelationshipDetail {
 		relationshipType: relationShipType,
 		Function:         nil,
 	}
+}
+
+func (relationshipDetail *RelationshipDetail) RelationshipType() int {
+	return relationshipDetail.relationshipType
 }
