@@ -37,16 +37,22 @@ func (controllerHandler *ControllerHandler) HandleRestController(
 
 	controllerGenerator := generator.NewControllerGenerator(controller)
 	controllerGenerator.SetIdentifier(identifier)
-
-	context.GetFromRegistry("controller").AddToCtx("controller", context.NewControllerContext())
-	fmt.Printf(controllerGenerator.String())
+	context.GetFromRegistry("controller").AddToCtx(identifier+`RestController`, controllerGenerator)
 	tempRouteEmitter := core.NewPhpEmitterFile("", "", nil, 1)
 	return tempRouteEmitter, nil
 }
 
 func (controllerHandler *ControllerHandler) HandleTransactor(
-	identifier string, value interface{}) ([]*api.EmitterFile, error) {
-	return nil, nil
+	identifier string, value interface{}) ([]api.EmitterFile, error) {
+	fileToEmitt := []api.EmitterFile{}
+	transactorGenerator := generator.NewTransactorGenerator()
+	transactorGenerator.SetIdentifier(identifier)
+
+	context.GetFromRegistry("controller").AddToCtx(identifier+"transactor", transactorGenerator)
+	tempRouteEmitter := core.NewPhpEmitterFile("", "", nil, 1)
+
+	fileToEmitt = append(fileToEmitt, tempRouteEmitter)
+	return fileToEmitt, nil
 }
 
 func (controllerHandler *ControllerHandler) HandleMutator(
