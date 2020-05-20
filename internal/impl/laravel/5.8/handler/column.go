@@ -195,6 +195,3 @@ func (columnHandler *ColumnHandler) handleNullable(isNullable bool) string {
 	}
 	return ""
 }
-
-
-

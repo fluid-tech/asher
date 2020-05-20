@@ -23,93 +23,93 @@ func ColTypeSwitcher(colType string, colName string, allowed []string) string {
 	switch colDataType[0] {
 	// TODO : Add more column types here
 	case "unsignedBigInteger":
-		return helper.UnsignedBigInteger(colName)
+		return UnsignedBigInteger(colName)
 	case "bigInteger":
-		return helper.BigInteger(colName)
+		return BigInteger(colName)
 	case "unsignedInteger":
-		return helper.UnsignedInteger(colName)
+		return UnsignedInteger(colName)
 	case "integer":
-		return helper.Integer(colName)
+		return Integer(colName)
 	case "unsignedTinyInteger":
-		return helper.UnsignedTinyInteger(colName)
+		return UnsignedTinyInteger(colName)
 	case "tinyInteger":
-		return helper.TinyInteger(colName)
+		return TinyInteger(colName)
 	case "unsignedMediumInteger":
-		return helper.UnsignedMediumInteger(colName)
+		return UnsignedMediumInteger(colName)
 	case "mediumInteger":
-		return helper.MediumInteger(colName)
+		return MediumInteger(colName)
 	case "string":
-		return helper.String(colName, colDataType)
+		return String(colName, colDataType)
 	case "boolean":
-		return helper.Boolean(colName)
+		return Boolean(colName)
 	case "char":
-		return helper.Char(colName, colDataType)
+		return Char(colName, colDataType)
 	case "date":
-		return helper.Date(colName, colDataType)
+		return Date(colName, colDataType)
 	case "double":
-		return helper.Double(colName, colDataType)
+		return Double(colName, colDataType)
 	case "float":
-		return helper.Float(colName, colDataType)
+		return Float(colName, colDataType)
 	case "enum":
-		return helper.Enum(colName, allowed)
+		return Enum(colName, allowed)
 	case "set":
-		return helper.Set(colName, allowed)
+		return Set(colName, allowed)
 	case "dateTime":
-		return helper.DateTime(colName, colDataType)
+		return DateTime(colName, colDataType)
 	case "dateTimeTz":
-		return helper.DateTimeTz(colName, colDataType)
+		return DateTimeTz(colName, colDataType)
 	case "decimal":
-		return helper.Decimal(colName, colDataType)
+		return Decimal(colName, colDataType)
 	case "geometry":
-		return helper.Geometry(colName)
+		return Geometry(colName)
 	case "geometryCollection":
-		return helper.GeometryCollection(colName)
+		return GeometryCollection(colName)
 	case "ipAddress":
-		return helper.IpAddress(colName)
+		return IpAddress(colName)
 	case "json":
-		return helper.Json(colName)
+		return Json(colName)
 	case "jsonb":
-		return helper.Jsonb(colName)
+		return Jsonb(colName)
 	case "lineString":
-		return helper.LineString(colName)
+		return LineString(colName)
 	case "longText":
-		return helper.LongText(colName)
+		return LongText(colName)
 	case "macAddress":
-		return helper.MacAddress(colName)
+		return MacAddress(colName)
 	case "morphs":
-		return helper.Morphs(colName)
+		return Morphs(colName)
 	case "uuidMorphs":
-		return helper.UuidMorphs(colName)
+		return UuidMorphs(colName)
 	case "multiLineString":
-		return helper.MultiLineString(colName)
+		return MultiLineString(colName)
 	case "multiPoint":
-		return helper.MultiPoint(colName)
+		return MultiPoint(colName)
 	case "multiPolygon":
-		return helper.MultiPolygon(colName)
+		return MultiPolygon(colName)
 	case "nullableMorphs":
-		return helper.NullableMorphs(colName)
+		return NullableMorphs(colName)
 	case "nullableUuidMorphs":
-		return helper.NullableUuidMorphs(colName)
+		return NullableUuidMorphs(colName)
 	case "point":
-		return helper.Point(colName)
+		return Point(colName)
 	case "polygon":
-		return helper.Polygon(colName)
+		return Polygon(colName)
 	case "softDelete":
-		return helper.SoftDeletes(colName, colDataType)
+		return SoftDeletes(colName, colDataType)
 	case "softDeleteTz":
-		return helper.SoftDeletesTz(colName, colDataType)
+		return SoftDeletesTz(colName, colDataType)
 	case "text":
-		return helper.Text(colName)
+		return Text(colName)
 	case "time":
-		return helper.Time(colName, colDataType)
+		return Time(colName, colDataType)
 	case "timeTz":
-		return helper.TimeTz(colName, colDataType)
+		return TimeTz(colName, colDataType)
 	case "timestamp":
-		return helper.Timestamp(colName, colDataType)
+		return Timestamp(colName, colDataType)
 	case "timeStampTz":
-		return helper.TimestampTz(colName, colDataType)
+		return TimestampTz(colName, colDataType)
 	case "year":
-		return helper.Year(colName)
+		return Year(colName)
 
 	default:
 		// TODO: Log this error and replace it with formatted error message.
@@ -294,11 +294,11 @@ func Polygon(colName string) string {
 }
 
 func SoftDeletes(colName string, dataType []string) string {
-	return multiParamColumnProcessor("softDeletes", colName, nil )
+	return multiParamColumnProcessor("softDeletes", colName, nil)
 }
 
 func SoftDeletesTz(colName string, dataType []string) string {
-	return multiParamColumnProcessor("softDeletesTz", colName, nil )
+	return multiParamColumnProcessor("softDeletesTz", colName, nil)
 }
 
 func Text(colName string) string {
@@ -340,7 +340,7 @@ func dataArrayProcessor(colName string, allowed []string, functionName string) s
 	return fmt.Sprintf("%s('%s', %s)", functionName, colName, handleAllowedKeywordsToString(allowed))
 }
 
-func multiParamColumnProcessor(functionName string, colName string, args []string ) string {
+func multiParamColumnProcessor(functionName string, colName string, args []string) string {
 	if len(args) > 1 {
 		return fmt.Sprintf("%s('%s', %s)", functionName, colName, args[1])
 	}
