@@ -79,7 +79,7 @@ Returns:
 */
 func (controllerHandler *ControllerHandler) HandleRoutes(identifier string, value interface{}) ([]*api.EmitterFile, error) {
 	var filesToEmit []*api.EmitterFile
-	//controller := value.(models.Controller)
+	controller := value.(models.Controller)
 	addRouteToEmmitFiles := false
 	gen := context.GetFromRegistry("route").GetCtx("api")
 	if gen == nil{
@@ -88,7 +88,7 @@ func (controllerHandler *ControllerHandler) HandleRoutes(identifier string, valu
 		gen = context.GetFromRegistry("route").GetCtx("api")
 	}
 	apiGenerator := gen.(generator.QueryGenerator)
-	apiGenerator.AddDefaultRestRoutes(identifier)
+	apiGenerator.AddDefaultRestRoutes(identifier,controller)
 
 	if addRouteToEmmitFiles {
 		emitFile:= api.EmitterFile(core.NewPhpEmitterFile("asher_api.php","/routes",nil,1))

@@ -3,6 +3,7 @@ package generator
 import (
 	"asher/internal/api"
 	"asher/internal/api/codebuilder/php/core"
+	"asher/internal/models"
 	"fmt"
 	"strings"
 )
@@ -17,6 +18,15 @@ func NewRouteGenerator() *RouteGenerator {
 		imports:	[]api.TabbedUnit{},
 		routes: 	[]*core.FunctionCall{},
 	}
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }
 
 /**
@@ -43,27 +53,33 @@ Sample Usage:
 	Route::post(/order/edit/{id}, OrderController@edit);
 	Route::post(/order/delete/{id}, OrderController@delete);
 */
-func (routeGenerator *RouteGenerator) AddDefaultRestRoutes(modelName string) *RouteGenerator {
+func (routeGenerator *RouteGenerator) AddDefaultRestRoutes(modelName string, controller models.Controller) *RouteGenerator {
 
 	type RouteConfig struct {
 		method         string
 		actionFunction string
 		subURI         string
+		httpMethod 	string
 	}
 
 	var apiRouteConfig = []RouteConfig{
-		{actionFunction: "get-by-id", method: "get", subURI: "{id}"},
-		{actionFunction: "all", method: "get", subURI: "all"},
-		{actionFunction: "create", method: "post", subURI: "create"},
-		{actionFunction: "edit", method: "patch", subURI: "edit/{id}"},
-		{actionFunction: "delete", method: "delete", subURI: "delete/{id}"},
-
+		{actionFunction: "get-by-id", method: "GET", subURI: "{id}"},
+		{actionFunction: "all", method: "GET", subURI: "all"},
+		{actionFunction: "create", method: "POST", subURI: "create"},
+		{actionFunction: "edit", method: "PATCH", subURI: "edit/{id}"},
+		{actionFunction: "delete", method: "DELETE", subURI: "delete/{id}"},
 	}
 
 	for _, routeConfig := range apiRouteConfig {
-		uri := "/" + strings.ToLower(modelName) + "/" + routeConfig.subURI
-		action := modelName + "Controller" + "@" + routeConfig.actionFunction
-		routeGenerator.AddRoute(routeConfig.method, uri, action)
+
+		/*CHECK IF METHOD IS PRESENT IN SUPPORTEDMETHODS ARRAY OF CONTROLLER IN JSON FILE
+		IF PRESENT ADD THE METHOD ELSE DONT ADD*/
+		if contains(controller.supportedMethods, routeConfig.method) {
+			uri := "/" + strings.ToLower(modelName) + "/" + routeConfig.subURI
+			action := modelName + "Controller" + "@" + routeConfig.actionFunction
+			routeGenerator.AddRoute(strings.ToLower(routeConfig.method), uri, action)
+		}
+
 	}
 
 	return routeGenerator
