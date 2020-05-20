@@ -18,22 +18,22 @@ func NewAuditColInputFromType(auditCol bool, softDeletes bool, timestamp bool, p
 
 /**
  Returns true if the auditCol field of this instance is set
- Return:
+ Returns:
 	bool
  Usage:
 	input.IsAuditColSet()
- */
+*/
 func (input *AuditColInput) IsAuditColSet() bool {
 	return input.auditCol
 }
 
 /**
  Returns true if the softDeletes field of this input is set
- Return:
+ Returns:
 	-bool
  Usage:
 	input.IsSoftDeleteSet()
- */
+*/
 func (input *AuditColInput) IsSoftDeletesSet() bool {
 	return input.softDeletes
 }
@@ -44,8 +44,7 @@ func (input *AuditColInput) IsSoftDeletesSet() bool {
 	-bool
  Usage:
 	input.IsTimestampSet()
- */
+*/
 func (input *AuditColInput) IsTimestampSet() bool {
 	return input.timestamp
 }
-
