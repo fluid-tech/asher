@@ -5,69 +5,143 @@ import (
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/builder/interfaces"
 	"asher/internal/api/codebuilder/php/core"
+	"asher/internal/models"
 	"github.com/iancoleman/strcase"
+	"strings"
 )
 
 type ControllerGenerator struct {
-	classBuilder		interfaces.Class
-	identifier 			string
-	imports 			[]string
+	classBuilder interfaces.Class
+	identifier   string
+	imports      []string
+	controller   models.Controller
 }
 
-func NewControllerGenerator() *ControllerGenerator  {
+func NewControllerGenerator(controller models.Controller) *ControllerGenerator {
 	return &ControllerGenerator{
 		classBuilder: builder.NewClassBuilder(),
-		identifier: "",
-		imports: []string{},
-
+		identifier:   "",
+		imports:      []string{},
+		controller:   controller,
 	}
 }
 
-func (conGen *ControllerGenerator) AddImports(units []string)  *ControllerGenerator {
+/**
+Appends import to the controller file
+Parameters:
+	- units: string array of the import
+Returns:
+	- instance of ControllerGenerator object
+Sample Usage:
+	- AppendImport([]string{"App\User",})
+*/
+func (conGen *ControllerGenerator) AppendImports(units []string) *ControllerGenerator {
 	conGen.imports = append(conGen.imports, units...)
 	return conGen
 }
 
-func (conGen *ControllerGenerator) AddSimpleStatement(
-	identifier string) *api.TabbedUnit  {
-	statement:= api.TabbedUnit(core.NewSimpleStatement(identifier))
+/**
+Adds a Simple Statement
+Parameters:
+	- identifier: string
+Returns:
+	- Return instance of TabbedUnit
+Sample Usage:
+	- addSimpleStatement("Just A Simple Statement String")
+*/
+func (conGen *ControllerGenerator) addSimpleStatement(identifier string) *api.TabbedUnit {
+	statement := api.TabbedUnit(core.NewSimpleStatement(identifier))
 	return &statement
 }
 
-func (conGen *ControllerGenerator) AddFunctionCall(
-	identifier string) *api.TabbedUnit  {
+/**
+Adds a FunctionCall String
+Parameters:
+	- identifier: string
+Returns:
+	- Return instance of TabbedUnit
+Sample Usage:
+	- addFunctionCall("create")
+	-  o/p: create();
+*/
+func (conGen *ControllerGenerator) addFunctionCall(identifier string) *api.TabbedUnit {
 	functionCallStatement := api.TabbedUnit(core.NewFunctionCall(identifier))
 	return &functionCallStatement
 }
 
-func (conGen *ControllerGenerator) AddReturnStatement(
-	identifier string) *api.TabbedUnit {
+/**
+Adds a Return Statement
+Parameters:
+	- identifier: string
+Returns:
+	- Return instance of TabbedUnit
+Sample Usage:
+	- addSimpleStatement("Just A Simple Statement String")
+*/
+func (conGen *ControllerGenerator) addReturnStatement(identifier string) *api.TabbedUnit {
 	returnStatement := api.TabbedUnit(core.NewReturnStatement(identifier))
 	return &returnStatement
 }
 
-func (conGen *ControllerGenerator) AddParameter(
-	identifier string) *api.TabbedUnit  {
+/**
+Adds a Parameter
+Parameters:
+	- identifier: string
+Returns:
+	- Return instance of TabbedUnit
+Sample Usage:
+	- addParameter("id")
+*/
+func (conGen *ControllerGenerator) addParameter(identifier string) *api.TabbedUnit {
 	parameter := api.TabbedUnit(core.NewParameter(identifier))
 	return &parameter
 }
 
-func (conGen *ControllerGenerator) SetIdentifier(identifier string)  {
-	conGen.identifier  = identifier
+/**
+Adds a Member in class
+Parameters:
+	- visibility: string
+	- identifier: string
+Returns:
+	- Return instance of ControllerGenerator
+Sample Usage:
+	- addMemberInClass("public", "variableName")
+*/
+func (conGen *ControllerGenerator) addMemberInClass(visibility string, identifier string) *ControllerGenerator {
+	variable := api.TabbedUnit(core.NewVarDeclaration(visibility, identifier))
+	conGen.classBuilder.AddMember(&variable)
+	return conGen
 }
 
-// Creating create function builder for Rest controller
+/**
+Sets the identifier of the current class
+Parameters:
+	- identifier: string
+Sample Usage:
+	- SetIdentifier("ClassName")
+*/
+func (conGen *ControllerGenerator) SetIdentifier(identifier string) {
+	conGen.identifier = identifier
+}
+
+/**
+Add Create Function of REST in the controller
+Returns:
+	- Return instance of ControllerGenerator
+Sample Usage:
+	- controllerGeneratorObject.AddCreateFunction()
+*/
 func (conGen *ControllerGenerator) AddCreateFunction() *ControllerGenerator {
 	loweCamelCaseIdentifier := strcase.ToLowerCamel(conGen.identifier)
-	transactorVariableName := loweCamelCaseIdentifier+`Transactor`
+	transactorVariableName := loweCamelCaseIdentifier + `Transactor`
 
 	functionCallStatement := core.NewFunctionCall(
-		`$`+loweCamelCaseIdentifier+` = $this->`+transactorVariableName+`->create`)
-	functionCallStatement.AddArg(conGen.AddParameter("Auth::id()"))
-	functionCallStatement.AddArg(conGen.AddParameter("$request->all()"))
+		`$` + loweCamelCaseIdentifier + ` = $this->` + transactorVariableName + `->create`)
+	functionCallStatement.AddArg(conGen.addParameter("Auth::id()"))
+	functionCallStatement.AddArg(conGen.addParameter("$request->all()"))
 	createCallStatement := api.TabbedUnit(functionCallStatement)
 
-	returnStatement := conGen.AddReturnStatement("$"+loweCamelCaseIdentifier)
+	returnStatement := conGen.addReturnStatement("$" + loweCamelCaseIdentifier)
 
 	createFunctionStatement := []*api.TabbedUnit{
 		&createCallStatement,
@@ -80,18 +154,24 @@ func (conGen *ControllerGenerator) AddCreateFunction() *ControllerGenerator {
 	return conGen
 }
 
-// Creating update function builder for controller
+/**
+Add Update Function of REST in the controller
+Returns:
+	- Return instance of ControllerGenerator
+Sample Usage:
+	- controllerGeneratorObject.AddUpdateFunction()
+*/
 func (conGen *ControllerGenerator) AddUpdateFunction() *ControllerGenerator {
 	loweCamelCaseIdentifier := strcase.ToLowerCamel(conGen.identifier)
-	transactorVariableName := loweCamelCaseIdentifier+`Transactor`
+	transactorVariableName := loweCamelCaseIdentifier + `Transactor`
 
 	functionCallStatement := core.NewFunctionCall(
-		`$`+loweCamelCaseIdentifier+` = $this->`+transactorVariableName+`->update`)
-	functionCallStatement.AddArg(conGen.AddParameter("Auth::id()"))
-	functionCallStatement.AddArg(conGen.AddParameter("$request->all()"))
+		`$` + loweCamelCaseIdentifier + ` = $this->` + transactorVariableName + `->update`)
+	functionCallStatement.AddArg(conGen.addParameter("Auth::id()"))
+	functionCallStatement.AddArg(conGen.addParameter("$request->all()"))
 	updateCallStatement := api.TabbedUnit(functionCallStatement)
 
-	returnStatement := conGen.AddReturnStatement("$"+loweCamelCaseIdentifier)
+	returnStatement := conGen.addReturnStatement("$" + loweCamelCaseIdentifier)
 
 	updateFunctionStatement := []*api.TabbedUnit{
 		&updateCallStatement,
@@ -103,17 +183,23 @@ func (conGen *ControllerGenerator) AddUpdateFunction() *ControllerGenerator {
 	return conGen
 }
 
-// Creating delete function builder for controller
+/**
+Add Delete Function of REST in the controller
+Returns:
+	- Return instance of ControllerGenerator
+Sample Usage:
+	- controllerGeneratorObject.AddDeleteFunction()
+*/
 func (conGen *ControllerGenerator) AddDeleteFunction() *ControllerGenerator {
 	loweCamelCaseIdentifier := strcase.ToLowerCamel(conGen.identifier)
-	transactorVariableName := loweCamelCaseIdentifier+`Transactor`
+	transactorVariableName := loweCamelCaseIdentifier + `Transactor`
 
 	functionCallStatement := core.NewFunctionCall(
-		`$`+loweCamelCaseIdentifier+` = $this->`+transactorVariableName+`->delete`)
-	functionCallStatement.AddArg(conGen.AddParameter("$id"))
-	functionCallStatement.AddArg(conGen.AddParameter("$request->user->id"))
+		`$` + loweCamelCaseIdentifier + ` = $this->` + transactorVariableName + `->delete`)
+	functionCallStatement.AddArg(conGen.addParameter("$id"))
+	functionCallStatement.AddArg(conGen.addParameter("$request->user->id"))
 	deleteCallStatement := api.TabbedUnit(functionCallStatement)
-	returnStatement := conGen.AddReturnStatement("$"+loweCamelCaseIdentifier)
+	returnStatement := conGen.addReturnStatement("$" + loweCamelCaseIdentifier)
 
 	deleteFunctionArgument := []string{
 		"Request $request",
@@ -130,23 +216,33 @@ func (conGen *ControllerGenerator) AddDeleteFunction() *ControllerGenerator {
 	return conGen
 }
 
-// Creating findById function builder for controller
+/**
+Add FindById Function of REST in the controller
+Returns:
+	- Return instance of ControllerGenerator
+Sample Usage:
+	- controllerGeneratorObject.AddFindByIdFunction()
+*/
 func (conGen *ControllerGenerator) AddFindByIdFunction() *ControllerGenerator {
-
-	//creating Try Block
+	queryVariableName := strcase.ToLowerCamel(conGen.identifier) + `Query`
 	returnTryStatement := []*api.TabbedUnit{
-		conGen.AddReturnStatement(
-			`response(['data' => `+conGen.identifier+`::findOrFail($id)])`),
+		conGen.addReturnStatement(`response(['data' => $this->` + queryVariableName + `->findById($id)])`),
 	}
 	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName("findById").
 		AddArgument("$id").SetVisibility("public").AddStatements(returnTryStatement).GetFunction())
 	return conGen
 }
 
-
-// Creating getAll function builder for controller
-func (conGen *ControllerGenerator) AddGetAllFunction() *ControllerGenerator  {
-	returnStatement := core.NewReturnStatement(conGen.identifier+ "::all()")
+/**
+Add GetAll Function of REST in the controller
+Returns:
+	- Return instance of ControllerGenerator
+Sample Usage:
+	- controllerGeneratorObject.AddGetAllFunction()
+*/
+func (conGen *ControllerGenerator) AddGetAllFunction() *ControllerGenerator {
+	queryVariableName := strcase.ToLowerCamel(conGen.identifier) + `Query`
+	returnStatement := core.NewReturnStatement(`$this->` + queryVariableName + `->datatables()])`)
 	tabbedUnitReturnStatement := api.TabbedUnit(returnStatement)
 	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().
 		SetName("getAll").SetVisibility("public").
@@ -154,61 +250,77 @@ func (conGen *ControllerGenerator) AddGetAllFunction() *ControllerGenerator  {
 	return conGen
 }
 
-func (conGen *ControllerGenerator) AddMemberInClass(
-	visibility string,identifier string)  *ControllerGenerator {
-	variable := api.TabbedUnit(core.NewVarDeclaration(visibility, identifier))
-	conGen.classBuilder.AddMember(&variable)
-	return conGen
-}
-
-
-// Creates a constructor of controller with Query and Mutator Class injected of the current model
-func (conGen *ControllerGenerator) AddConstructor() *ControllerGenerator  {
+/**
+Adds Constructor in the controller with Query and Transactor Injected of the currentController
+Returns:
+	- Return instance of ControllerGenerator
+Sample Usage:
+	- controllerGeneratorObject.AddConstructorFunction()
+*/
+func (conGen *ControllerGenerator) AddConstructorFunction() *ControllerGenerator {
 	lowerCamelIdentifier := strcase.ToLowerCamel(conGen.identifier)
-	queryVariableName := lowerCamelIdentifier+`Query`
-	transactorVariableName := lowerCamelIdentifier+`Transactor`
+	queryVariableName := lowerCamelIdentifier + `Query`
+	transactorVariableName := lowerCamelIdentifier + `Transactor`
 	constructorArguments := []string{
-		conGen.identifier+`Query $`+queryVariableName,
-		conGen.identifier+`Transactor $`+ transactorVariableName,
+		conGen.identifier + `Query $` + queryVariableName,
+		conGen.identifier + `Transactor $` + transactorVariableName,
 	}
 
-	conGen.AddMemberInClass("private", queryVariableName)
-	conGen.AddMemberInClass("private", transactorVariableName)
+	conGen.addMemberInClass("private", queryVariableName)
+	conGen.addMemberInClass("private", transactorVariableName)
+
 	constructorStatements := []*api.TabbedUnit{
-		conGen.AddSimpleStatement(
-			"$this->"+queryVariableName+" = "+queryVariableName),
-		conGen.AddSimpleStatement(
-			"$this->"+ transactorVariableName +" = "+ transactorVariableName),
+		conGen.addSimpleStatement("$this->" + queryVariableName + " = " + queryVariableName),
+		conGen.addSimpleStatement("$this->" + transactorVariableName + " = " + transactorVariableName),
 	}
 	conGen.classBuilder.AddFunction(
 		builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
-		AddArguments(constructorArguments).AddStatements(constructorStatements).GetFunction())
+			AddArguments(constructorArguments).AddStatements(constructorStatements).GetFunction())
 	return conGen
 }
 
-
-//Builds the RestController Class
-func (conGen *ControllerGenerator) BuildRestController() *core.Class {
+/**
+Main Function To be called when we want to build the controller
+Parameter:
+	- controller configuration for controller
+Returns:
+	- Return instance of core.Class
+Sample Usage:
+	- controllerGeneratorObject.BuildRestController()
+*/
+func (conGen *ControllerGenerator) BuildRestController(controller models.Controller) *core.Class {
 	className := conGen.identifier + "RestController"
 	namespace := `App\Http\Controllers`
-	extends  := "Controller"
+	extends := "Controller"
 
 	restControllerImports := []string{
-		`App\`+conGen.identifier,
-		`App\Transactors\`+conGen.identifier+`Transactor`,
-		`App\Query\`+conGen.identifier+`Query`,
+		`App\` + conGen.identifier,
+		`App\Transactors\` + conGen.identifier + `Transactor`,
+		`App\Query\` + conGen.identifier + `Query`,
 		`Illuminate\Http\Request`,
 	}
 
-	conGen.AddImports(restControllerImports)
+	conGen.AppendImports(restControllerImports)
 
+	if controller.HttpMethods != nil {
+		if len(controller.HttpMethods) >= 0 {
+			for _, element := range controller.HttpMethods {
+				switch strings.ToLower(element) {
+				case "post":
+					conGen.AddCreateFunction()
+				case "get":
+					conGen.AddGetAllFunction().AddFindByIdFunction()
+				case "put":
+					conGen.AddUpdateFunction()
+				case "delete":
+					conGen.AddDeleteFunction()
+				}
+			}
+		}
+	} else {
+		conGen.addAllFunctionsInController()
+	}
 	//Adding functions in the controller
-	conGen.AddConstructor()
-	conGen.AddCreateFunction()
-	conGen.AddUpdateFunction()
-	conGen.AddDeleteFunction()
-	conGen.AddFindByIdFunction()
-	conGen.AddGetAllFunction()
 
 	conGen.classBuilder.SetName(className).
 		SetPackage(namespace).
@@ -217,8 +329,21 @@ func (conGen *ControllerGenerator) BuildRestController() *core.Class {
 	return conGen.classBuilder.GetClass()
 }
 
-func (conGen *ControllerGenerator) String() string  {
-	return conGen.BuildRestController().String()
+func (conGen *ControllerGenerator) addAllFunctionsInController() {
+	conGen.AddConstructorFunction()
+	conGen.AddCreateFunction()
+	conGen.AddUpdateFunction()
+	conGen.AddDeleteFunction()
+	conGen.AddFindByIdFunction()
+	conGen.AddGetAllFunction()
 }
 
-
+/**
+Returns:
+	- Return string object of ControllerGenerator
+Sample Usage:
+	- controllerGeneratorObject.String()
+*/
+func (conGen *ControllerGenerator) String() string {
+	return conGen.BuildRestController(conGen.controller).String()
+}

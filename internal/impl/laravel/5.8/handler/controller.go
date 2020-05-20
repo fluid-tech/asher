@@ -26,27 +26,32 @@ func (controllerHandler *ControllerHandler) Handle(
 	}
 
 	var emitFiles []*api.EmitterFile
-	routeFiles, _ := controllerHandler.HandleRoutes(identifier,value)
-	emitFiles = append(emitFiles,routeFiles...)
-	return  emitFiles,nil
+	routeFiles, _ := controllerHandler.HandleRoutes(identifier, value)
+	emitFiles = append(emitFiles, routeFiles...)
+	return emitFiles, nil
 }
 
 func (controllerHandler *ControllerHandler) HandleRestController(
 	identifier string, value interface{}) (api.EmitterFile, error) {
-	generatorObject := generator.NewControllerGenerator().BuildRestController().String()
-	fmt.Printf(generatorObject)
-	tempRouteEmitter := api.EmitterFile(core.NewPhpEmitterFile("","",nil,1))
+	controller := value.(models.Controller)
+
+	controllerGenerator := generator.NewControllerGenerator(controller)
+	controllerGenerator.SetIdentifier(identifier)
+
+	context.GetFromRegistry("controller").AddToCtx("controller", context.NewControllerContext())
+	fmt.Printf(controllerGenerator.String())
+	tempRouteEmitter := core.NewPhpEmitterFile("", "", nil, 1)
 	return tempRouteEmitter, nil
 }
 
 func (controllerHandler *ControllerHandler) HandleTransactor(
 	identifier string, value interface{}) ([]*api.EmitterFile, error) {
-	return nil,nil
+	return nil, nil
 }
 
 func (controllerHandler *ControllerHandler) HandleMutator(
 	identifier string, value interface{}) ([]*api.EmitterFile, error) {
-	return nil,nil
+	return nil, nil
 }
 
 func (controllerHandler *ControllerHandler) HandleQuery(
@@ -54,14 +59,12 @@ func (controllerHandler *ControllerHandler) HandleQuery(
 
 	var filesToEmit []api.EmitterFile
 
-	queryGenerator:= generator.NewQueryGenerator(identifier,true)
+	queryGenerator := generator.NewQueryGenerator(identifier, true)
 
 	context.GetFromRegistry("query").AddToCtx(identifier, queryGenerator)
 
-
-	emitFile:= core.NewPhpEmitterFile(identifier+"Query.php","/app/query",queryGenerator.String(),1))
-	filesToEmit=append(filesToEmit,emitFile)
-
+	emitFile := core.NewPhpEmitterFile(identifier+"Query.php", "/app/query", queryGenerator.String(), 1)
+	filesToEmit = append(filesToEmit, emitFile)
 
 	return filesToEmit, nil
 
@@ -82,17 +85,17 @@ func (controllerHandler *ControllerHandler) HandleRoutes(identifier string, valu
 	controller := value.(models.Controller)
 	addRouteToEmmitFiles := false
 	gen := context.GetFromRegistry("route").GetCtx("api")
-	if gen == nil{
+	if gen == nil {
 		addRouteToEmmitFiles = true
 		context.GetFromRegistry("route").AddToCtx("api", context.NewRouteContext())
 		gen = context.GetFromRegistry("route").GetCtx("api")
 	}
 	apiGenerator := gen.(generator.QueryGenerator)
-	apiGenerator.AddDefaultRestRoutes(identifier,controller)
+	apiGenerator.AddDefaultRestRoutes(identifier, controller)
 
 	if addRouteToEmmitFiles {
-		emitFile:= api.EmitterFile(core.NewPhpEmitterFile("asher_api.php","/routes",nil,1))
-		filesToEmit=append(filesToEmit,&emitFile)
+		emitFile := api.EmitterFile(core.NewPhpEmitterFile("asher_api.php", "/routes", nil, 1))
+		filesToEmit = append(filesToEmit, &emitFile)
 	}
 
 	return filesToEmit, nil
