@@ -7,6 +7,7 @@ import (
 	"asher/internal/api/codebuilder/php/core"
 	"asher/internal/impl/laravel/5.8/handler/helper"
 	"github.com/iancoleman/strcase"
+	"strings"
 )
 
 type ModelGenerator struct {
@@ -47,8 +48,42 @@ Returns:
 Example:
 	- AddCreateValidationRule('student_name', 'max:255|string')
 */
-func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, colRule string) *ModelGenerator {
-	modelGenerator.createValidationRules[colName] = colRule
+func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, colRule string, modelName string) *ModelGenerator {
+	//returnString := "[ "
+	//var ruleArray = strings.Split(colRule, "|")
+	//for i:=0; i< len(ruleArray); i++ {
+	//	if ruleArray[i] == "unique" || strings.HasPrefix(ruleArray[i], "unique:") {
+	//		ruleArray[i] = `'unique'`
+	//	} else {
+	//		ruleArray[i] = `'` + ruleArray[i] + `'`
+	//	}
+	//}
+	//
+	//returnString = returnString + strings.Join(ruleArray, ", ")
+	//modelGenerator.createValidationRules[colName] = returnString + ` ]`
+	//return modelGenerator
+
+	returnString := "[ "
+	var ruleArray = strings.Split(colRule, "|")
+	for i:=0; i< len(ruleArray); i++ {
+		if strings.HasPrefix(ruleArray[i], "unique:") {
+			tableDataSplitter := strings.Split(ruleArray[i], ",")
+			//tableName := strings.TrimPrefix(tableDataSplitter[0], "unique:")
+			if len(tableDataSplitter) == 1 {
+				ruleArray[i] = `'` + ruleArray[i] + `,` + colName + `'`
+			} else {
+				ruleArray[i] = `'` + ruleArray[i] + `'`
+			}
+		} else if ruleArray[i] == "unique" {
+			ruleArray[i] = `'` + ruleArray[i] + ":" + modelName + "," + colName + `'`
+		} else {
+			ruleArray[i] = `'` + ruleArray[i] + `'`
+		}
+	}
+
+	returnString = returnString + strings.Join(ruleArray, ", ")
+
+	modelGenerator.createValidationRules[colName] =  returnString + ` ]`
 	return modelGenerator
 }
 
@@ -62,8 +97,29 @@ Returns:
 Example:
 	- AddUpdateValidationRule('student_name', 'string|max:255')
 */
-func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, colRule string) *ModelGenerator {
-	modelGenerator.updateValidationRules[colName] = colRule
+func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, colRule string, modelName string) *ModelGenerator {
+
+	returnString := "[ "
+	var ruleArray = strings.Split(colRule, "|")
+	for i:=0; i< len(ruleArray); i++ {
+		if strings.HasPrefix(ruleArray[i], "unique:") {
+			tableDataSplitter := strings.Split(ruleArray[i], ",")
+			tableName := strings.TrimPrefix(tableDataSplitter[0], "unique:")
+			if len(tableDataSplitter) == 1 {
+				ruleArray[i] = `'` + ruleArray[i] + `,` + colName + `' . $row_ids['` + tableName + `']`
+			} else {
+				ruleArray[i] = `'` + ruleArray[i] + `,' . $row_ids['` + tableName + `']`
+			}
+		} else if ruleArray[i] == "unique" {
+			ruleArray[i] = `'` + ruleArray[i] + ":" + modelName + "," + colName + `,' . $row_ids['` + modelName + `']`
+		} else {
+			ruleArray[i] = `'` + ruleArray[i] + `'`
+		}
+	}
+
+	returnString = returnString + strings.Join(ruleArray, ", ")
+
+	modelGenerator.updateValidationRules[colName] =  returnString + ` ]`
 	return modelGenerator
 }
 
@@ -164,14 +220,12 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 	}
 
 	if len(modelGenerator.createValidationRules) > 0 {
-		createFunction := getValidationRulesFunction("createValidationRules",
-			modelGenerator.createValidationRules)
+		createFunction := getCreateValidationRulesFunction(modelGenerator.createValidationRules)
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(createFunction)
 	}
 
 	if len(modelGenerator.updateValidationRules) > 0 {
-		updateFunction := getValidationRulesFunction("updateValidationRules",
-			modelGenerator.updateValidationRules)
+		updateFunction := getUpdateValidationRulesFunction(modelGenerator.updateValidationRules)
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(updateFunction)
 	}
 
@@ -196,16 +250,31 @@ func (modelGenerator *ModelGenerator) String() string {
 /**
  A helper function to generate a ReturnArray for rules with the given method name.
  Parameters:
-	- functionName: name of the function that returns these validation rules.
 	- rules: a map of columns and their validation rules.
  Returns:
 	- instance of core.Function for the given input.
  Example:
-	- getValidationRulesFunction('createValidationRules', map[string]string{'name':'max:255'})
+	- getValidationRulesFunction(map[string]string{'name':'max:255'})
 */
-func getValidationRulesFunction(functionName string, rules map[string]string) *core.Function {
-	returnArray := api.TabbedUnit(core.NewReturnArrayFromMap(rules))
-	function := builder.NewFunctionBuilder().SetName(functionName).
-		SetVisibility("public").AddStatement(&returnArray).GetFunction()
+func getUpdateValidationRulesFunction(rules map[string]string) *core.Function {
+	returnArray := api.TabbedUnit(core.NewReturnArrayFromMapRaw(rules))
+	function := builder.NewFunctionBuilder().SetName("updateValidationRules").
+		SetVisibility("public").AddStatement(&returnArray).SetStatic(true).AddArgument("$row_ids").GetFunction()
+	return function
+}
+
+/**
+ A helper function to generate a ReturnArray for rules with the given method name.
+ Parameters:
+	- rules: a map of columns and their validation rules.
+ Returns:
+	- instance of core.Function for the given input.
+ Example:
+	- getValidationRulesFunction(map[string]string{'name':'max:255'})
+*/
+func getCreateValidationRulesFunction(rules map[string]string) *core.Function {
+	returnArray := api.TabbedUnit(core.NewReturnArrayFromMapRaw(rules))
+	function := builder.NewFunctionBuilder().SetName("createValidationRules").
+		SetVisibility("public").AddStatement(&returnArray).SetStatic(true).GetFunction()
 	return function
 }
