@@ -1,12 +1,12 @@
 package api
 
 /**
- Maintains a collection of handlers of all types. Each and every framework must have an implementation for this
- interface. This would be used by the Writer to fetch handler for the required framework. It is recommended to use a map
- to store the WriterHandlers with the handlerType as the key.
- ***********************************************************************************************************************
- Note: All the implementation must strictly follow singleton pattern for the implementation of this interface.
- */
+Maintains a collection of handlers of all types. Each and every framework must have an implementation for this
+interface. This would be used by the Writer to fetch handler for the required framework. It is recommended to use a map
+to store the WriterHandlers with the handlerType as the key.
+***********************************************************************************************************************
+Note: All the implementation must strictly follow singleton pattern for the implementation of this interface.
+*/
 type WriterHandlerRegistry interface {
 	/**
 	 Fetches the corresponding WriterHandler for the given handlerType.
@@ -16,7 +16,7 @@ type WriterHandlerRegistry interface {
 	 Returns:
 		- instance of the corresponding WriterHandler for the given handlerType or nil if no such handlerType is found.
 	 Example:
-		- GetFromRegistry(api.Model)s
-	 */
-	GetFromRegistry(handlerType int)	WriterHandler
+		- GetFromRegistry(api.Model)
+	*/
+	GetFromRegistry(handlerType int) WriterHandler
 }

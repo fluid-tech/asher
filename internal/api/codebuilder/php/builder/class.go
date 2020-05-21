@@ -13,7 +13,7 @@ type Class struct {
 
 /**
 Creates a new instance of this builder, with a new core.Class
- */
+*/
 func NewClassBuilder() *Class {
 	return &Class{
 		class: core.NewClass(),
@@ -22,8 +22,8 @@ func NewClassBuilder() *Class {
 
 /**
 Creates a new instance of this builder, with an existing core.Class
- */
-func NewClassBuilderFromClass(class *core.Class) *Class{
+*/
+func NewClassBuilderFromClass(class *core.Class) *Class {
 	return &Class{
 		class: class,
 	}
@@ -86,7 +86,7 @@ func (klass *Class) AddImports(imports []string) interfaces.Class {
 
 /**
 Add import to this class
- */
+*/
 func (klass *Class) AddImport(importPkg string) interfaces.Class {
 	return klass.AddImports([]string{importPkg})
 }

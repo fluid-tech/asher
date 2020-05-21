@@ -11,10 +11,10 @@ type PhpEmitterFile struct {
 	fileName string
 	path     string
 	fileType int
-	content  *api.Generator
+	content  api.Generator
 }
 
-func NewPhpEmitterFile(name string, path string, units *api.Generator, fileType int) *PhpEmitterFile {
+func NewPhpEmitterFile(name string, path string, units api.Generator, fileType int) *PhpEmitterFile {
 	return &PhpEmitterFile{
 		fileName: name,
 		path:     path,
@@ -31,7 +31,7 @@ func (f *PhpEmitterFile) Path() string {
 	return f.path
 }
 
-func (f *PhpEmitterFile) Content() *api.Generator {
+func (f *PhpEmitterFile) Generator() api.Generator {
 	return f.content
 }
 
@@ -42,6 +42,6 @@ func (f *PhpEmitterFile) FileType() int {
 func (p *PhpEmitterFile) String() string {
 	var builder strings.Builder
 	fmt.Fprintf(&builder, "<?php\n")
-	fmt.Fprint(&builder, (*p.Content()).String(), "\n")
+	fmt.Fprint(&builder, p.Generator().String(), "\n")
 	return builder.String()
 }

@@ -7,14 +7,14 @@ package api
 	BeforeHandle()	->	Handle()	->	AfterHandle()
  ***********************************************************************************************************************
  Note: The methods of this handler must only be called by the Writer. To maintain its lifecycle.
- */
+*/
 type WriterHandler interface {
 	/**
 	 A method that is called before Handler(). This can be used to perform any pre-processing operations that needs to
 	 be performed on the given emitter file, if required.
 	 Parameters:
 		- emitterFile: instance of emitterFile that needs to be written with the required meta-data.
-	 */
+	*/
 	BeforeHandle(emitterFile EmitterFile)
 
 	/**
@@ -24,8 +24,8 @@ type WriterHandler interface {
 		- emitterFile: instance of emitterFile that needs to be written with the required meta-data.
 	 Returns:
 		- number of bytes that were written, if 0 bytes are returned it means the operation failed.
-	 */
-	Handle(emitterFile EmitterFile)		int
+	*/
+	Handle(emitterFile EmitterFile) int
 
 	/**
 	 A method that is called after Handler(). This can be used to perform any post-processing operations that needs to

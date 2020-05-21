@@ -11,18 +11,18 @@ var handlersMap = map[int]api.WriterHandler{
 }
 
 /**
- Laravel's implementation for WriterHandlerRegistry. For more details [@see api/writer_handler_registry.go].
- */
+Laravel's implementation for WriterHandlerRegistry. For more details [@see api/writer_handler_registry.go].
+*/
 type WriterHandlerRegistry struct {
 	api.WriterHandlerRegistry
-	handlers	map[int]api.WriterHandler
+	handlers map[int]api.WriterHandler
 }
 
 /**
  Creates a single instance of the WriterHandlerRegistry.
  Returns:
 	- instance of WriterHandlerRegistry.
- */
+*/
 func NewWriterHandlerRegistry() *WriterHandlerRegistry {
 	// We'll create a new instance of WriterHandlerRegistry, if no instance has been created yet.
 	if registryObj == nil {
@@ -40,7 +40,7 @@ func NewWriterHandlerRegistry() *WriterHandlerRegistry {
 	- handlerType: type of the handlers that is required. Value must be one of the supported types in api/emitter_file.
  Example:
 	- registry.GetFromRegistry(api.Migration)
- */
+*/
 func (registry *WriterHandlerRegistry) GetFromRegistry(handlerType int) api.WriterHandler {
 	return registry.handlers[handlerType]
 }

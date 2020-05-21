@@ -7,7 +7,7 @@ import (
 type AsherObjectWalker struct {
 	emitter     Emitter      // the Emitter this instance of Walker uses
 	asherObject models.Asher // the object this instance iterates over
-	writer		*Writer
+	writer      *Writer
 }
 
 /**
@@ -15,9 +15,9 @@ Constructs a new AsherObjectWalker with the given args
 */
 func NewAsherObjectWalker(asherObject models.Asher, emitter Emitter, registry WriterHandlerRegistry) *AsherObjectWalker {
 	return &AsherObjectWalker{
-		emitter: emitter,
+		emitter:     emitter,
 		asherObject: asherObject,
-		writer: NewWriter(registry),
+		writer:      NewWriter(registry),
 	}
 }
 

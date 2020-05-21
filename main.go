@@ -4,6 +4,7 @@ import (
 	"asher/internal"
 	"asher/internal/api"
 	"asher/internal/impl/laravel"
+	"asher/internal/impl/laravel/5.8/handler/writer"
 	"fmt"
 	"os"
 )
@@ -25,7 +26,8 @@ func main() {
 	fmt.Println("printing asher")
 	fmt.Println(asherObject)
 	laravelEmitter := laravel.NewLaravelEmitter("5.8")
-	objectWalker := api.NewAsherObjectWalker(*asherObject, *laravelEmitter)
+	writerHandlerRegistry := writer.NewWriterHandlerRegistry()
+	objectWalker := api.NewAsherObjectWalker(*asherObject, *laravelEmitter, writerHandlerRegistry)
 	objectWalker.Walk()
 
 }

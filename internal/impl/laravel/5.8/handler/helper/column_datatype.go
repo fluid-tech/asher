@@ -5,8 +5,6 @@ import (
 	"strings"
 )
 
-
-
 func UnsignedBigInteger(colName string) string {
 	return fmt.Sprintf("unsignedBigInteger('%s')", colName)
 }

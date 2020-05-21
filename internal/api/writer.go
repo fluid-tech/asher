@@ -1,12 +1,12 @@
 package api
 
 /**
- A writer will be used by AsherWalker to write the files for the given respective EmitterFiles.
- The main task of Walker is to identify the type of EmitterFile and delegate it to it's respective handlers.
- These handlers will then write the content of those EmitterFile after performing some pre-processing, if required.
- */
+A writer will be used by AsherWalker to write the files for the given respective EmitterFiles.
+The main task of Walker is to identify the type of EmitterFile and delegate it to it's respective handlers.
+These handlers will then write the content of those EmitterFile after performing some pre-processing, if required.
+*/
 type Writer struct {
-	registry	WriterHandlerRegistry
+	registry WriterHandlerRegistry
 }
 
 /**
@@ -15,10 +15,10 @@ type Writer struct {
 	- 	registry: instance of the WriterHandlerRegistry.
  Returns:
 	- A new instance of the Writer with the given WriterHandlerRegistry.
- */
+*/
 func NewWriter(registry WriterHandlerRegistry) *Writer {
 	return &Writer{
-		registry:	registry,
+		registry: registry,
 	}
 }
 

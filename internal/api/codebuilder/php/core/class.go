@@ -51,7 +51,7 @@ func (klass Class) String() string {
 	fmt.Fprint(&sb, " {\n")
 	klass.handleMembers(&sb)
 	klass.handleFunctions(&sb)
-	fmt.Fprint(&sb,  api.TabbedString(uint(klass.Tabs)), "}\n")
+	fmt.Fprint(&sb, api.TabbedString(uint(klass.Tabs)), "}\n")
 
 	return sb.String()
 }
@@ -82,8 +82,8 @@ func (klass *Class) FindFunction(identifier string) (*Function, error) {
 
 /**
 Appends a tabbed unit to the members list
- */
-func (klass *Class) AppendMember(unit *api.TabbedUnit){
+*/
+func (klass *Class) AppendMember(unit *api.TabbedUnit) {
 	klass.Members = append(klass.Members, unit)
 }
 

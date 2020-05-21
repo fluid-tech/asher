@@ -22,15 +22,15 @@ func NewAuditColInputFromType(auditCol bool, softDeletes bool, timestamp bool) *
 }
 
 func (input *AuditColInput) IsAuditColSet() bool {
-	return input.ColumnType & 3 == 3
+	return input.ColumnType&3 == 3
 }
 
 func (input *AuditColInput) IsSoftDeletesSet() bool {
-	return input.ColumnType & 4 == 4
+	return input.ColumnType&4 == 4
 }
 
 func (input *AuditColInput) IsTimestampSet() bool {
-	return input.ColumnType & 8 == 8
+	return input.ColumnType&8 == 8
 }
 
 /**
@@ -38,7 +38,7 @@ Returns a slice containing a list of columns to be appended to the fillable arra
 */
 func (input *AuditColInput) GetFillableArray() []string {
 	var arr []string
-	if  input.IsAuditColSet() {
+	if input.IsAuditColSet() {
 		arr = append(arr, `"created_by"`, `"updated_by"`)
 	}
 	if input.IsSoftDeletesSet() {
@@ -47,17 +47,17 @@ func (input *AuditColInput) GetFillableArray() []string {
 	return arr
 }
 
-func (input *AuditColInput) GetCreateValidationRules() []string{
-	var arr[]string
-	if input.IsAuditColSet(){
+func (input *AuditColInput) GetCreateValidationRules() []string {
+	var arr []string
+	if input.IsAuditColSet() {
 		arr = append(arr, `"created_by" => "required|exists:users,id"`)
 	}
 	return arr
 }
 
 func (input *AuditColInput) GetUpdateValidationRules() []string {
-	var arr[] string
-	if input.IsAuditColSet(){
+	var arr []string
+	if input.IsAuditColSet() {
 		arr = append(arr, `"updated_by" => "required|exists:users,id"`)
 	}
 	if input.IsSoftDeletesSet() {

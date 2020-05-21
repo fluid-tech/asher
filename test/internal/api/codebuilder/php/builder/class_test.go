@@ -35,8 +35,6 @@ func getClassWithoutExtendsAndInitialization() *api.GeneralTest {
 	return api.NewGeneralTest(klass.GetClass().String(), TestClass2)
 }
 
-
-
 func getClassWithExtendsAndInitialization() *api.GeneralTest {
 	assigmentSS := api2.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
 	//assigmentSS2 := core.TabbedUnit(core.NewSimpleStatement("$this->query = $query"))
@@ -89,4 +87,3 @@ func buildClassBuilderWithExistingClassAndInterface() *api.GeneralTest {
 
 	return api.NewGeneralTest(b.GetClass().String(), TestClass4)
 }
-
