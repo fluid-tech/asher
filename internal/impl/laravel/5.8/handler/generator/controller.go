@@ -5,24 +5,22 @@ import (
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/builder/interfaces"
 	"asher/internal/api/codebuilder/php/core"
-	"asher/internal/models"
 	"github.com/iancoleman/strcase"
-	"strings"
 )
 
 type ControllerGenerator struct {
 	classBuilder interfaces.Class
 	identifier   string
 	imports      []string
-	controller   models.Controller
+
 }
 
-func NewControllerGenerator(controller models.Controller) *ControllerGenerator {
+func NewControllerGenerator() *ControllerGenerator {
 	return &ControllerGenerator{
 		classBuilder: builder.NewClassBuilder(),
 		identifier:   "",
 		imports:      []string{},
-		controller:   controller,
+
 	}
 }
 
@@ -242,7 +240,7 @@ Sample Usage:
 */
 func (conGen *ControllerGenerator) AddGetAllFunction() *ControllerGenerator {
 	queryVariableName := strcase.ToLowerCamel(conGen.identifier) + `Query`
-	returnStatement := core.NewReturnStatement(`$this->` + queryVariableName + `->datatables()])`)
+	returnStatement := core.NewReturnStatement(`$this->` + queryVariableName + `->datatables()`)
 	tabbedUnitReturnStatement := api.TabbedUnit(returnStatement)
 	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().
 		SetName("getAll").SetVisibility("public").
@@ -270,8 +268,8 @@ func (conGen *ControllerGenerator) AddConstructorFunction() *ControllerGenerator
 	conGen.addMemberInClass("private", transactorVariableName)
 
 	constructorStatements := []*api.TabbedUnit{
-		conGen.addSimpleStatement("$this->" + queryVariableName + " = " + queryVariableName),
-		conGen.addSimpleStatement("$this->" + transactorVariableName + " = " + transactorVariableName),
+		conGen.addSimpleStatement("$this->" + queryVariableName + " = $" + queryVariableName),
+		conGen.addSimpleStatement("$this->" + transactorVariableName + " = $" + transactorVariableName),
 	}
 	conGen.classBuilder.AddFunction(
 		builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
@@ -288,7 +286,7 @@ Returns:
 Sample Usage:
 	- controllerGeneratorObject.BuildRestController()
 */
-func (conGen *ControllerGenerator) BuildRestController(controller models.Controller) *core.Class {
+func (conGen *ControllerGenerator) BuildRestController() *core.Class {
 	className := conGen.identifier + "RestController"
 	namespace := `App\Http\Controllers`
 	extends := "Controller"
@@ -302,24 +300,6 @@ func (conGen *ControllerGenerator) BuildRestController(controller models.Control
 
 	conGen.AppendImports(restControllerImports)
 
-	if controller.HttpMethods != nil {
-		if len(controller.HttpMethods) >= 0 {
-			for _, element := range controller.HttpMethods {
-				switch strings.ToLower(element) {
-				case "post":
-					conGen.AddCreateFunction()
-				case "get":
-					conGen.AddGetAllFunction().AddFindByIdFunction()
-				case "put":
-					conGen.AddUpdateFunction()
-				case "delete":
-					conGen.AddDeleteFunction()
-				}
-			}
-		}
-	} else {
-		conGen.addAllFunctionsInController()
-	}
 	//Adding functions in the controller
 
 	conGen.classBuilder.SetName(className).
@@ -329,7 +309,7 @@ func (conGen *ControllerGenerator) BuildRestController(controller models.Control
 	return conGen.classBuilder.GetClass()
 }
 
-func (conGen *ControllerGenerator) addAllFunctionsInController() {
+func (conGen *ControllerGenerator) AddAllFunctionsInController() {
 	conGen.AddConstructorFunction()
 	conGen.AddCreateFunction()
 	conGen.AddUpdateFunction()
@@ -345,5 +325,5 @@ Sample Usage:
 	- controllerGeneratorObject.String()
 */
 func (conGen *ControllerGenerator) String() string {
-	return conGen.BuildRestController(conGen.controller).String()
+	return conGen.BuildRestController().String()
 }
