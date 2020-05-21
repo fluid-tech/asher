@@ -12,7 +12,7 @@ type WriterHandlerRegistry interface {
 	 Fetches the corresponding WriterHandler for the given handlerType.
 	 Parameters:
 		- handlerType: the type of the handler required. The value must be one of the FileTypes specified in the
-					   emitter_file. To view all the supported types {@see /api/emitter_file.go},
+					   emitter_file. To view all the supported types [@see /api/emitter_file.go],
 	 Returns:
 		- instance of the corresponding WriterHandler for the given handlerType or nil if no such handlerType is found.
 	 Example:

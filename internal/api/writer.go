@@ -10,6 +10,19 @@ type Writer struct {
 }
 
 /**
+ Creates a new instance of Writer with the given WriterHandlerRegistry.
+ Parameters:
+	- 	registry: instance of the WriterHandlerRegistry.
+ Returns:
+	- A new instance of the Writer with the given WriterHandlerRegistry.
+ */
+func NewWriter(registry WriterHandlerRegistry) *Writer {
+	return &Writer{
+		registry:	registry,
+	}
+}
+
+/**
  Used to walk through all the given emitterFiles and delegate them to their respective WriterHandlers.
  Parameters:
 	- emitterFiles: An collection of EmitterFile that needs to be written on the current project.
