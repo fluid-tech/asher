@@ -5,7 +5,7 @@ const ModelWithFillable = `namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 class StudentAllotments extends Model {
-    protected $fillable = ["name", 
+	protected $fillable = ["name", 
 "phone_number"
 ];
 
@@ -21,7 +21,7 @@ class StudentAllotments extends Model {
 `
 
 const ModelWithHidden = `namespace App;
-
+		
 use Illuminate\Database\Eloquent\Model;
 
 class StudentAllotments extends Model {
@@ -37,9 +37,10 @@ const ModelWithCreateValidationRules = `namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 class StudentAllotments extends Model {
-    public function createValidationRules() {
+    public static function createValidationRules() {
         return [
-phone_number => "string|max:12|unique:users"];
+'name' => [ 'string', 'max:225', 'unique:student_allotments,name' ];
+'phone_number' => [ 'string', 'max:12', 'unique:users,id' ]];
     }
 
 
@@ -51,9 +52,10 @@ const ModelWithUpdateValidationRules = `namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 class StudentAllotments extends Model {
-    public function updateValidationRules() {
+    public static function updateValidationRules($id_rows) {
         return [
-phone_number => "string|max:12|unique:users"];
+'name' => [ 'string', 'max:225', 'unique:student_allotments,name' ];
+'phone_number' => [ 'string', 'max:12', 'unique:users,id' ],
     }
 
 
