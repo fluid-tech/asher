@@ -22,7 +22,7 @@ func NewForEach() *ForEach  {
 }
 
 func (forEach *ForEach)  Id() string{
-	return "try"
+	return "for"
 }
 
 func (forEach *ForEach) SetNumTabs(tabs int)  {
@@ -47,12 +47,12 @@ func (forEach *ForEach) AddCondition(unit string) *ForEach  {
 func (forEach *ForEach) String() string  {
 	var builder strings.Builder
 	tabbedString := api.TabbedString(uint(forEach.tabs))
-	fmt.Fprint(&builder, tabbedString, " for ( "+forEach.Condition +") { \n")
+	fmt.Fprint(&builder, tabbedString, "foreach ( "+forEach.Condition +") {\n")
 
 	for _,element := range forEach.Statements {
 		(*element).SetNumTabs(forEach.tabs+ 1)
 		fmt.Fprint(&builder, (*element).String(), "\n")
 	}
-	fmt.Fprint(&builder, tabbedString, " }\n")
+	fmt.Fprint(&builder, tabbedString, "}\n")
 	return builder.String()
 }
