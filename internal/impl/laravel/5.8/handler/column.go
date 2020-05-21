@@ -19,14 +19,14 @@ func NewColumnHandler() *ColumnHandler {
 	return &ColumnHandler{}
 }
 
-func (columnHandler *ColumnHandler) Handle(modelName string, colsArr interface{}) ([]*api.EmitterFile, error) {
+func (columnHandler *ColumnHandler) Handle(modelName string, colsArr interface{}) ([]api.EmitterFile, error) {
 
 	myColsArray := colsArr.([]models.Column)
 
 	tempMigration := api.EmitterFile(columnHandler.handleMigration(modelName, myColsArray))
 	tempModel := api.EmitterFile(columnHandler.handleModel(modelName, myColsArray))
 
-	return []*api.EmitterFile{&tempMigration, &tempModel}, nil
+	return []api.EmitterFile{tempMigration, tempModel}, nil
 }
 
 func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []models.Column) *core.PhpEmitterFile {
