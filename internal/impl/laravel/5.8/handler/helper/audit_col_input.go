@@ -7,7 +7,7 @@ type AuditColInput struct {
 	PkColVal    string
 }
 
-func NewAuditColInputFromType(auditCol bool, softDeletes bool, timestamp bool, pkColVal string) *AuditColInput {
+func NewAuditCol(auditCol bool, softDeletes bool, timestamp bool, pkColVal string) *AuditColInput {
 	return &AuditColInput{
 		auditCol:    auditCol,
 		softDeletes: softDeletes,
