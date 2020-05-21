@@ -28,9 +28,9 @@ const ClassNoSoftDeletesAndNotTimestamp = `use Illuminate\Database\Migrations\Mi
 use Illuminate\DatabaseSchema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateHelloTable extends Migration {
+class CreateRnadomTable extends Migration {
     public function up() {
-        Schema::create('hello',  function (Blueprint $table) {
+        Schema::create('rnadom',  function (Blueprint $table) {
     $table->unsignedBigInteger('created_by');
     $table->unsignedBigInteger('updated_by')->nullable();
 }
@@ -40,7 +40,7 @@ class CreateHelloTable extends Migration {
 
 
     public function down() {
-        Schema::dropIfExists('hello');
+        Schema::dropIfExists('rnadom');
     }
 
 
@@ -51,9 +51,9 @@ const ClassWithSoftDeletesAndTimestamp = `use Illuminate\Database\Migrations\Mig
 use Illuminate\DatabaseSchema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateHelloTable extends Migration {
+class CreateRandomTable extends Migration {
     public function up() {
-        Schema::create('hello',  function (Blueprint $table) {
+        Schema::create('random',  function (Blueprint $table) {
     $table->timestamps();
     $table->softDeletes();
 }
@@ -63,7 +63,7 @@ class CreateHelloTable extends Migration {
 
 
     public function down() {
-        Schema::dropIfExists('hello');
+        Schema::dropIfExists('random');
     }
 
 
@@ -74,9 +74,9 @@ const ClassWithNoArgs = `use Illuminate\Database\Migrations\Migration;
 use Illuminate\DatabaseSchema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateHelloTable extends Migration {
+class CreateHelloWTable extends Migration {
     public function up() {
-        Schema::create('hello',  function (Blueprint $table) {
+        Schema::create('hello_w',  function (Blueprint $table) {
 }
 
 );
@@ -84,7 +84,7 @@ class CreateHelloTable extends Migration {
 
 
     public function down() {
-        Schema::dropIfExists('hello');
+        Schema::dropIfExists('hello_w');
     }
 
 

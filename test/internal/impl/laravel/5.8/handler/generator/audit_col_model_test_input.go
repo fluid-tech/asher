@@ -28,12 +28,11 @@ class Hello extends Model {
 }
 `
 
-const AuditColModelWithSoftDeleteUnset =`namespace App;
+const AuditColModelWithAuditColOnly =`namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Hello extends Model {
-    public $timestamps = true;
+class Rnadom extends Model {
     protected $fillable = ["created_by", 
 "updated_by"
 ];
@@ -57,7 +56,7 @@ const AuditColModelWithAuditColUnset =`namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Hello extends Model {
+class Random extends Model {
     public $timestamps = true;
     use SoftDeletes;
     protected $fillable = ["deleted_at"
@@ -72,21 +71,11 @@ class Hello extends Model {
 }
 `
 
-const AuditColModelWithAuditColAndTimestampUnset =`namespace App;
+const EmptyAuditCol =`namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Hello extends Model {
-    use SoftDeletes;
-    protected $fillable = ["deleted_at"
-];
-
-    public function updateValidationRules() {
-        return [
-"deleted_at" => "required|date_format:Y-m-d H:i:s"];
-    }
-
-
+class HelloW extends Model {
 }
 `
 

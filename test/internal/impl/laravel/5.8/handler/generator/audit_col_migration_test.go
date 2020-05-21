@@ -8,13 +8,13 @@ import (
 
 func  TestAuditColMigration(t *testing.T)  {
 	var table = []*api.GeneralTest{
-		genAuditColMigrationTest("hello", true, true, true, "unsignedInteger",
+		genAuditColMigrationTest("Hello", true, true, true, "unsignedInteger",
 			ClassWithAllArgsSet),
-		genAuditColMigrationTest("hello", false, false, true, "unsignedBigInteger",
+		genAuditColMigrationTest("Rnadom", false, false, true, "unsignedBigInteger",
 			ClassNoSoftDeletesAndNotTimestamp),
-		genAuditColMigrationTest("hello", true, true,  false,"unsignedInteger",
+		genAuditColMigrationTest("Random", true, true,  false,"unsignedInteger",
 			ClassWithSoftDeletesAndTimestamp),
-		genAuditColMigrationTest("hello", false, false, false, "unsignedInteger",
+		genAuditColMigrationTest("HelloW", false, false, false, "unsignedInteger",
 			ClassWithNoArgs),
 	}
 

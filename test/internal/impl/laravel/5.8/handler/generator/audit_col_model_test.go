@@ -7,9 +7,9 @@ import (
 func TestAuditColModel(t *testing.T) {
 	var table = []*api.GeneralTest{
 		genAuditColModelTest("Hello", true, true, true, AuditColModelWithAllSet),
-		genAuditColModelTest("Hello", false, true, true, AuditColModelWithSoftDeleteUnset),
-		genAuditColModelTest("Hello", true, true, false, AuditColModelWithAuditColUnset),
-		genAuditColModelTest("Hello", true, false, false, AuditColModelWithAuditColAndTimestampUnset),
+		genAuditColModelTest("Rnadom", false, false, true, AuditColModelWithAuditColOnly),
+		genAuditColModelTest("Random", true, true, false, AuditColModelWithAuditColUnset),
+		genAuditColModelTest("HelloW", false, false, false, EmptyAuditCol),
 	}
 	api.IterateAndTest(table, t)
 }
