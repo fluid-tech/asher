@@ -10,9 +10,14 @@ type AuditColMigration struct {
 	pkColVal     string
 }
 
-
-
-func NewAuditColGenerator(generator *MigrationGenerator) *AuditColMigration {
+/**
+ Creates a AuditColMigration instance with the provided migration generator instance
+ Returns:
+	-*AuditColMigration
+ Usage:
+	generator.NewAuditColMigration(migrationGenInstance)
+*/
+func NewAuditColMigration(generator *MigrationGenerator) *AuditColMigration {
 	return &AuditColMigration{
 		migrationGen: generator,
 		pkColVal:     DefaultColVal,
@@ -46,6 +51,7 @@ func (auditColGen *AuditColMigration) SetAuditCols(auditCols bool) *AuditColMigr
  Sets the pkCol field of this generator. During build adds string such as
  `$table->unsignedBigInteger('created_by');` and `$table->unsignedBigInteger('updated_by');`
  NOTE if this is not set the default value (`unsignedBigInteger`) is used.
+ THIS METHOD MUST BE CALLED BEFORE SetAuditCols !!!
  Parameters
 	- pkColType:	string		The primary key col type of users table
  Returns:
