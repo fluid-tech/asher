@@ -37,7 +37,7 @@ func NewMigrationGenerator() *MigrationGenerator {
 func (migrationGenerator *MigrationGenerator) SetName(tableName string) *MigrationGenerator {
 	className := "Create" + strcase.ToCamel(tableName) + "Table"
 	migrationGenerator.classBuilder.SetName(className)
-	migrationGenerator.tableName = tableName
+	migrationGenerator.tableName = strcase.ToSnake(tableName)
 	return migrationGenerator
 }
 
