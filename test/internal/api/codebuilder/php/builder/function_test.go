@@ -25,8 +25,8 @@ func TestFunctionBuilder(t *testing.T) {
 	assigmentSS := api2.TabbedUnit(core.NewSimpleStatement("$this->mutator = $mutator"))
 	assigmentSS2 := api2.TabbedUnit(core.NewSimpleStatement("$this->query = $query"))
 	builder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
-		AddArgument("BaseMutator $mutator").AddArgument("BaseQuery $query").AddStatement(&assigmentSS2).
-		AddStatement(&assigmentSS)
+		AddArgument("BaseMutator $mutator").AddArgument("BaseQuery $query").AddStatement(assigmentSS2).
+		AddStatement(assigmentSS)
 
 	var table = []*api.GeneralTest{
 		api.NewGeneralTest(builder.GetFunction().String(), Ctor),
@@ -43,7 +43,7 @@ func buildFunctionBuilderWithExistingFunction() *api.GeneralTest {
 	function.Visibility = "protected"
 	function.Arguments = []string{"$hello", "$world"}
 	s := api2.TabbedUnit(core.NewSimpleStatement("return $world+$hello"))
-	b := builder.NewFunctionBuilderFromFunction(function).AddStatement(&s)
+	b := builder.NewFunctionBuilderFromFunction(function).AddStatement(s)
 	return api.NewGeneralTest(b.GetFunction().String(), TestFunction)
 }
 
