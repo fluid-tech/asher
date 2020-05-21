@@ -9,13 +9,13 @@ import (
 type Emitter struct {
 	api.Emitter
 	activeHandlerRegister map[string]*api.Handler
-	fileMap               map[string]*api.EmitterFile
+	fileMap               []*api.EmitterFile
 	version               string
 }
 
 func NewLaravelEmitter(version string) *Emitter {
 	return &Emitter{version: version,
-		fileMap:               map[string]*api.EmitterFile{},
+		fileMap:               []*api.EmitterFile{},
 		activeHandlerRegister: map[string]*api.Handler{},
 	}
 }
@@ -35,6 +35,6 @@ func (e Emitter) Emit(value interface{}) {
 
 }
 
-func (e Emitter) GetFileMap() map[string]*api.EmitterFile {
+func (e Emitter) GetFileMap() []*api.EmitterFile {
 	return e.fileMap
 }
