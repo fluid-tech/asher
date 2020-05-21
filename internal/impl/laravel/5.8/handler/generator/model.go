@@ -121,26 +121,6 @@ func (modelGenerator *ModelGenerator) AddRelationship(detail *helper.Relationshi
 	return modelGenerator
 }
 
-
-func (modelGenerator *ModelGenerator) SetSoftDeletes(softDeletes bool) *ModelGenerator {
-	modelGenerator.softDeletes = softDeletes
-	return modelGenerator
-}
-
-/**
- Sets the auditCol field of this generator. If true, during build, it adds created_by and updated_by
- cols to fillables arr. It also adds created_by to createValidationRules and updated_by to
- updateValidationRules.
- Returns:
-	- instance of the generator object
- Example:
-	- builder.SetAuditCols(true)
-*/
-func (modelGenerator *ModelGenerator) SetAuditCols(auditCols bool) *ModelGenerator {
-	modelGenerator.auditCols = auditCols
-	return modelGenerator
-}
-
 /**
 Builds the corresponding model from the given ingredients of input.
 Note: It returns a new core.Class object every time it's called.
@@ -155,18 +135,13 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 	if len(modelGenerator.fillables) > 0 {
 		fillableArray := api.TabbedUnit(core.NewArrayAssignment("protected", "fillable",
 			modelGenerator.fillables))
-		modelGenerator.classBuilder.AddMember(&fillableArray)
+		modelGenerator.classBuilder.AddMember(fillableArray)
 	}
 
 	if len(modelGenerator.hidden) > 0 {
 		hiddenArray := api.TabbedUnit(core.NewArrayAssignment("protected", "visible",
 			modelGenerator.hidden))
-		modelGenerator.classBuilder.AddMember(&hiddenArray)
-	}
-
-	if modelGenerator.timestamps {
-		timestamps := api.TabbedUnit(core.NewVarAssignment("public", "timestamps", "true"))
-		modelGenerator.classBuilder.AddMember(&timestamps)
+		modelGenerator.classBuilder.AddMember(hiddenArray)
 	}
 
 	if len(modelGenerator.createValidationRules) > 0 {
@@ -212,6 +187,6 @@ func (modelGenerator *ModelGenerator) String() string {
 func getValidationRulesFunction(functionName string, rules map[string]string) *core.Function {
 	returnArray := api.TabbedUnit(core.NewReturnArrayFromMap(rules))
 	function := builder.NewFunctionBuilder().SetName(functionName).
-		SetVisibility("public").AddStatement(&returnArray).GetFunction()
+		SetVisibility("public").AddStatement(returnArray).GetFunction()
 	return function
 }
