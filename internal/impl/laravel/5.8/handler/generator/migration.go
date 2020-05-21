@@ -21,6 +21,7 @@ Creates a new instance of this generator with a new interfaces.Class
 func NewMigrationGenerator() *MigrationGenerator {
 	return &MigrationGenerator{
 		classBuilder: builder.NewClassBuilder(),
+		columns:      []*core.SimpleStatement{},
 	}
 }
 
@@ -36,7 +37,7 @@ func NewMigrationGenerator() *MigrationGenerator {
 func (migrationGenerator *MigrationGenerator) SetName(tableName string) *MigrationGenerator {
 	className := "Create" + strcase.ToCamel(tableName) + "Table"
 	migrationGenerator.classBuilder.SetName(className)
-	migrationGenerator.tableName = tableName
+	migrationGenerator.tableName = strcase.ToSnake(tableName)
 	return migrationGenerator
 }
 
@@ -47,7 +48,7 @@ func (migrationGenerator *MigrationGenerator) SetName(tableName string) *Migrati
  Returns:
 	- instance of the migration generator object.
  Example:
-	- AddColumn(core.NewSimpleStatement('$this->string('name')->unique()'))
+	- AddColumn(core.NewSimpleStatement(`$this->string("name")->unique()`))
 */
 func (migrationGenerator *MigrationGenerator) AddColumn(column core.SimpleStatement) *MigrationGenerator {
 	return migrationGenerator.AddColumns([]*core.SimpleStatement{&column})
@@ -61,8 +62,8 @@ func (migrationGenerator *MigrationGenerator) AddColumn(column core.SimpleStatem
 	- instance of the migration generator object.
  Example:
 	- AddColumns([]core.SimpleStatement{
-		core.NewSimpleStatement('$this->string('name')->unique()')
-		core.NewSimpleStatement('$this->string('phone_number', 12)->unique()')
+		core.NewSimpleStatement(`$this->string('name')->unique()`),
+		core.NewSimpleStatement(`$this->string('phone_number', 12)->unique()`)
 	  })
 */
 func (migrationGenerator *MigrationGenerator) AddColumns(columns []*core.SimpleStatement) *MigrationGenerator {
@@ -77,22 +78,24 @@ func (migrationGenerator *MigrationGenerator) AddColumns(columns []*core.SimpleS
 */
 func (migrationGenerator *MigrationGenerator) Build() *core.Class {
 	// Preparing the arguments for up function
+
 	arg1 := api.TabbedUnit(core.NewParameter("'" + migrationGenerator.tableName + "'"))
 	closure := builder.NewFunctionBuilder().AddArgument("Blueprint $table")
 	for _, element := range migrationGenerator.columns {
-		tu := api.TabbedUnit(element)
-		closure.AddStatement(&tu)
+		closure.AddStatement(element)
 	}
 
 	arg2 := api.TabbedUnit(closure.GetFunction())
 
 	// Preparing the statements for up function
 	schemaBlock := api.TabbedUnit(core.NewFunctionCall("Schema::create").AddArg(&arg1).AddArg(&arg2))
-	upFunction := builder.NewFunctionBuilder().SetName("up").SetVisibility("public").AddStatement(&schemaBlock).GetFunction()
+	upFunction := builder.NewFunctionBuilder().SetName("up").SetVisibility("public").
+		AddStatement(schemaBlock).GetFunction()
 
 	// Preparing the statements for down function
 	dropStatement := api.TabbedUnit(core.NewSimpleStatement("Schema::dropIfExists('" + migrationGenerator.tableName + "')"))
-	downFunction := builder.NewFunctionBuilder().SetName("down").SetVisibility("public").AddStatement(&dropStatement).GetFunction()
+	downFunction := builder.NewFunctionBuilder().SetName("down").SetVisibility("public").
+		AddStatement(dropStatement).GetFunction()
 
 	migrationGenerator.classBuilder.AddImports([]string{
 		`Illuminate\Database\Migrations\Migration`,

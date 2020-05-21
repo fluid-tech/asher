@@ -13,7 +13,7 @@ type Class struct {
 	Name           string
 	Extends        string
 	ImplementsList []string
-	Members        []*api.TabbedUnit
+	Members        []api.TabbedUnit
 	Functions      []*Function
 	Package        string
 	Imports        []string
@@ -25,7 +25,7 @@ func NewClass() *Class {
 		Name:           "",
 		Extends:        "",
 		ImplementsList: []string{},
-		Members:        []*api.TabbedUnit{},
+		Members:        []api.TabbedUnit{},
 		Functions:      []*Function{},
 		Package:        "",
 		Imports:        []string{},
@@ -51,7 +51,7 @@ func (klass Class) String() string {
 	fmt.Fprint(&sb, " {\n")
 	klass.handleMembers(&sb)
 	klass.handleFunctions(&sb)
-	fmt.Fprint(&sb,  api.TabbedString(uint(klass.Tabs)), "}\n")
+	fmt.Fprint(&sb, api.TabbedString(uint(klass.Tabs)), "}\n")
 
 	return sb.String()
 }
@@ -59,9 +59,9 @@ func (klass Class) String() string {
 /**
 Searches for the identifier in the members list
 */
-func (klass *Class) FindMember(identifier string) (*api.TabbedUnit, error) {
+func (klass *Class) FindMember(identifier string) (api.TabbedUnit, error) {
 	for _, element := range klass.Members {
-		if (*element).Id() == identifier {
+		if element.Id() == identifier {
 			return element, nil
 		}
 	}
@@ -82,8 +82,8 @@ func (klass *Class) FindFunction(identifier string) (*Function, error) {
 
 /**
 Appends a tabbed unit to the members list
- */
-func (klass *Class) AppendMember(unit *api.TabbedUnit){
+*/
+func (klass *Class) AppendMember(unit api.TabbedUnit) {
 	klass.Members = append(klass.Members, unit)
 }
 
@@ -111,8 +111,8 @@ func (klass *Class) handleExtends(builder *strings.Builder) {
 func (klass *Class) handleMembers(builder *strings.Builder) {
 	if len(klass.Members) > 0 {
 		for _, element := range klass.Members {
-			(*element).SetNumTabs(klass.Tabs + 1)
-			_, err := fmt.Fprint(builder, (*element).String(), "\n")
+			element.SetNumTabs(klass.Tabs + 1)
+			_, err := fmt.Fprint(builder, element.String(), "\n")
 			if err != nil {
 				fmt.Println("Error encounted ", err)
 			}
