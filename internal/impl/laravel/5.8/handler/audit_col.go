@@ -12,7 +12,6 @@ import (
 const CreatedBy = "$table->%s('created_by')"
 const UpdatedBy = "$table->%s('updated_by')->nullable()"
 
-
 const FillableIdentifier = "fillable"
 const CreateValidationRulesIdentifier = "getCreateValidationRules"
 const UpdateValidationRulesIdentifier = "getUpdateValidationRules"
@@ -30,11 +29,11 @@ func (auditColHandler *AuditCol) Handle(identifier string, value interface{}) ([
 	input := value.(*helper.AuditColInput)
 	// todo handle errors
 	err := auditColHandler.handleModel(identifier, input)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	err = auditColHandler.handleMigration(identifier, input)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	return []*api.EmitterFile{}, nil
@@ -51,13 +50,13 @@ func (auditColHandler *AuditCol) Handle(identifier string, value interface{}) ([
 func (auditColHandler *AuditCol) handleModel(identifier string, input *helper.AuditColInput) error {
 	modelGenerator := context.GetFromRegistry("model").GetCtx(identifier).(*generator.ModelGenerator)
 	if modelGenerator != nil {
-		modelGenerator.SetTimestamps(input.IsTimestampSet())
-		modelGenerator.SetSoftDeletes(input.IsSoftDeletesSet())
-		modelGenerator.SetAuditCols(input.IsAuditColSet())
+		auditColModel := generator.NewAuditColModel(modelGenerator)
+		auditColModel.SetTimestamps(input.IsTimestampSet())
+		auditColModel.SetSoftDeletes(input.IsSoftDeletesSet())
+		auditColModel.SetAuditCol(input.IsAuditColSet())
 	}
 	return errors.New(fmt.Sprintf("model class %s not found", identifier))
 }
-
 
 /**
  Orchestrates methods that adds columns to the migration class
@@ -70,10 +69,11 @@ func (auditColHandler *AuditCol) handleModel(identifier string, input *helper.Au
 func (auditColHandler *AuditCol) handleMigration(identifier string, input *helper.AuditColInput) error {
 	migGen := context.GetFromRegistry("migration").GetCtx(identifier).(*generator.MigrationGenerator)
 	if migGen != nil {
-		migGen.SetAuditCols(input.IsAuditColSet())
-		migGen.SetTimestamps(input.IsTimestampSet())
-		migGen.SetSoftDeletes(input.IsSoftDeletesSet())
-		migGen.SetPkCol(input.PkColVal)
+		auditColMigGen := generator.NewAuditColMigration(migGen)
+		auditColMigGen.SetPkCol(input.PkColVal)
+		auditColMigGen.SetAuditCols(input.IsAuditColSet())
+		auditColMigGen.SetTimestamps(input.IsTimestampSet())
+		auditColMigGen.SetSoftDeletes(input.IsSoftDeletesSet())
 	}
 	return errors.New(fmt.Sprintf("migration class %s not found", identifier))
 
