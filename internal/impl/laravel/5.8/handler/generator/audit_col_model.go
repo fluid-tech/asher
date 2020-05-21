@@ -42,6 +42,7 @@ func (auditColModel *AuditColModel) SetSoftDeletes(softDeletes bool) *AuditColMo
 		auditColModel.modelGen.classBuilder.AddMember(core.NewSimpleStatement(UseSoftDeletesStr))
 		// todo make date format configurable
 		auditColModel.modelGen.AddUpdateValidationRule(DeletedAtStr, DeletedAtValidationRule)
+		auditColModel.modelGen.AddFillable(DeletedAtStr)
 	}
 	return auditColModel
 }
