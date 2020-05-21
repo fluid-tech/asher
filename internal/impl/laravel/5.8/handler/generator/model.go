@@ -14,12 +14,9 @@ type ModelGenerator struct {
 	classBuilder          interfaces.Class
 	fillables             []string
 	hidden                []string
-	timestamps            bool
 	createValidationRules map[string]string
 	updateValidationRules map[string]string
 	relationshipDetails   []*helper.RelationshipDetail
-	softDeletes           bool
-	auditCols             bool
 }
 
 /**
@@ -32,12 +29,9 @@ func NewModelGenerator() *ModelGenerator {
 		classBuilder:          builder.NewClassBuilder(),
 		fillables:             []string{},
 		hidden:                []string{},
-		timestamps:            false,
 		createValidationRules: map[string]string{},
 		updateValidationRules: map[string]string{},
 		relationshipDetails:   []*helper.RelationshipDetail{},
-		softDeletes:           false,
-		auditCols:             false,
 	}
 }
 
@@ -115,18 +109,6 @@ func (modelGenerator *ModelGenerator) AddHiddenField(columnName string) *ModelGe
 }
 
 /**
- Control whether to set timestamps in the model of not
- Returns:
-	- instance of the generator object
- Example:
-	- SetTimestamps(true)
-*/
-func (modelGenerator *ModelGenerator) SetTimestamps(flag bool) *ModelGenerator {
-	modelGenerator.timestamps = flag
-	return modelGenerator
-}
-
-/**
  Adds Relationship method of various tables inside the model
  Returns:
 	- instance of the generator object
@@ -139,14 +121,7 @@ func (modelGenerator *ModelGenerator) AddRelationship(detail *helper.Relationshi
 	return modelGenerator
 }
 
-/**
- Sets the soft deletes field of this generator. During build adds the string `Use SoftDeletes;`
- to the model.
- Returns:
-	- instance of the generator object
- Example:
-	- builder.SetSoftDeletes(true)
-*/
+
 func (modelGenerator *ModelGenerator) SetSoftDeletes(softDeletes bool) *ModelGenerator {
 	modelGenerator.softDeletes = softDeletes
 	return modelGenerator
@@ -176,18 +151,6 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 	modelGenerator.classBuilder = modelGenerator.classBuilder.SetPackage("App").AddImports([]string{
 		`Illuminate\Database\Eloquent\Model`,
 	}).SetExtends("Model")
-
-	if modelGenerator.softDeletes {
-		tabbedUnit := api.TabbedUnit(core.NewSimpleStatement("use SoftDeletes"))
-		modelGenerator.classBuilder.AddMember(&tabbedUnit)
-		modelGenerator.AddFillable("deleted_at")
-	}
-
-	if modelGenerator.auditCols {
-		modelGenerator.AddCreateValidationRule("created_by", "exists:users,id")
-		modelGenerator.AddUpdateValidationRule("updated_by", "exists:users,id")
-		modelGenerator.AddFillable("created_by").AddFillable("updated_by")
-	}
 
 	if len(modelGenerator.fillables) > 0 {
 		fillableArray := api.TabbedUnit(core.NewArrayAssignment("protected", "fillable",
