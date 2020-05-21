@@ -38,8 +38,8 @@ func NewAuditColMigration(generator *MigrationGenerator) *AuditColMigration {
 */
 func (auditColGen *AuditColMigration) SetAuditCols(auditCols bool) *AuditColMigration {
 	if auditCols {
-		cbstr := helper.ColTypeSwitcher(auditColGen.pkColVal, CreatedByStr, []string{})
-		upstr := helper.ColTypeSwitcher(auditColGen.pkColVal, UpdatedByStr, []string{}) + "->nullable()"
+		cbstr := "$table->"+helper.ColTypeSwitcher(auditColGen.pkColVal, CreatedByStr, []string{})
+		upstr := "$table->"+helper.ColTypeSwitcher(auditColGen.pkColVal, UpdatedByStr, []string{}) + "->nullable()"
 		auditColGen.migrationGen.AddColumns([]*core.SimpleStatement{
 			core.NewSimpleStatement(cbstr), core.NewSimpleStatement(upstr),
 		})
