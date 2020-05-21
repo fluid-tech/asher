@@ -52,8 +52,9 @@ func (auditColHandler *AuditCol) handleModel(identifier string, input *helper.Au
 	if modelGenerator != nil {
 		auditColModel := generator.NewAuditColModel(modelGenerator)
 		auditColModel.SetTimestamps(input.IsTimestampSet())
-		auditColModel.SetSoftDeletes(input.IsSoftDeletesSet())
 		auditColModel.SetAuditCol(input.IsAuditColSet())
+		auditColModel.SetSoftDeletes(input.IsSoftDeletesSet())
+		return nil
 	}
 	return errors.New(fmt.Sprintf("model class %s not found", identifier))
 }
@@ -70,10 +71,11 @@ func (auditColHandler *AuditCol) handleMigration(identifier string, input *helpe
 	migGen := context.GetFromRegistry("migration").GetCtx(identifier).(*generator.MigrationGenerator)
 	if migGen != nil {
 		auditColMigGen := generator.NewAuditColMigration(migGen)
+		auditColMigGen.SetTimestamps(input.IsTimestampSet())
 		auditColMigGen.SetPkCol(input.PkColVal)
 		auditColMigGen.SetAuditCols(input.IsAuditColSet())
-		auditColMigGen.SetTimestamps(input.IsTimestampSet())
 		auditColMigGen.SetSoftDeletes(input.IsSoftDeletesSet())
+		return nil
 	}
 	return errors.New(fmt.Sprintf("migration class %s not found", identifier))
 
