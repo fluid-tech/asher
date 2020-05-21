@@ -16,7 +16,7 @@ type WriterHandlerRegistry interface {
 	 Returns:
 		- instance of the corresponding WriterHandler for the given handlerType or nil if no such handlerType is found.
 	 Example:
-		- GetFromRegistry(api.Model)
+		- GetFromRegistry(api.Model)s
 	 */
 	GetFromRegistry(handlerType int)	WriterHandler
 }

@@ -6,7 +6,7 @@ package api
  These handlers will then write the content of those EmitterFile after performing some pre-processing, if required.
  */
 type Writer struct {
-	registry
+	registry	WriterHandlerRegistry
 }
 
 /**
@@ -16,4 +16,6 @@ type Writer struct {
  Returns:
  	- true if all the given EmitterFiles were written successfully on the current project.
 */
-Walk(emitterFiles [] EmitterFile)	bool
+func (writer *Writer) Walk(emitterFiles [] EmitterFile)	bool {
+
+}
