@@ -71,7 +71,7 @@ the model.
 ```
 array(
         'valid_till'    => 'required|date_format:Y-m-d H:i:s',
-        'course_name'   => 'required|max:255|unique:courses',
+        'course_name'   => 'required|max:255|unique:courses,course_name,'.ids['courses'],
         "price"         => "required|numeric|min:1",
         'file_urls'      => 'required|array',
         'description'   => 'sometimes|required',
@@ -82,7 +82,9 @@ array(
 In our implementation, keys present in the update validation rules array are *optional*, ie we don't require all of them
 when the method is called. We merge the values present in the updateValidationRules array with the input array and 
 persist the data. Our controller decides which keys are required for a particular endpoint, and hence it has its own 
-form request validator.
+form request validator. If you notice we appends `ids['courses]` to the unique validation rule to ignore the current row
+id. For more details on laravel validations click [here](https://laravel.com/docs/7.x/validation#rule-unique).
+ 
 Keys present in the create validation rules array are *compulsory*.
 
 ##### Mutators
