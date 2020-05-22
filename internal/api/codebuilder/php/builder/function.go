@@ -40,11 +40,11 @@ func (f *Function) AddArguments(args []string) interfaces.Function {
 	return f
 }
 
-func (f *Function) AddStatement(statement *api.TabbedUnit) interfaces.Function {
-	return f.AddStatements([]*api.TabbedUnit{statement})
+func (f *Function) AddStatement(statement api.TabbedUnit) interfaces.Function {
+	return f.AddStatements([]api.TabbedUnit{statement})
 }
 
-func (f *Function) AddStatements(statements []*api.TabbedUnit) interfaces.Function {
+func (f *Function) AddStatements(statements []api.TabbedUnit) interfaces.Function {
 	f.function.Statements = append(f.function.Statements, statements...)
 	return f
 }

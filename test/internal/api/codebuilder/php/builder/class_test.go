@@ -9,15 +9,14 @@ import (
 )
 
 func TestClassBuilder(t *testing.T) {
-
 	var table = []*api.GeneralTest{
 		getClassWithExtendsAndInitialization(),
 		getClassWithoutExtendsAndInitialization(),
 		buildClassBuilderWithExistingClass(),
+		buildClassBuilderWithExistingClassAndInterface(),
 	}
 
 	api.IterateAndTest(table, t)
-
 }
 
 func getClassWithoutExtendsAndInitialization() *api.GeneralTest {
@@ -25,12 +24,12 @@ func getClassWithoutExtendsAndInitialization() *api.GeneralTest {
 	//assigmentSS2 := core.TabbedUnit(core.NewSimpleStatement("$this->query = $query"))
 	functionBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
 		AddArgument("string $fullyQualifiedModel").
-		AddStatement(&assigmentSS)
+		AddStatement(assigmentSS)
 
-	member := api2.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
+	member := api2.TabbedUnit(core.NewVarDeclaration("private", "fullyQualifiedModel"))
 
 	klass := builder.NewClassBuilder().SetName("TestMutator").
-		AddFunction(functionBuilder.GetFunction()).AddMember(&member).
+		AddFunction(functionBuilder.GetFunction()).AddMember(member).
 		SetPackage("App").AddImport(`Illuminate\Database\Eloquent\Model`)
 
 	return api.NewGeneralTest(klass.GetClass().String(), TestClass2)
@@ -41,12 +40,12 @@ func getClassWithExtendsAndInitialization() *api.GeneralTest {
 	//assigmentSS2 := core.TabbedUnit(core.NewSimpleStatement("$this->query = $query"))
 	functionBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
 		AddArgument("string $fullyQualifiedModel").
-		AddStatement(&assigmentSS)
+		AddStatement(assigmentSS)
 
-	member := api2.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
+	member := api2.TabbedUnit(core.NewVarDeclaration("private", "fullyQualifiedModel"))
 
 	klass := builder.NewClassBuilder().SetName("TestMutator").SetExtends("BaseMutator").
-		AddFunction(functionBuilder.GetFunction()).AddMember(&member).
+		AddFunction(functionBuilder.GetFunction()).AddMember(member).
 		SetPackage("App").AddImport(`Illuminate\Database\Eloquent\Model`)
 	return api.NewGeneralTest(klass.GetClass().String(), TestClass)
 }
@@ -56,57 +55,35 @@ func buildClassBuilderWithExistingClass() *api.GeneralTest {
 	//assigmentSS2 := core.TabbedUnit(core.NewSimpleStatement("$this->query = $query"))
 	functionBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
 		AddArgument("string $fullyQualifiedModel").
-		AddStatement(&assigmentSS)
+		AddStatement(assigmentSS)
 
-	member := api2.TabbedUnit(core.GetVarDeclaration("private", "fullyQualifiedModel"))
+	member := api2.TabbedUnit(core.NewVarDeclaration("private", "fullyQualifiedModel"))
 
 	klass := core.NewClass()
 	klass.Name = "Hello"
 	klass.Package = "Test"
 
-	b := builder.NewClassBuilderFromClass(klass).AddFunction(functionBuilder.GetFunction()).AddMember(&member).
+	b := builder.NewClassBuilderFromClass(klass).AddFunction(functionBuilder.GetFunction()).AddMember(member).
 		SetPackage("Test")
 
 	return api.NewGeneralTest(b.GetClass().String(), TestClass3)
 }
 
-// INITIALIZATION AREA FOR CONSTANTS
-// REMEMBER TO USE SPACES INSTEAD OF TABS :(
-const TestClass string = `namespace App;
+func buildClassBuilderWithExistingClassAndInterface() *api.GeneralTest {
+	assigmentSS := api2.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
+	//assigmentSS2 := core.TabbedUnit(core.NewSimpleStatement("$this->query = $query"))
+	functionBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
+		AddArgument("string $fullyQualifiedModel").
+		AddStatement(assigmentSS)
 
-use Illuminate\Database\Eloquent\Model;
+	member := api2.TabbedUnit(core.NewVarDeclaration("private", "fullyQualifiedModel"))
 
-class TestMutator extends BaseMutator {
-    private $fullyQualifiedModel;
-    public function __construct(string $fullyQualifiedModel) {
-        $this->fullyQualifiedModel = $fullyQualifiedModel;
-    }
+	klass := core.NewClass()
+	klass.Name = "Hello"
+	klass.Package = "Test"
 
+	b := builder.NewClassBuilderFromClass(klass).AddFunction(functionBuilder.GetFunction()).AddMember(member).
+		SetPackage("Test").AddInterface("Runnable")
 
+	return api.NewGeneralTest(b.GetClass().String(), TestClass4)
 }
-`
-const TestClass2 string = `namespace App;
-
-use Illuminate\Database\Eloquent\Model;
-
-class TestMutator {
-    private $fullyQualifiedModel;
-    public function __construct(string $fullyQualifiedModel) {
-        $this->fullyQualifiedModel = $fullyQualifiedModel;
-    }
-
-
-}
-`
-
-const TestClass3 string = `namespace Test;
-
-class Hello {
-    private $fullyQualifiedModel;
-    public function __construct(string $fullyQualifiedModel) {
-        $this->fullyQualifiedModel = $fullyQualifiedModel;
-    }
-
-
-}
-`
