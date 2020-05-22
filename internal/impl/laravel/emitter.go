@@ -26,7 +26,7 @@ func (e Emitter) Emit(value interface{}) {
 	model := value.(models.Model)
 	//arrayOfEmittedFiles, err := GetFromRegistry("cols").Handle(model.Name, model.Cols)
 	// todo add if
-	//GetFromRegistry("relations").Handle(model.Name, model.Cols)
+	GetFromRegistry("relation").Handle(model.Name, model.Relations)
 	//GetFromRegistry("softDeletes").Handle(model.Name, model.SoftDeletes)
 	//GetFromRegistry("timestamps").Handle(model.Name, model.Timestamps)
 	GetFromRegistry("auditCols").
