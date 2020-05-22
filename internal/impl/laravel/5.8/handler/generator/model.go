@@ -5,7 +5,6 @@ import (
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/builder/interfaces"
 	"asher/internal/api/codebuilder/php/core"
-	"asher/internal/impl/laravel/5.8/handler/helper"
 	"github.com/iancoleman/strcase"
 	"strings"
 )
@@ -18,7 +17,6 @@ type ModelGenerator struct {
 	timestamps            bool
 	createValidationRules map[string]string
 	updateValidationRules map[string]string
-	relationshipDetails   []*helper.RelationshipDetail
 }
 
 /**
@@ -34,7 +32,6 @@ func NewModelGenerator() *ModelGenerator {
 		timestamps:            false,
 		createValidationRules: map[string]string{},
 		updateValidationRules: map[string]string{},
-		relationshipDetails:   []*helper.RelationshipDetail{},
 	}
 }
 
@@ -49,19 +46,6 @@ Example:
 	- AddCreateValidationRule('student_name', 'max:255|string')
 */
 func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, colRule string, modelName string) *ModelGenerator {
-	//returnString := "[ "
-	//var ruleArray = strings.Split(colRule, "|")
-	//for i:=0; i< len(ruleArray); i++ {
-	//	if ruleArray[i] == "unique" || strings.HasPrefix(ruleArray[i], "unique:") {
-	//		ruleArray[i] = `'unique'`
-	//	} else {
-	//		ruleArray[i] = `'` + ruleArray[i] + `'`
-	//	}
-	//}
-	//
-	//returnString = returnString + strings.Join(ruleArray, ", ")
-	//modelGenerator.createValidationRules[colName] = returnString + ` ]`
-	//return modelGenerator
 
 	returnString := "[ "
 	var ruleArray = strings.Split(colRule, "|")
@@ -178,18 +162,6 @@ func (modelGenerator *ModelGenerator) SetTimestamps(flag bool) *ModelGenerator {
 	return modelGenerator
 }
 
-/**
- Adds Relationship method of various tables inside the model
- Returns:
-	- instance of the generator object
- Example:
-	details := helper.RelationshipDetail{1, <object of function>}
-	- AddRelationship(details)
-*/
-func (modelGenerator *ModelGenerator) AddRelationship(detail *helper.RelationshipDetail) *ModelGenerator {
-	modelGenerator.relationshipDetails = append(modelGenerator.relationshipDetails, detail)
-	return modelGenerator
-}
 
 /**
 Builds the corresponding model from the given ingredients of input.
@@ -198,9 +170,9 @@ Returns:
 	- The corresponding model core.Class from the given ingredients of input.
 */
 func (modelGenerator *ModelGenerator) Build() *core.Class {
-	modelGenerator.classBuilder = modelGenerator.classBuilder.SetPackage("App").AddImports([]string{
+	modelGenerator.classBuilder = modelGenerator.classBuilder.SetPackage("App").AddImport(
 		`Illuminate\Database\Eloquent\Model`,
-	}).SetExtends("Model")
+	).SetExtends("Model")
 
 	if len(modelGenerator.fillables) > 0 {
 		fillableArray := api.TabbedUnit(core.NewArrayAssignment("protected", "fillable",
@@ -227,12 +199,6 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 	if len(modelGenerator.updateValidationRules) > 0 {
 		updateFunction := getUpdateValidationRulesFunction(modelGenerator.updateValidationRules)
 		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(updateFunction)
-	}
-
-	if len(modelGenerator.relationshipDetails) > 0 {
-		for _, relnFunc := range modelGenerator.relationshipDetails {
-			modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(relnFunc.Function)
-		}
 	}
 
 	return modelGenerator.classBuilder.GetClass()
