@@ -44,3 +44,7 @@ func NewWriterHandlerRegistry() *WriterHandlerRegistry {
 func (registry *WriterHandlerRegistry) GetFromRegistry(handlerType int) api.WriterHandler {
 	return registry.handlers[handlerType]
 }
+
+
+const PhpTag = "<?php\n"
+const PhpExtension = ".php"

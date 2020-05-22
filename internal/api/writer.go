@@ -30,25 +30,22 @@ func NewWriter(registry WriterHandlerRegistry) *Writer {
  	- true if all the given EmitterFiles were written successfully on the current project.
 */
 func (writer *Writer) Walk(emitterFiles []*EmitterFile) bool {
-	status := true
 	for _, emitterFile := range emitterFiles {
 		writerHandler := writer.registry.GetFromRegistry((*emitterFile).FileType())
 		// A nil writerHandler means that the framework doesn;t support the given type of WriterHandler
 		if writerHandler == nil {
-			status = false
-			break
+			return false
 		}
 
 		// Delegating the emitterFile to the respective WriterHandler
 		writerHandler.BeforeHandle(*emitterFile)
-		noOfBytes := writerHandler.Handle(*emitterFile)
+		status := writerHandler.Handle(*emitterFile)
 		writerHandler.AfterHandle(*emitterFile)
 
 		// This means that no bytes were written and the operation failed.
-		if noOfBytes == 0 {
-			status = false
-			break
+		if !status {
+			return false
 		}
 	}
-	return status
+	return true
 }

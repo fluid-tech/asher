@@ -23,9 +23,9 @@ type WriterHandler interface {
 	 Parameters:
 		- emitterFile: instance of emitterFile that needs to be written with the required meta-data.
 	 Returns:
-		- number of bytes that were written, if 0 bytes are returned it means the operation failed.
+		- true if the given file was generated and written successfully.
 	*/
-	Handle(emitterFile EmitterFile) int
+	Handle(emitterFile EmitterFile) bool
 
 	/**
 	 A method that is called after Handler(). This can be used to perform any post-processing operations that needs to

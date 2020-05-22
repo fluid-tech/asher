@@ -3,13 +3,14 @@ package writer
 import (
 	"asher/internal/api"
 	"bytes"
+	"fmt"
+	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"regexp"
 	"strings"
 )
-
-const tempProjectPath = "/Users/gauravpunjabi/Coding/Projects/asher/resources/projects/laravel-demo"
 
 type MigrationWriterHandler struct {
 	api.WriterHandler
@@ -26,19 +27,25 @@ func (writerHandler *MigrationWriterHandler) BeforeHandle(emitterFile api.Emitte
 	writerHandler.migrationFileName = generateMigration(emitterFile.FileName())
 }
 
-func (writerHandler *MigrationWriterHandler) Handle(emitterFile api.EmitterFile) int {
-	noOfBytes := 0
-	generator := emitterFile.Generator()
-	fileContent := (*generator).String()
-	pathToMigrationFile := tempProjectPath + emitterFile.Path() + writerHandler.migrationFileName + ".php"
-	fileWriter, err := os.Create(pathToMigrationFile)
-	if err == nil {
-		noOfBytes, err = fileWriter.WriteString(fileContent)
-		if err != nil {
-			noOfBytes = 0
-		}
+func (writerHandler *MigrationWriterHandler) Handle(emitterFile api.EmitterFile) bool {
+	if writerHandler.migrationFileName == "" {
+		return false
 	}
-	return noOfBytes
+	// Fetching the current working directory
+	basePath, err := os.Getwd()
+	if err != nil {
+		return false
+	}
+
+	fileContent := PhpTag + emitterFile.Generator().String()
+	pathToMigrationFile := basePath + "/" + emitterFile.Path() + "/" + writerHandler.migrationFileName +
+		PhpExtension
+	err = ioutil.WriteFile(pathToMigrationFile, []byte(fileContent), 0644)
+	if err != nil {
+		log.Fatal(err)
+		return false
+	}
+	return true
 }
 
 func (writerHandler *MigrationWriterHandler) AfterHandle(emitterFile api.EmitterFile) {
@@ -46,13 +53,20 @@ func (writerHandler *MigrationWriterHandler) AfterHandle(emitterFile api.Emitter
 
 func generateMigration(name string) string {
 	migrationFileName := ""
+	// Fetching the current working directory
+	basePath, err := os.Getwd()
+	if err != nil {
+		return ""
+	}
+
+	fmt.Println("Path : " + basePath)
 
 	// Creating a new migration
 	cmd := exec.Command("php", "artisan", "make:migration", name)
-	cmd.Dir = tempProjectPath
+	cmd.Dir = basePath
 	var out bytes.Buffer
 	cmd.Stdout = &out
-	err := cmd.Run()
+	err = cmd.Run()
 	if err == nil {
 		message := out.String()
 		// Extracting the migration name from the command line output
