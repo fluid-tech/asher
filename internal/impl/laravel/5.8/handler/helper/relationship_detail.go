@@ -2,6 +2,7 @@ package helper
 
 import (
 	"asher/internal/api/codebuilder/php/core"
+	"fmt"
 )
 
 const (
@@ -10,13 +11,28 @@ const (
 )
 
 type RelationshipDetail struct {
-	relationshipType int
+	RelationshipType int
 	Function         *core.Function
+	ForeignKey       string
+	ReferencingModel string
 }
 
-func NewRelationshipDetail(relationShipType int) *RelationshipDetail {
+// TODO: Dhano search Relationship context for order key returns array of RelationshipDetails
+func NewRelationshipDetail(relationShipType int, function *core.Function, foreignKey string, referencingModel string) *RelationshipDetail {
 	return &RelationshipDetail{
-		relationshipType: relationShipType,
-		Function:         nil,
+		RelationshipType: relationShipType,
+		Function:         function,
+		ForeignKey:       foreignKey,
+		ReferencingModel: referencingModel,
 	}
+}
+
+/**
+Just For Printing Purpose.
+*/
+func (relationshipDetail *RelationshipDetail) String() {
+	fmt.Println("RelationShipType : ", relationshipDetail.RelationshipType)
+	fmt.Println("Function : ", relationshipDetail.Function.String())
+	fmt.Println("Foreign Key : ", relationshipDetail.ForeignKey)
+	fmt.Println("ReferenceModel Name : ", relationshipDetail.ReferencingModel)
 }
