@@ -68,5 +68,5 @@ func (relationshipModel *RelationshipModel) buildRelationshipFunction(relationsh
 	}
 	returnStatementStringFormatter := fmt.Sprintf(`return $this->%s('App\%s','%s','%s')`, relation, referenceTableName, foreignKey, primaryKey)
 	statement := api.TabbedUnit(core.NewSimpleStatement(returnStatementStringFormatter))
-	return builder.NewFunctionBuilder().SetName(referenceTableName).AddStatement(&statement).GetFunction()
+	return builder.NewFunctionBuilder().SetName(referenceTableName).AddStatement(statement).GetFunction()
 }

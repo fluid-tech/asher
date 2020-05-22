@@ -14,7 +14,6 @@ type ModelGenerator struct {
 	classBuilder          interfaces.Class
 	fillables             []string
 	hidden                []string
-	timestamps            bool
 	createValidationRules map[string]string
 	updateValidationRules map[string]string
 }
@@ -29,7 +28,6 @@ func NewModelGenerator() *ModelGenerator {
 		classBuilder:          builder.NewClassBuilder(),
 		fillables:             []string{},
 		hidden:                []string{},
-		timestamps:            false,
 		createValidationRules: map[string]string{},
 		updateValidationRules: map[string]string{},
 	}
@@ -150,18 +148,6 @@ func (modelGenerator *ModelGenerator) AddHiddenField(columnName string) *ModelGe
 	return modelGenerator
 }
 
-/**
- Control whether to set timestamps in the model of not
- Returns:
-	- instance of the generator object
- Example:
-	- SetTimestamps(true)
-*/
-func (modelGenerator *ModelGenerator) SetTimestamps(flag bool) *ModelGenerator {
-	modelGenerator.timestamps = flag
-	return modelGenerator
-}
-
 
 /**
 Builds the corresponding model from the given ingredients of input.
@@ -177,28 +163,31 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 	if len(modelGenerator.fillables) > 0 {
 		fillableArray := api.TabbedUnit(core.NewArrayAssignment("protected", "fillable",
 			modelGenerator.fillables))
-		modelGenerator.classBuilder = modelGenerator.classBuilder.AddMember(&fillableArray)
+		modelGenerator.classBuilder.AddMember(fillableArray)
 	}
 
 	if len(modelGenerator.hidden) > 0 {
 		hiddenArray := api.TabbedUnit(core.NewArrayAssignment("protected", "visible",
 			modelGenerator.hidden))
-		modelGenerator.classBuilder = modelGenerator.classBuilder.AddMember(&hiddenArray)
-	}
-
-	if modelGenerator.timestamps {
-		timestamps := api.TabbedUnit(core.NewVarAssignment("public", "timestamps", "true"))
-		modelGenerator.classBuilder = modelGenerator.classBuilder.AddMember(&timestamps)
+		modelGenerator.classBuilder.AddMember(hiddenArray)
 	}
 
 	if len(modelGenerator.createValidationRules) > 0 {
-		createFunction := getCreateValidationRulesFunction(modelGenerator.createValidationRules)
-		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(createFunction)
+		createFunction := getValidationRulesFunction("createValidationRules",
+			modelGenerator.createValidationRules)
+		modelGenerator.classBuilder.AddFunction(createFunction)
 	}
 
 	if len(modelGenerator.updateValidationRules) > 0 {
-		updateFunction := getUpdateValidationRulesFunction(modelGenerator.updateValidationRules)
-		modelGenerator.classBuilder = modelGenerator.classBuilder.AddFunction(updateFunction)
+		updateFunction := getValidationRulesFunction("updateValidationRules",
+			modelGenerator.updateValidationRules)
+		modelGenerator.classBuilder.AddFunction(updateFunction)
+	}
+
+	if len(modelGenerator.relationshipDetails) > 0 {
+		for _, relnFunc := range modelGenerator.relationshipDetails {
+			modelGenerator.classBuilder.AddFunction(relnFunc.Function)
+		}
 	}
 
 	return modelGenerator.classBuilder.GetClass()

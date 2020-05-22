@@ -1,4 +1,4 @@
-package context
+package handler
 
 import (
 	"asher/internal/api/codebuilder/php/core"
@@ -73,7 +73,7 @@ func getFillableRhs(klass *core.Class, t *testing.T) []string {
 	if err != nil {
 		t.Error("fillable not found in klass")
 	}
-	return (*element).(*core.ArrayAssignment).Rhs
+	return element.(*core.ArrayAssignment).Rhs
 }
 
 func getHiddenRhs(klass *core.Class, t *testing.T) []string {
@@ -81,7 +81,7 @@ func getHiddenRhs(klass *core.Class, t *testing.T) []string {
 	if err != nil {
 		t.Error("hidden not found in klass")
 	}
-	return (*element).(*core.ArrayAssignment).Rhs
+	return element.(*core.ArrayAssignment).Rhs
 }
 
 func arrayEquilizer(t *testing.T, in []string, out []string) {

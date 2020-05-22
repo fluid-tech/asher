@@ -15,7 +15,7 @@ type Function struct {
 	Visibility string
 	Static     bool
 	Arguments  []string
-	Statements []*api.TabbedUnit
+	Statements []api.TabbedUnit
 }
 
 func NewFunction() *Function {
@@ -26,7 +26,7 @@ func NewFunction() *Function {
 		Visibility: "",
 		Static:     false,
 		Arguments:  []string{},
-		Statements: []*api.TabbedUnit{},
+		Statements: []api.TabbedUnit{},
 	}
 }
 
@@ -46,10 +46,10 @@ func (f *Function) String() string {
 	tabbedString := api.TabbedString(uint(f.tabs))
 	fmt.Fprint(&builder, tabbedString, f.Visibility, getStaticValue(f.Static), " function ", f.Name, "(")
 
-	fmt.Fprint(&builder, strings.Join(f.Arguments, ", "), ") {\n")
-	for _, element := range f.Statements {
-		(*element).SetNumTabs(f.tabs + 1)
-		fmt.Fprint(&builder, (*element).String(), "\n")
+	fmt.Fprint(&builder, strings.Join(f.Arguments, ", "),") {\n")
+	for _, element := range f.Statements{
+		element.SetNumTabs(f.tabs + 1)
+		fmt.Fprint(&builder, element.String(), "\n")
 	}
 	fmt.Fprint(&builder, tabbedString, "}\n\n")
 	return builder.String()
@@ -64,11 +64,11 @@ func getStaticValue(isStatic bool) string {
 
 /**
 Finds a statement with a regex
-*/
-func (f *Function) FindStatement(pattern string) (*api.TabbedUnit, error) {
+ */
+func (f *Function) FindStatement(pattern string) (api.TabbedUnit, error) {
 	for _, element := range f.Statements {
-		found, err := regexp.Match(pattern, []byte((*element).Id()))
-		if err == nil && found {
+		found, err := regexp.Match(pattern, []byte(element.Id()))
+		if  err == nil && found {
 			return element, nil
 		}
 	}
@@ -76,20 +76,8 @@ func (f *Function) FindStatement(pattern string) (*api.TabbedUnit, error) {
 }
 
 /**
-Finds a tabbed unit by id
-*/
-func (f *Function) FindById(id string) (*api.TabbedUnit, error) {
-	for _, element := range f.Statements {
-		if (*element).Id() == id {
-			return element, nil
-		}
-	}
-	return nil, errors.New(fmt.Sprintf("cant find statement with identifier %s", id))
-}
-
-/**
 Append Statement
-*/
-func (f *Function) AppendStatement(unit *api.TabbedUnit) {
+ */
+func (f *Function) AppendStatement(unit api.TabbedUnit) {
 	f.Statements = append(f.Statements, unit)
 }
