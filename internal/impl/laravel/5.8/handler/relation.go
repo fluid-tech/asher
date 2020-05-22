@@ -30,7 +30,7 @@ Parameters:
 Returns:
 	- nil nil
  */
-func (relationshipHandler *RelationshipHandler) Handle(currentTableName string, relations interface{}) ([]*api.EmitterFile, error) {
+func (relationshipHandler *RelationshipHandler) Handle(currentTableName string, relations interface{}) ([]api.EmitterFile, error) {
 
 	currentModelGenerator := context.GetFromRegistry("model").GetCtx(currentTableName).(*generator.ModelGenerator)
 	relationshipModelGenerator := generator.NewRelationshipModel(currentModelGenerator)

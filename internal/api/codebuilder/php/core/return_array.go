@@ -82,8 +82,9 @@ func sortedKeysFromMap(baseMap map[string]string) []string {
 
 func rawConvertMapToStringAssociativeArray(rulesMap map[string]string) []string {
 	var returnVal []string
-	for colName, colRule := range rulesMap {
-		returnVal = append(returnVal, `'` + colName + "' => " + colRule)
+	keys := sortedKeysFromMap(rulesMap)
+	for _, key := range keys {
+		returnVal = append(returnVal, `'` + key + "' => " + rulesMap[key])
 	}
 	return returnVal
 }

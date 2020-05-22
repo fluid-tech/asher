@@ -25,8 +25,8 @@ func TestFunctionBuilder(t *testing.T) {
 	assigmentSS := api2.TabbedUnit(core.NewSimpleStatement("$this->mutator = $mutator"))
 	assigmentSS2 := api2.TabbedUnit(core.NewSimpleStatement("$this->query = $query"))
 	builder := builder.NewFunctionBuilder().SetVisibility("public").SetStatic(true).SetName("__construct").
-		AddArgument("BaseMutator $mutator").AddArgument("BaseQuery $query").AddStatement(&assigmentSS2).
-		AddStatement(&assigmentSS)
+		AddArgument("BaseMutator $mutator").AddArgument("BaseQuery $query").AddStatement(assigmentSS2).
+		AddStatement(assigmentSS)
 
 	var table = []*api.GeneralTest{
 		api.NewGeneralTest(builder.GetFunction().String(), Ctor),

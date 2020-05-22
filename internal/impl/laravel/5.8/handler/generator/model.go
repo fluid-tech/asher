@@ -173,21 +173,13 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 	}
 
 	if len(modelGenerator.createValidationRules) > 0 {
-		createFunction := getValidationRulesFunction("createValidationRules",
-			modelGenerator.createValidationRules)
+		createFunction := getCreateValidationRulesFunction(modelGenerator.createValidationRules)
 		modelGenerator.classBuilder.AddFunction(createFunction)
 	}
 
 	if len(modelGenerator.updateValidationRules) > 0 {
-		updateFunction := getValidationRulesFunction("updateValidationRules",
-			modelGenerator.updateValidationRules)
+		updateFunction := getUpdateValidationRulesFunction(modelGenerator.updateValidationRules)
 		modelGenerator.classBuilder.AddFunction(updateFunction)
-	}
-
-	if len(modelGenerator.relationshipDetails) > 0 {
-		for _, relnFunc := range modelGenerator.relationshipDetails {
-			modelGenerator.classBuilder.AddFunction(relnFunc.Function)
-		}
 	}
 
 	return modelGenerator.classBuilder.GetClass()
@@ -214,7 +206,7 @@ func (modelGenerator *ModelGenerator) String() string {
 func getUpdateValidationRulesFunction(rules map[string]string) *core.Function {
 	returnArray := api.TabbedUnit(core.NewReturnArrayFromMapRaw(rules))
 	function := builder.NewFunctionBuilder().SetName("updateValidationRules").
-		SetVisibility("public").AddStatement(&returnArray).SetStatic(true).AddArgument("$row_ids").GetFunction()
+		SetVisibility("public").AddStatement(returnArray).SetStatic(true).AddArgument("$row_ids").GetFunction()
 	return function
 }
 
@@ -230,6 +222,6 @@ func getUpdateValidationRulesFunction(rules map[string]string) *core.Function {
 func getCreateValidationRulesFunction(rules map[string]string) *core.Function {
 	returnArray := api.TabbedUnit(core.NewReturnArrayFromMapRaw(rules))
 	function := builder.NewFunctionBuilder().SetName("createValidationRules").
-		SetVisibility("public").AddStatement(&returnArray).SetStatic(true).GetFunction()
+		SetVisibility("public").AddStatement(returnArray).SetStatic(true).GetFunction()
 	return function
 }

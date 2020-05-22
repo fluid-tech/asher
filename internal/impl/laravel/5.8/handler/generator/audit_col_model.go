@@ -4,13 +4,13 @@ import "asher/internal/api/codebuilder/php/core"
 
 type AuditColModel struct {
 	modelGen  *ModelGenerator
-	modelName string
+	//modelName string
 }
 
 func NewAuditColModel(generator *ModelGenerator) *AuditColModel {
 	return &AuditColModel{
 		modelGen:  generator,
-		modelName: generator.Build().Name,
+		//modelName: generator.Build().Name,
 	}
 }
 
@@ -43,7 +43,7 @@ func (auditColModel *AuditColModel) SetSoftDeletes(softDeletes bool) *AuditColMo
 	if softDeletes {
 		auditColModel.modelGen.classBuilder.AddMember(core.NewSimpleStatement(UseSoftDeletesStr))
 		// todo make date format configurable
-		auditColModel.modelGen.AddUpdateValidationRule(DeletedAtStr, DeletedAtValidationRule, auditColModel.modelName)
+		auditColModel.modelGen.AddUpdateValidationRule(DeletedAtStr, DeletedAtValidationRule, "auditColModel.modelName")
 		auditColModel.modelGen.AddFillable(DeletedAtStr)
 	}
 	return auditColModel
@@ -61,8 +61,8 @@ func (auditColModel *AuditColModel) SetSoftDeletes(softDeletes bool) *AuditColMo
 */
 func (auditColModel *AuditColModel) SetAuditCol(auditCol bool) *AuditColModel {
 	if auditCol {
-		auditColModel.modelGen.AddCreateValidationRule(CreatedByStr, DefaultAuditColValidation, auditColModel.modelName)
-		auditColModel.modelGen.AddUpdateValidationRule(UpdatedByStr, DefaultAuditColValidation, auditColModel.modelName)
+		auditColModel.modelGen.AddCreateValidationRule(CreatedByStr, DefaultAuditColValidation, "auditColModel.modelName")
+		auditColModel.modelGen.AddUpdateValidationRule(UpdatedByStr, DefaultAuditColValidation, "auditColModel.modelName")
 		auditColModel.modelGen.AddFillable(CreatedByStr).AddFillable(UpdatedByStr)
 	}
 	return auditColModel
