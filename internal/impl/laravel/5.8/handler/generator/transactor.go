@@ -8,14 +8,14 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
-var db_begin_transaction = api.TabbedUnit(core.NewSimpleStatement("DB::beginTransaction()"))
-var db_commit = api.TabbedUnit(core.NewSimpleStatement("DB::commit()"))
+var dbBeginTransaction = core.NewSimpleStatement("DB::beginTransaction()")
+var dbCommit = core.NewSimpleStatement("DB::commit()")
 
 type TransactorGenerator struct {
 	classBuilder interfaces.Class
 	identifier   string
 	imports      []string
-
+	transactorType string
 }
 
 func NewTransactorGenerator() *TransactorGenerator {
@@ -39,61 +39,15 @@ func (transactorGenerator *TransactorGenerator) SetIdentifier(identifier string)
 }
 
 /**
-Adds a Simple Statement
+Sets the type of the transactor
 Parameters:
 	- identifier: string
-Returns:
-	- Return instance of TabbedUnit
 Sample Usage:
-	- addSimpleStatement("Just A Simple Statement String")
+	- SetTransactorType("default") or SetTransactorType("file") or SetTransactorType("image")
 */
-func (transactorGenerator *TransactorGenerator) addSimpleStatement(identifier string) *api.TabbedUnit {
-	statement := api.TabbedUnit(core.NewSimpleStatement(identifier))
-	return &statement
-}
-
-/**
-Adds a Parameter
-Parameters:
-	- identifier: string
-Returns:
-	- Return instance of TabbedUnit
-Sample Usage:
-	- addParameter("id")
-*/
-func (transactorGenerator *TransactorGenerator) addParameter(identifier string) *api.TabbedUnit {
-	parameter := api.TabbedUnit(core.NewParameter(identifier))
-	return &parameter
-}
-
-/**
-Adds a Member in class
-Parameters:
-	- visibility: string
-	- identifier: string
-Returns:
-	- Return instance of ControllerGenerator
-Sample Usage:
-	- addMemberInClass("public", "variableName")
-*/
-func (transactorGenerator *TransactorGenerator) addMemberInClass(visibility string, identifier string) *TransactorGenerator {
-	variable := api.TabbedUnit(core.NewVarDeclaration(visibility, identifier))
-	transactorGenerator.classBuilder.AddMember(&variable)
+func (transactorGenerator *TransactorGenerator) SetTransactorType(identifier string) *TransactorGenerator {
+	transactorGenerator.transactorType = identifier
 	return transactorGenerator
-}
-
-/**
-Adds a Return Statement
-Parameters:
-	- identifier: string
-Returns:
-	- Return instance of TabbedUnit
-Sample Usage:
-	- addSimpleStatement("Just A Simple Statement String")
-*/
-func (transactorGenerator *TransactorGenerator) addReturnStatement(identifier string) *api.TabbedUnit {
-	returnStatement := api.TabbedUnit(core.NewReturnStatement(identifier))
-	return &returnStatement
 }
 
 
@@ -123,51 +77,54 @@ func (transactorGenerator *TransactorGenerator) AddConstructorFunction() *Transa
 	lowerCamelIdentifier := strcase.ToLowerCamel(transactorGenerator.identifier)
 	queryVariableName := lowerCamelIdentifier + `Query`
 	mutatorVariableName := lowerCamelIdentifier + `Mutator`
+
 	constructorArguments := []string{
 		transactorGenerator.identifier + `Query $` + queryVariableName,
 		transactorGenerator.identifier + `Mutator $` + mutatorVariableName,
 	}
-	parentConstructorCall := api.TabbedUnit(core.NewFunctionCall("parent::__construct").
-		AddArg(transactorGenerator.addParameter("$" + queryVariableName + ", $" + mutatorVariableName + ", 'id'")))
 
-	constructorStatements := []*api.TabbedUnit{
-		&parentConstructorCall,
-		transactorGenerator.addSimpleStatement("$this->className = self::CLASS_NAME"),
+	parentConstructorCall := core.NewFunctionCall("parent::__construct").
+		AddArg(core.NewParameter("$" + queryVariableName + ", $" + mutatorVariableName + ", 'id'"))
+
+	constructorStatements := []api.TabbedUnit{
+		parentConstructorCall,
+		core.NewSimpleStatement("$this->className = self::CLASS_NAME"),
 	}
+
 	transactorGenerator.classBuilder.AddFunction(builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
 		AddArguments(constructorArguments).AddStatements(constructorStatements).GetFunction())
 	return transactorGenerator
 }
 
-func (transactorGenerator *TransactorGenerator) AddCreateFunction() *TransactorGenerator {
-	loweCamelCaseIdentifier := strcase.ToLowerCamel(transactorGenerator.identifier)
-
-	createFunctionCall := core.NewSimpleStatement(`$`+loweCamelCaseIdentifier+" = parent::create($createById, $args)")
-	createCallStatement := api.TabbedUnit(createFunctionCall)
-
-	returnStatement := transactorGenerator.addReturnStatement("$" + loweCamelCaseIdentifier)
-
-	createFunctionStatement := []*api.TabbedUnit {
-		&db_begin_transaction,
-		&createCallStatement,
-		&db_commit,
-		returnStatement,
-	}
-	//var hasOneStatements = transactorGenerator.CheckHasOneStatment()
-
-	//for _, element := range hasOneStatements {
-	//	createFunctionStatement = append(createFunctionStatement, element)
-	//}
-
-	//var hasmanyStatement = transactorGenerator.CheckHasManyStatements()
-	//for _, element := range hasmanyStatement {
-	//	createFunctionStatement = append(createFunctionStatement, element)
-	//}
-	transactorGenerator.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName("create").
-		SetVisibility("public").AddArgument("$createById, $args, $extraArgs = null").
-		AddStatements(createFunctionStatement).GetFunction())
-	return transactorGenerator
-}
+//func (transactorGenerator *TransactorGenerator) AddCreateFunction() *TransactorGenerator {
+//	loweCamelCaseIdentifier := strcase.ToLowerCamel(transactorGenerator.identifier)
+//
+//	createFunctionCall := core.NewSimpleStatement(`$`+loweCamelCaseIdentifier+" = parent::create($createById, $args)")
+//	createCallStatement := api.TabbedUnit(createFunctionCall)
+//
+//	returnStatement := transactorGenerator.addReturnStatement("$" + loweCamelCaseIdentifier)
+//
+//	createFunctionStatement := []*api.TabbedUnit {
+//		&dbBeginTransaction,
+//		&createCallStatement,
+//		&dbCommit,
+//		returnStatement,
+//	}
+//	//var hasOneStatements = transactorGenerator.CheckHasOneStatment()
+//
+//	//for _, element := range hasOneStatements {
+//	//	createFunctionStatement = append(createFunctionStatement, element)
+//	//}
+//
+//	//var hasmanyStatement = transactorGenerator.CheckHasManyStatements()
+//	//for _, element := range hasmanyStatement {
+//	//	createFunctionStatement = append(createFunctionStatement, element)
+//	//}
+//	transactorGenerator.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName("create").
+//		SetVisibility("public").AddArgument("$createById, $args, $extraArgs = null").
+//		AddStatements(createFunctionStatement).GetFunction())
+//	return transactorGenerator
+//}
 
 //func (transactorGenerator *TransactorGenerator) CheckHasManyStatements() []*api.TabbedUnit  {
 //	hasManyStatements := []*api.TabbedUnit{}
@@ -250,8 +207,18 @@ Sample Usage:
 	- transactorGeneratorObject.BuildRestTransactor()
 */
 func (transactorGenerator *TransactorGenerator) BuildTransactor() *core.Class {
-	const extends = `BaseTransactor`
 	const namespace = `App\Transactors`
+	var extendsTransactor string
+
+	switch transactorGenerator.transactorType {
+		case "default":
+			extendsTransactor = "BaseTransactor"
+		case "file" :
+			extendsTransactor = "FileTransactor"
+		case "image":
+			extendsTransactor = "ImageTransactor"
+	}
+
 
 	transactorImports := []string{
 		`App\Query\` + transactorGenerator.identifier + `Query`,
@@ -259,13 +226,15 @@ func (transactorGenerator *TransactorGenerator) BuildTransactor() *core.Class {
 	}
 
 	className := transactorGenerator.identifier + "Transactor"
+
 	transactorGenerator.AppendImports(transactorImports)
 	transactorGenerator.AddConstructorFunction()
 
 
-	transactorGenerator.classBuilder.AddMember(transactorGenerator.addSimpleStatement(
+	transactorGenerator.classBuilder.AddMember(core.NewSimpleStatement(
 		"private const CLASS_NAME = '" + className + "'")).SetName(className).
-		SetExtends(extends).SetPackage(namespace).AddImports(transactorGenerator.imports)
+		SetExtends(extendsTransactor).SetPackage(namespace).AddImports(transactorGenerator.imports)
+
 	return transactorGenerator.classBuilder.GetClass()
 }
 

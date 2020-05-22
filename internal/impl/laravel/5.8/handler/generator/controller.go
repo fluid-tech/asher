@@ -6,6 +6,7 @@ import (
 	"asher/internal/api/codebuilder/php/builder/interfaces"
 	"asher/internal/api/codebuilder/php/core"
 	"github.com/iancoleman/strcase"
+	"strings"
 )
 
 type ControllerGenerator struct {
@@ -277,6 +278,38 @@ func (conGen *ControllerGenerator) AddConstructorFunction() *ControllerGenerator
 	return conGen
 }
 
+func (conGen *ControllerGenerator) AddAllRESTFunctionsInController() {
+	conGen.AddConstructorFunction()
+	conGen.AddCreateFunction()
+	conGen.AddUpdateFunction()
+	conGen.AddDeleteFunction()
+	conGen.AddFindByIdFunction()
+	conGen.AddGetAllFunction()
+}
+
+func (conGen *ControllerGenerator) AddFunctionsInController(methods []string) {
+	if methods != nil {
+		if len(methods) >= 0 {
+			conGen.AddConstructorFunction()
+			for _, element := range methods {
+				switch strings.ToLower(element) {
+				case "POST":
+					conGen.AddCreateFunction()
+				case "GET":
+					conGen.AddFindByIdFunction().AddGetAllFunction()
+				case "PUT":
+					conGen.AddUpdateFunction()
+				case "DELETE":
+					conGen.AddDeleteFunction()
+				}
+			}
+		}
+	} else {
+		conGen.AddAllRESTFunctionsInController()
+	}
+}
+
+
 /**
 Main Function To be called when we want to build the controller
 Parameter:
@@ -309,14 +342,8 @@ func (conGen *ControllerGenerator) BuildRestController() *core.Class {
 	return conGen.classBuilder.GetClass()
 }
 
-func (conGen *ControllerGenerator) AddAllFunctionsInController() {
-	conGen.AddConstructorFunction()
-	conGen.AddCreateFunction()
-	conGen.AddUpdateFunction()
-	conGen.AddDeleteFunction()
-	conGen.AddFindByIdFunction()
-	conGen.AddGetAllFunction()
-}
+
+
 
 /**
 Returns:

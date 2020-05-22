@@ -76,7 +76,7 @@ func (routeGenerator *RouteGenerator) AddDefaultRestRoutes(modelName string, con
 
 		/*CHECK IF METHOD IS PRESENT IN SUPPORTEDMETHODS ARRAY OF CONTROLLER IN JSON FILE
 		IF PRESENT ADD THE METHOD ELSE DONT ADD*/
-		if contains(controller.supportedMethods, routeConfig.method) {
+		if contains(controller.HttpMethods, routeConfig.method) {
 			uri := "/" + strings.ToLower(modelName) + "/" + routeConfig.subURI
 			action := modelName + "Controller" + "@" + routeConfig.actionFunction
 			routeGenerator.AddRoute(strings.ToLower(routeConfig.method), uri, action)
