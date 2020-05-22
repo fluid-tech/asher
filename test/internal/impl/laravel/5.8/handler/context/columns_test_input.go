@@ -4,7 +4,7 @@ import (
 	"asher/internal/models"
 )
 
-var test_1_tableName = "student_enrollments"
+const test_1_tableName = "student_enrollments"
 var test_1_columnInputArray = []models.Column{
 
 	{
@@ -219,3 +219,32 @@ var test_1_columnInputArray = []models.Column{
 
 var test_1_fillableExpectedOutput = []string{`"id_int"`, `"id_medium"`, `"id_small"`, `"id_tiny"`, `"id_big"`, `"id_uuid"`, `"order_id"`, `"order_id"`, `"order_id"`}
 var test_1_hiddenExpectedOutput = []string{`"id_int"`, `"id_medium"`, `"id_small"`, `"id_tiny"`, `"id_big"`, `"id_uuid"`, `"order_id"`, `"order_id"`, `"order_id"`, `"name"`, `"dummy_column"`}
+
+
+const migration_output_up = `public function up() {
+    Schema::create('student_enrollments',  function (Blueprint $table) {
+    $table->increments('id_int');
+    $table->mediumIncrements('id_medium');
+    $table->smallIncrements('id_small');
+    $table->tinyIncrements('id_tiny');
+    $table->bigIncrements('id_big');
+    $table->uuid('id_uuid')->primary();
+    $table->foreign('order_id')->references('id')->on('Orders')->onDelete('cascade');
+    $table->foreign('order_id')->references('id')->on('Orders')->onDelete('set null');
+    $table->foreign('order_id')->references('id')->on('Orders')->onDelete('set null')->nullable();
+    $table->string('name');
+    $table->string('description', 255)->default('default description')->nullable()->unique();
+    $table->bigInteger('order_id')->default('0')->nullable()->unique()->index();
+    $table->enum('dummy_column', ['a', 'asas', 'saDASD'])->nullable()->unique();
+}
+
+);
+}
+
+`
+
+const migration_output_down = `public function down() {
+    Schema::dropIfExists('student_enrollments');
+}
+
+`
