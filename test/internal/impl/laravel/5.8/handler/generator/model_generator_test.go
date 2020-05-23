@@ -19,6 +19,10 @@ func TestModelGenerator(t *testing.T) {
 		"name":         "string|max:255|unique",
 		"phone_number": "string|max:12|unique:users,id",
 	}
+	createRules2 := map[string]string{
+		"name":         "string|max:255|unique",
+		"phone_number": "string|max:12|unique:users",
+	}
 	updateRules2 := map[string]string{
 		"name":         "string|max:255|unique",
 		"phone_number": "string|max:12|unique:users",
@@ -31,7 +35,7 @@ func TestModelGenerator(t *testing.T) {
 			ModelWithCreateValidationRules),
 		genModelGeneratorTest("student_allotments", emptyArr, emptyArr, emptyMap, updateRules,
 			ModelWithUpdateValidationRules),
-		genModelGeneratorTest("student_allotments", emptyArr, emptyArr, emptyMap, updateRules2,
+		genModelGeneratorTest("student_allotments", emptyArr, emptyArr, createRules2, updateRules2,
 			ModelWithUpdateValidationRulesWithoutId),
 	}
 
