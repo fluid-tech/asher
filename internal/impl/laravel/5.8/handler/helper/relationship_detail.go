@@ -2,7 +2,6 @@ package helper
 
 import (
 	"asher/internal/api/codebuilder/php/core"
-	"fmt"
 )
 
 const (
@@ -25,14 +24,4 @@ func NewRelationshipDetail(relationShipType int, function *core.Function, foreig
 		ForeignKey:       foreignKey,
 		ReferencingModel: referencingModel,
 	}
-}
-
-/**
-Just For Printing Purpose.
-*/
-func (relationshipDetail *RelationshipDetail) String() {
-	fmt.Println("RelationShipType : ", relationshipDetail.RelationshipType)
-	fmt.Println("Function : ", relationshipDetail.Function.String())
-	fmt.Println("Foreign Key : ", relationshipDetail.ForeignKey)
-	fmt.Println("ReferenceModel Name : ", relationshipDetail.ReferencingModel)
 }

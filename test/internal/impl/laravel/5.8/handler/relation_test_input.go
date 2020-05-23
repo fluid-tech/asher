@@ -1,6 +1,6 @@
 package handler
 
-const output_1 = `namespace App;
+const output1CheckForeignkeyConstraint = `namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 

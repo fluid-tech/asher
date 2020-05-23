@@ -3,13 +3,13 @@ package generator
 import "asher/internal/api/codebuilder/php/core"
 
 type AuditColModel struct {
-	modelGen  *ModelGenerator
+	modelGen *ModelGenerator
 	//modelName string
 }
 
 func NewAuditColModel(generator *ModelGenerator) *AuditColModel {
 	return &AuditColModel{
-		modelGen:  generator,
+		modelGen: generator,
 		//modelName: generator.Build().Name,
 	}
 }
@@ -43,6 +43,7 @@ func (auditColModel *AuditColModel) SetSoftDeletes(softDeletes bool) *AuditColMo
 	if softDeletes {
 		auditColModel.modelGen.classBuilder.AddMember(core.NewSimpleStatement(UseSoftDeletesStr))
 		// todo make date format configurable
+		// Passing auditColModel.modelName as argument below just to show the intent although it will bot be used in this case
 		auditColModel.modelGen.AddUpdateValidationRule(DeletedAtStr, DeletedAtValidationRule, "auditColModel.modelName")
 		auditColModel.modelGen.AddFillable(DeletedAtStr)
 	}
@@ -61,6 +62,7 @@ func (auditColModel *AuditColModel) SetSoftDeletes(softDeletes bool) *AuditColMo
 */
 func (auditColModel *AuditColModel) SetAuditCol(auditCol bool) *AuditColModel {
 	if auditCol {
+		// Passing auditColModel.modelName as argument below just to show the intent although it will bot be used in this case
 		auditColModel.modelGen.AddCreateValidationRule(CreatedByStr, DefaultAuditColValidation, "auditColModel.modelName")
 		auditColModel.modelGen.AddUpdateValidationRule(UpdatedByStr, DefaultAuditColValidation, "auditColModel.modelName")
 		auditColModel.modelGen.AddFillable(CreatedByStr).AddFillable(UpdatedByStr)
