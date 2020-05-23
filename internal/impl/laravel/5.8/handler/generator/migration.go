@@ -50,8 +50,8 @@ func (migrationGenerator *MigrationGenerator) SetName(tableName string) *Migrati
  Example:
 	- AddColumn(core.NewSimpleStatement(`$this->string("name")->unique()`))
 */
-func (migrationGenerator *MigrationGenerator) AddColumn(column core.SimpleStatement) *MigrationGenerator {
-	return migrationGenerator.AddColumns([]*core.SimpleStatement{&column})
+func (migrationGenerator *MigrationGenerator) AddColumn(column *core.SimpleStatement) *MigrationGenerator {
+	return migrationGenerator.AddColumns([]*core.SimpleStatement{column})
 }
 
 /**
