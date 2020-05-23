@@ -13,7 +13,6 @@ type RelationshipHandler struct {
 	api.Handler
 }
 
-
 func NewRelationshipHandler() *RelationshipHandler {
 	return &RelationshipHandler{}
 }
@@ -29,17 +28,16 @@ Parameters:
 	- relations: String of all Relation reference of models.Relation
 Returns:
 	- nil nil
- */
+*/
 func (relationshipHandler *RelationshipHandler) Handle(currentTableName string, relations interface{}) ([]api.EmitterFile, error) {
 
 	currentModelGenerator := context.GetFromRegistry("model").GetCtx(currentTableName).(*generator.ModelGenerator)
 	relationshipModelGenerator := generator.NewRelationshipModel(currentModelGenerator)
 	myRelations := relations.(models.Relation)
 
-
 	for _, rel := range myRelations.HasMany {
 		var referenceTableName, foreignKey, primaryKey = getRelationshipKeys(rel, currentTableName)
-		relationshipDetailObj := relationshipModelGenerator.AddRelationshipToModel(helper.HasManny, currentTableName, referenceTableName, foreignKey, primaryKey)
+		relationshipDetailObj := relationshipModelGenerator.AddRelationshipToModel(helper.HasMany, currentTableName, referenceTableName, foreignKey, primaryKey)
 		context.GetFromRegistry("relation").AddToCtx(currentTableName, relationshipDetailObj)
 	}
 
@@ -55,7 +53,7 @@ func (relationshipHandler *RelationshipHandler) Handle(currentTableName string, 
 /**
 This method generates referenceTableName, foreignKey, primaryKey form the Relation string
 as per laravel requirement.
- */
+*/
 func getRelationshipKeys(relation string, currentTableName string) (string, string, string) {
 	var referenceTableName, foreignKey, primaryKey string
 	splittedArray := strings.Split(relation, ":")

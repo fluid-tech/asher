@@ -38,8 +38,8 @@ func NewAuditColMigration(generator *MigrationGenerator) *AuditColMigration {
 */
 func (auditColGen *AuditColMigration) SetAuditCols(auditCols bool) *AuditColMigration {
 	if auditCols {
-		cbstr := "$table->"+helper.ColTypeSwitcher(auditColGen.pkColVal, CreatedByStr, []string{})
-		upstr := "$table->"+helper.ColTypeSwitcher(auditColGen.pkColVal, UpdatedByStr, []string{}) + "->nullable()"
+		cbstr := "$table->" + helper.ColTypeSwitcher(auditColGen.pkColVal, CreatedByStr, []string{})
+		upstr := "$table->" + helper.ColTypeSwitcher(auditColGen.pkColVal, UpdatedByStr, []string{}) + "->nullable()"
 		auditColGen.migrationGen.AddColumns([]*core.SimpleStatement{
 			core.NewSimpleStatement(cbstr), core.NewSimpleStatement(upstr),
 		})
@@ -74,7 +74,7 @@ func (auditColGen *AuditColMigration) SetPkCol(pkCol string) *AuditColMigration 
 */
 func (auditColGen *AuditColMigration) SetSoftDeletes(softDeletes bool) *AuditColMigration {
 	if softDeletes {
-		auditColGen.migrationGen.AddColumn(*core.NewSimpleStatement(SoftDeletesCol))
+		auditColGen.migrationGen.AddColumn(core.NewSimpleStatement(SoftDeletesCol))
 	}
 	return auditColGen
 }

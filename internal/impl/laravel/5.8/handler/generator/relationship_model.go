@@ -30,9 +30,10 @@ Parameters:
 Returns:
 	- instance of the *RelationshipDetail
 Example:
-	- Input: buildRelationshipFunction(1, 'Orders', 'OrderProducts', 'order_id', 'id')
+	- Input: AddRelationshipToModel(1, 'Orders', 'OrderProducts', 'order_id', 'id')
 */
-func (relationshipModel *RelationshipModel) AddRelationshipToModel(relationshipType int, currentTableName string, referenceTableName string, foreignKey string, primaryKey string) *helper.RelationshipDetail {
+func (relationshipModel *RelationshipModel) AddRelationshipToModel(relationshipType int, currentTableName string,
+	referenceTableName string, foreignKey string, primaryKey string) *helper.RelationshipDetail {
 
 	generatedFunction := relationshipModel.buildRelationshipFunction(relationshipType, referenceTableName, foreignKey, primaryKey)
 	relationshipDetailObj := helper.NewRelationshipDetail(relationshipType, generatedFunction, foreignKey, referenceTableName)
@@ -59,7 +60,7 @@ Example:
 */
 func (relationshipModel *RelationshipModel) buildRelationshipFunction(relationshipType int, referenceTableName string, foreignKey string, primaryKey string) *core.Function {
 	relation := ""
-	if relationshipType == helper.HasManny {
+	if relationshipType == helper.HasMany {
 		relation = "hasMany"
 	} else if relationshipType == helper.HasOne {
 		relation = "hasOne"

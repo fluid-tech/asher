@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	HasOne   = 1
-	HasManny = 2
+	HasOne  = 1
+	HasMany = 2
 )
 
 type RelationshipDetail struct {
