@@ -79,16 +79,16 @@ func (migrationGenerator *MigrationGenerator) AddColumns(columns []*core.SimpleS
 func (migrationGenerator *MigrationGenerator) Build() *core.Class {
 	// Preparing the arguments for up function
 
-	arg1 := api.TabbedUnit(core.NewParameter("'" + migrationGenerator.tableName + "'"))
+	arg1 := core.NewParameter("'" + migrationGenerator.tableName + "'")
 	closure := builder.NewFunctionBuilder().AddArgument("Blueprint $table")
 	for _, element := range migrationGenerator.columns {
 		closure.AddStatement(element)
 	}
 
-	arg2 := api.TabbedUnit(closure.GetFunction())
+	arg2 := closure.GetFunction()
 
 	// Preparing the statements for up function
-	schemaBlock := api.TabbedUnit(core.NewFunctionCall("Schema::create").AddArg(&arg1).AddArg(&arg2))
+	schemaBlock := core.NewFunctionCall("Schema::create").AddArg(arg1).AddArg(arg2)
 	upFunction := builder.NewFunctionBuilder().SetName("up").SetVisibility("public").
 		AddStatement(schemaBlock).GetFunction()
 
