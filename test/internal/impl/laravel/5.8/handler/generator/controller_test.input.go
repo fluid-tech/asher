@@ -1,7 +1,9 @@
 package generator
 
 
-const CreateRestController =`namespace App\Http\Controllers;
+
+
+const CreateRestController = `namespace App\Http\Controllers;
 
 use App\Order;
 use App\Transactors\OrderTransactor;
@@ -105,7 +107,6 @@ class OrderRestController extends Controller {
 }
 `
 
-
 const AllFunctionsRestController = `namespace App\Http\Controllers;
 
 use App\Order;
@@ -152,3 +153,6 @@ class OrderRestController extends Controller {
 
 }
 `
+
+
+

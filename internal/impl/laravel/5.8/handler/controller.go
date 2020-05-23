@@ -6,7 +6,7 @@ import (
 	"asher/internal/impl/laravel/5.8/handler/context"
 	"asher/internal/impl/laravel/5.8/handler/generator"
 	"asher/internal/models"
-	"flag"
+	"strings"
 )
 
 type ControllerHandler struct {
@@ -32,12 +32,11 @@ func (controllerHandler *ControllerHandler) Handle(
 	var fileToEmit []api.EmitterFile
 
 	if controllerConfig.Rest {
-		fileToEmit = append(fileToEmit,controllerHandler.HandleRestController(identifier, value)...)
+		fileToEmit = append(fileToEmit, controllerHandler.handleRestController(identifier, value)...)
 	}
 
 	return fileToEmit, nil
 }
-
 
 /**
 IF the type of controller is REST in controller conifg then this method will be called
@@ -54,7 +53,7 @@ Parameters:
 Returns:
 	- array of emmitter files
 */
-func (controllerHandler *ControllerHandler) HandleRestController(
+func (controllerHandler *ControllerHandler) handleRestController(
 	identifier string, value interface{}) []api.EmitterFile {
 
 	var fileToEmit []api.EmitterFile
@@ -65,13 +64,14 @@ func (controllerHandler *ControllerHandler) HandleRestController(
 
 	conGen.AddFunctionsInController(controllerConfig.HttpMethods)
 
-	context.GetFromRegistry("controller").AddToCtx(identifier+`RestController`, conGen)
+	context.GetFromRegistry("controller").AddToCtx(identifier, conGen)
 
-	controllerEmitterFile := core.NewPhpEmitterFile(identifier+"RestController",  api.ControllerPath, conGen, api.Controller)
-	transactorEmitterFiles := controllerHandler.HandleTransactor(identifier,value)
-	mutatorEmitterFiles := controllerHandler.HandleMutator(identifier)
-	queryEmitterFiles := controllerHandler.HandleQuery(identifier)
-	routeEmitterFiles := controllerHandler.HandleRoutes(identifier,value)
+	controllerEmitterFile := core.NewPhpEmitterFile(identifier+"RestController.php", api.ControllerPath, conGen, api.Controller)
+
+	transactorEmitterFiles := controllerHandler.handleTransactor(identifier, controllerConfig)
+	mutatorEmitterFiles := controllerHandler.handleMutator(identifier)
+	queryEmitterFiles := controllerHandler.handleQuery(identifier)
+	routeEmitterFiles := controllerHandler.handleRoutes(identifier, controllerConfig)
 
 	fileToEmit = append(fileToEmit, controllerEmitterFile)
 	fileToEmit = append(fileToEmit, transactorEmitterFiles...)
@@ -79,119 +79,118 @@ func (controllerHandler *ControllerHandler) HandleRestController(
 	fileToEmit = append(fileToEmit, queryEmitterFiles...)
 	fileToEmit = append(fileToEmit, routeEmitterFiles...)
 
-
 	return fileToEmit
 }
 
-func (controllerHandler *ControllerHandler) HandleTransactor(identifier string, value interface{}) []api.EmitterFile {
-	controllerConfig := value.(models.Controller)
+/*make methods private direct cast and pass in function call cast everything to * which ypu are fecthing from context*/
+func (controllerHandler *ControllerHandler) handleTransactor(identifier string,
+	controllerConfig models.Controller) []api.EmitterFile {
+
 	var filesToEmmit []api.EmitterFile
 	var transactorEmmiterFile []api.EmitterFile
 
-
-	modelGen := context.GetFromRegistry("model").GetCtx(identifier).(generator.ModelGenerator)
-	migrationGen := context.GetFromRegistry("migration").GetCtx(identifier).(generator.MigrationGenerator)
+	modelGen := context.GetFromRegistry("model").GetCtx(identifier).(*generator.ModelGenerator)
+	migrationGen := context.GetFromRegistry("migration").GetCtx(identifier).(*generator.MigrationGenerator)
 	/*SWITCH CASE FOR TYPE OF TRANSACTOR*/
 
-	switch controllerConfig.Type {
-		case "file":
-			transactorEmmiterFile = controllerHandler.HandleFileTransactor(identifier,value,modelGen,migrationGen)
-		case "image":
-			transactorEmmiterFile = controllerHandler.HandleImageTransactor(identifier,value,modelGen,migrationGen)
-		default:
-			transactorEmmiterFile = controllerHandler.HandleDefaultTransactor(identifier,value,modelGen,migrationGen)
+	switch strings.ToLower(controllerConfig.Type) {
+	case "file":
+		transactorEmmiterFile = controllerHandler.handleFileTransactor(identifier, controllerConfig, modelGen, migrationGen)
+	case "image":
+		transactorEmmiterFile = controllerHandler.handleImageTransactor(identifier, controllerConfig, modelGen, migrationGen)
+	default:
+		transactorEmmiterFile = controllerHandler.handleDefaultTransactor(identifier, controllerConfig)
 	}
-	filesToEmmit = append(filesToEmmit,transactorEmmiterFile...)
+	filesToEmmit = append(filesToEmmit, transactorEmmiterFile...)
 
 	return filesToEmmit
 }
 
-func (controllerHandler *ControllerHandler) HandleDefaultTransactor(identifier string, value interface{},
-modelGen generator.ModelGenerator, migrationGen generator.MigrationGenerator) []api.EmitterFile {
-	controller := value.(models.Controller)
+func (controllerHandler *ControllerHandler) handleDefaultTransactor(identifier string,
+	controllerConfig models.Controller) []api.EmitterFile {
+	//controller := value.(models.Controller)
 	var filesToEmmit []api.EmitterFile
 
-	transactorGen := generator.NewTransactorGenerator()
-	transactorGen.SetIdentifier(identifier)
-	transactorGen.SetTransactorType("default")
+	transactorGen := generator.NewTransactorGenerator(identifier,"default")
 
-	context.GetFromRegistry("transactor").AddToCtx(identifier+"Transactor", transactorGen)
+	context.GetFromRegistry("transactor").AddToCtx(identifier, transactorGen)
 
-	transactorEmitter := core.NewPhpEmitterFile(identifier+"Transactor",  api.TransactorPath, transactorGen, api.Transactor)
+	transactorEmitter := core.NewPhpEmitterFile(identifier+"Transactor.php", api.TransactorPath, transactorGen, api.Transactor)
 
 	filesToEmmit = append(filesToEmmit, transactorEmitter)
 	return filesToEmmit
 }
 
-func (controllerHandler *ControllerHandler) HandleFileTransactor(identifier string, value interface{},
-modelGen generator.ModelGenerator, migrationGen generator.MigrationGenerator) []api.EmitterFile {
-	controller := value.(models.Controller)
+func (controllerHandler *ControllerHandler) handleFileTransactor(identifier string, controllerConfig models.Controller,
+	modelGen *generator.ModelGenerator, migrationGen *generator.MigrationGenerator) []api.EmitterFile {
+	//controller := value.(models.Controller)
 	var filesToEmmit []api.EmitterFile
 
-
+	/*controller argumtn something while merging with master*/
 	modelGen.AddCreateValidationRule("file_urls", "required").
-		AddUpdateValidationRule("file_urls.urls", "array")
+		AddCreateValidationRule("file_urls.urls", "array")
 
 	modelGen.AddUpdateValidationRule("file_urls", "required").
 		AddUpdateValidationRule("file_urls.urls", "array")
 
-	modelGen.AddFillable("fileurls")
+	modelGen.AddFillable("file_urls")
+
+	/*TODO DATA type should be configurable in 2nd iteration*/
+	migrationGen.AddColumn(core.NewSimpleStatement(`$table->longText('file_urls')->nullable();`))
+
+	transactorGen := generator.NewTransactorGenerator(identifier,"file")
+
+	context.GetFromRegistry("transactor").AddToCtx(identifier, transactorGen)
+
+	transactorEmitter := core.NewPhpEmitterFile(identifier+"Transactor.php", api.TransactorPath, transactorGen, api.Transactor)
+
+	filesToEmmit = append(filesToEmmit, transactorEmitter)
+	return filesToEmmit
+}
+
+/*Depeneding upon file type
+image */
+
+func (controllerHandler *ControllerHandler) handleImageTransactor(identifier string, controllerConfig models.Controller,
+	modelGen *generator.ModelGenerator, migrationGen *generator.MigrationGenerator) []api.EmitterFile {
+	//controller := value.(models.Controller)
+	var filesToEmmit []api.EmitterFile
+
+	/*controller argumtn something while merging with master*/
+	modelGen.AddCreateValidationRule("file_urls", "required").
+		AddCreateValidationRule("file_urls.urls", "array")
+
+	modelGen.AddUpdateValidationRule("file_urls", "required").
+		AddUpdateValidationRule("file_urls.urls", "array")
+
+	modelGen.AddFillable("file_urls")
 
 	migrationGen.AddColumn(core.NewSimpleStatement(`$table->longText('img_urls')->nullable();`))
 
-	transactorGen := generator.NewTransactorGenerator()
-	transactorGen.SetIdentifier(identifier)
-	transactorGen.SetTransactorType("file")
+	transactorGen := generator.NewTransactorGenerator(identifier,"image")
 
-	context.GetFromRegistry("transactor").AddToCtx(identifier+"Transactor", transactorGen)
+	context.GetFromRegistry("transactor").AddToCtx(identifier, transactorGen)
 
-	transactorEmitter := core.NewPhpEmitterFile(identifier+"Transactor",  api.TransactorPath, transactorGen, api.Transactor)
+	transactorEmitter := core.NewPhpEmitterFile(identifier+"Transactor.php", api.TransactorPath, transactorGen, api.Transactor)
 
 	filesToEmmit = append(filesToEmmit, transactorEmitter)
 	return filesToEmmit
 }
 
-func (controllerHandler *ControllerHandler) HandleImageTransactor(identifier string, value interface{},
-modelGen generator.ModelGenerator, migrationGen generator.MigrationGenerator) []api.EmitterFile {
-	controller := value.(models.Controller)
-	var filesToEmmit []api.EmitterFile
-
-	modelGen.AddCreateValidationRule("img_urls", "required").
-		AddUpdateValidationRule("img_urls.urls", "array")
-
-	modelGen.AddUpdateValidationRule("img_urls", "required").
-		AddUpdateValidationRule("img_urls.urls", "array")
-
-
-	modelGen.AddFillable("imgurls")
-	migrationGen.AddColumn("")
-
-	transactorGen := generator.NewTransactorGenerator()
-	transactorGen.SetIdentifier(identifier)
-	transactorGen.SetTransactorType("image")
-
-	context.GetFromRegistry("transactor").AddToCtx(identifier+"Transactor", transactorGen)
-
-	transactorEmitter := core.NewPhpEmitterFile(identifier+"Transactor",  api.TransactorPath, transactorGen, api.Transactor)
-
-	filesToEmmit = append(filesToEmmit, transactorEmitter)
-	return filesToEmmit
-}
-
-func (controllerHandler *ControllerHandler) HandleMutator(identifier string) ([]api.EmitterFile) {
+func (controllerHandler *ControllerHandler) handleMutator(identifier string) []api.EmitterFile {
 	var filesToEmit []api.EmitterFile
 	mutatorGen := generator.NewMutatorGenerator()
 	mutatorGen.SetIdentifier(identifier)
 
-	context.GetFromRegistry("controller").AddToCtx(identifier+"Mutator", mutatorGen)
+	context.GetFromRegistry("mutator").AddToCtx(identifier, mutatorGen)
 	mutatorEmitter :=
-		core.NewPhpEmitterFile(identifier+"Mutator",  api.MutatorPath, mutatorGen, api.Mutator)
+		core.NewPhpEmitterFile(identifier+"Mutator.php", api.MutatorPath, mutatorGen, api.Mutator)
 
 	filesToEmit = append(filesToEmit, mutatorEmitter)
 	return filesToEmit
 }
 
-func (controllerHandler *ControllerHandler) HandleQuery(
+func (controllerHandler *ControllerHandler) handleQuery(
 	identifier string) []api.EmitterFile {
 
 	var filesToEmit []api.EmitterFile
@@ -200,7 +199,7 @@ func (controllerHandler *ControllerHandler) HandleQuery(
 
 	context.GetFromRegistry("query").AddToCtx(identifier, queryGenerator)
 
-	emitFile := core.NewPhpEmitterFile(identifier+"Query.php", "/app/query", queryGenerator, 1)
+	emitFile := core.NewPhpEmitterFile(identifier+"Query.php", api.QueryPath, queryGenerator, api.Query)
 	filesToEmit = append(filesToEmit, emitFile)
 
 	return filesToEmit
@@ -216,21 +215,27 @@ Returns:
 	- if asher_api.php file already exists it returns blank *api.EmitterFile array
 		else it will create and return the file in the array
 */
-func (controllerHandler *ControllerHandler) HandleRoutes(identifier string, value interface{}) []api.EmitterFile {
+func (controllerHandler *ControllerHandler) handleRoutes(identifier string, controllerConfig models.Controller) []api.EmitterFile {
 	var filesToEmit []api.EmitterFile
-	controller := value.(models.Controller)
+
+
 	addRouteToEmmitFiles := false
-	gen := context.GetFromRegistry("route").GetCtx("api")
+
+	gen := context.GetFromRegistry("route").GetCtx("api").(*generator.RouteGenerator)
+
+
 	if gen == nil {
 		addRouteToEmmitFiles = true
-		context.GetFromRegistry("route").AddToCtx("api", context.NewRouteContext())
-		gen = context.GetFromRegistry("route").GetCtx("api")
+		context.GetFromRegistry("route").AddToCtx("api", generator.NewRouteGenerator())
+		gen = context.GetFromRegistry("route").GetCtx("api").(*generator.RouteGenerator)
 	}
-	apiGenerator := gen.(generator.RouteGenerator)
-	apiGenerator.AddDefaultRestRoutes(identifier, controller)
+
+
+	gen.AddDefaultRestRoutes(identifier, controllerConfig)
+
 
 	if addRouteToEmmitFiles {
-		emitFile := core.NewPhpEmitterFile("asher_api.php", "/routes", apiGenerator, 1)
+		emitFile := core.NewPhpEmitterFile("asher_api.php", api.RouteFilePath, gen, api.RouterFile)
 		filesToEmit = append(filesToEmit, emitFile)
 	}
 

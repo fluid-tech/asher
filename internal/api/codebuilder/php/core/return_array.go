@@ -63,7 +63,7 @@ func convertMapToStringAssociativeArray(rulesMap map[string]string) []string {
  - []string - A slice of keys sorted in the ascending order present in the map
  Usage
  myKeySlice := sortedKeysFromMap(someMap)
- */
+*/
 func sortedKeysFromMap(baseMap map[string]string) []string {
 	var keys []string
 	for key := range baseMap {
@@ -72,4 +72,3 @@ func sortedKeysFromMap(baseMap map[string]string) []string {
 	sort.Strings(keys)
 	return keys
 }
-

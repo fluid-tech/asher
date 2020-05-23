@@ -2,13 +2,22 @@ package generator
 
 import (
 	"asher/internal/impl/laravel/5.8/handler/generator"
-	"fmt"
+	"asher/test/api"
 	"testing"
 )
 
-//Route::get('/user', 'UserController@index');
 func TestQueryGenerator(t *testing.T) {
-	queryGenrator:=generator.NewQueryGenerator("Order", false)
-
-	fmt.Print(queryGenrator)
+	//transactorGenerator := generator.NewQueryGenerator("Order", true)
+	//fmt.Print(transactorGenerator)
+	var table = []*api.GeneralTest{
+		genQueryTest("Order", BasicQuery),
+	}
+	api.IterateAndTest(table, t)
 }
+
+func genQueryTest(modelName string, expectedOut string) *api.GeneralTest {
+	/*TODO relation is not used for iteration1*/
+	transactorGenerator := generator.NewQueryGenerator(modelName, true)
+	return api.NewGeneralTest(transactorGenerator.String(), expectedOut)
+}
+

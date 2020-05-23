@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestTryBlock(t *testing.T)  {
+func TestTryBlock(t *testing.T) {
 	tryBlockVar := core.NewTryBlock()
 	newStatement := api.TabbedUnit(core.NewSimpleStatement(
 		"$this->fullyQualifiedModel = $fullyQualifiedModel"))

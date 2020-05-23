@@ -9,14 +9,15 @@ import (
 )
 
 type RouteGenerator struct {
+	api.Generator
 	imports []api.TabbedUnit
 	routes  []*core.FunctionCall
 }
 
 func NewRouteGenerator() *RouteGenerator {
 	return &RouteGenerator{
-		imports:	[]api.TabbedUnit{},
-		routes: 	[]*core.FunctionCall{},
+		imports: []api.TabbedUnit{},
+		routes:  []*core.FunctionCall{},
 	}
 }
 
@@ -61,7 +62,7 @@ func (routeGenerator *RouteGenerator) AddDefaultRestRoutes(modelName string, con
 		method         string
 		actionFunction string
 		subURI         string
-		httpMethod 	string
+		httpMethod     string
 	}
 
 	var apiRouteConfig = []RouteConfig{

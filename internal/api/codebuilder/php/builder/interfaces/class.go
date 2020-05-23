@@ -7,8 +7,8 @@ import (
 
 type Class interface {
 	SetName(className string) Class
-	AddMembers(members []*api.TabbedUnit) Class
-	AddMember(member *api.TabbedUnit) Class
+	AddMembers(members []api.TabbedUnit) Class
+	AddMember(member api.TabbedUnit) Class
 	SetExtends(extendsClass string) Class
 	AddFunction(function *core.Function) Class
 	AddFunctions(functions []*core.Function) Class

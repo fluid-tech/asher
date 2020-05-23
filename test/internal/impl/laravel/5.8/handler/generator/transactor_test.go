@@ -6,12 +6,18 @@ import (
 	"testing"
 )
 
-func TestTransactorGeneratorTest(t *testing.T)  {
-	transactorGenerator := generator.NewTransactorGenerator()
-	transactorGenerator.SetIdentifier("Centre")
-	//fmt.Printf(transactorGenerator.String() )
-	test := api.NewGeneralTest(transactorGenerator.String(), BasicTransactor)
-	api.IterateAndTest([]*api.GeneralTest{
-		test,
-	},t)
+func TestTransactorGenerator(t *testing.T) {
+	var table = []*api.GeneralTest{
+		genTransactorTest("Order", "default", BasicTransactor),
+		genTransactorTest("Order", "file", FileTransactor),
+		genTransactorTest("Order", "image", ImageTransactor),
+		genTransactorTest("Order", "", BasicTransactor),
+	}
+	api.IterateAndTest(table, t)
+}
+
+func genTransactorTest(modelName string,  transactorType string, expectedOut string) *api.GeneralTest {
+	transactorGenerator := generator.NewTransactorGenerator(modelName, transactorType)
+
+	return api.NewGeneralTest(transactorGenerator.String(), expectedOut)
 }

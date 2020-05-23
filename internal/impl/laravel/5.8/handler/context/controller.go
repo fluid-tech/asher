@@ -8,13 +8,15 @@ type Controller struct {
 }
 
 func NewControllerContext() *Controller {
-	return &Controller{}
+	return &Controller{
+		controllerGenerators: make(map[string]*generator.ControllerGenerator),
+	}
 }
 
 /**
 Store a ControllerInfo instance.
 */
-func (controller *Controller) AddToCtx(key string, value interface{})  {
+func (controller *Controller) AddToCtx(key string, value interface{}) {
 	controller.controllerGenerators[key] = value.(*generator.ControllerGenerator)
 }
 

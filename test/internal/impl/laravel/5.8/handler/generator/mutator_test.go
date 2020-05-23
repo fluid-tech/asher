@@ -6,12 +6,12 @@ import (
 	"testing"
 )
 
-func TestMutatorGeneratorTest(t *testing.T)  {
+func TestMutatorGeneratorTest(t *testing.T) {
 	mutatorGenerator := generator.NewMutatorGenerator()
 	mutatorGenerator.SetIdentifier("BatchLectureStatus")
 	//fmt.Printf(mutatorGenerator.String() )
 	test := api.NewGeneralTest(mutatorGenerator.String(), BasicMutator)
 	api.IterateAndTest([]*api.GeneralTest{
 		test,
-	},t)
+	}, t)
 }

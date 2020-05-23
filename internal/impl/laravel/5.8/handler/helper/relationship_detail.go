@@ -12,7 +12,7 @@ const (
 type RelationshipDetail struct {
 	relationshipType int
 
-	Function         *core.Function
+	Function *core.Function
 }
 
 func NewRelationshipDetail(relationShipType int) *RelationshipDetail {

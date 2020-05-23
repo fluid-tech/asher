@@ -1,8 +1,6 @@
 package generator
 
-type ModelRelationship struct{
+type ModelRelationship struct {
 	relationshipType int
 	referencingModel *ModelGenerator
-
-
 }

@@ -6,18 +6,20 @@ import (
 
 type Route struct {
 	BaseContext
-	routeGenerators map[string]*generator.QueryGenerator
+	routeGenerators map[string]*generator.RouteGenerator
 }
 
 func NewRouteContext() *Route {
-	return &Route{}
+	return &Route{
+		routeGenerators: make(map[string]*generator.RouteGenerator),
+	}
 }
 
 /**
 Store a MigrationInfo instance.
 */
-func (route *Route) AddToCtx(key string, value interface{})  {
-	route.routeGenerators[key] = value.(*generator.QueryGenerator)
+func (route *Route) AddToCtx(key string, value interface{}) {
+	route.routeGenerators[key] = value.(*generator.RouteGenerator)
 }
 
 /**
@@ -27,7 +29,3 @@ The user of this method must cast and fetch appropriate data
 func (route *Route) GetCtx(key string) interface{} {
 	return route.routeGenerators[key]
 }
-
-
-
-

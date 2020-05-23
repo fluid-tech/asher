@@ -74,7 +74,6 @@ func (mutatorGenerator *MutatorGenerator) AppendImports(imports []string) *Mutat
 	return mutatorGenerator
 }
 
-
 /**
 Adds Constructor in the mutator
 Returns:
@@ -83,12 +82,14 @@ Sample Usage:
 	- mutatorGeneratorObject.AddConstructorFunction()
 */
 func (mutatorGenerator *MutatorGenerator) AddConstructorFunction() *MutatorGenerator {
+
+
 	parentConstructorCall := api.TabbedUnit(
-		core.NewFunctionCall("parent::__construct").AddArg(mutatorGenerator.addParameter(
+		core.NewFunctionCall("parent::__construct").AddArg(core.NewParameter(
 			`'App\` + mutatorGenerator.identifier + `', 'id'`)))
 
-	constructorStatements := []*api.TabbedUnit{
-		&parentConstructorCall,
+	constructorStatements := []api.TabbedUnit{
+		parentConstructorCall,
 	}
 
 	mutatorGenerator.classBuilder.AddFunction(
@@ -96,8 +97,6 @@ func (mutatorGenerator *MutatorGenerator) AddConstructorFunction() *MutatorGener
 			AddStatements(constructorStatements).GetFunction())
 	return mutatorGenerator
 }
-
-
 
 /**
 Main Function To be called when we want to build the mutator

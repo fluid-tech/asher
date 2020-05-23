@@ -7,12 +7,12 @@ import (
 )
 
 type QueryGenerator struct {
-	Class *builder.Class
-	imports []api.TabbedUnit
+	api.Generator
+	Class     *builder.Class
+	imports   []api.TabbedUnit
 	modelName string
-	relation bool
+	relation  bool
 }
-
 
 /**
 Get the new instance of query Generator ,Query is a part of transactor pattern which handles the read operations
@@ -27,7 +27,7 @@ Sample Usage:
 */
 func NewQueryGenerator(modelName string, relation bool) *QueryGenerator {
 	classBuilder := builder.NewClassBuilder()
-	classBuilder.SetName(modelName+"Query")
+	classBuilder.SetName(modelName + "Query")
 	classBuilder.SetPackage(`App\Queries`)
 	return &QueryGenerator{Class: classBuilder, imports: nil, modelName: modelName, relation: relation}
 }
@@ -49,7 +49,7 @@ Returns:
 */
 func (queryGenerator *QueryGenerator) Build() *core.Class {
 	/*IMPORTS*/
-	queryGenerator.Class.AddImport(`App\`+queryGenerator.modelName)
+	queryGenerator.Class.AddImport(`App\` + queryGenerator.modelName)
 
 	/*EXTENDS*/
 	queryGenerator.Class.SetExtends("BaseQuery")
@@ -57,7 +57,7 @@ func (queryGenerator *QueryGenerator) Build() *core.Class {
 	/*CONSTRUCTOR*/
 	constructor := builder.NewFunctionBuilder()
 	constructor.SetName("__construct").SetVisibility("public")
-	fullyQualifiedModelArg:= core.NewParameter(`"App\`+queryGenerator.modelName+`"`)
+	fullyQualifiedModelArg := core.NewParameter(`"App\` + queryGenerator.modelName + `"`)
 	callToSuperConstructor := core.NewFunctionCall("parent::__construct").AddArg(fullyQualifiedModelArg)
 	constructor.AddStatement(callToSuperConstructor)
 	queryGenerator.GetClass().AddFunction(constructor.GetFunction())
@@ -87,7 +87,7 @@ Sample Usage:
 
 
 */
-func (queryGenerator *QueryGenerator) String() string {
+func (queryGenerator QueryGenerator) String() string {
 	queryClass := queryGenerator.Build()
 	return queryClass.String()
 }

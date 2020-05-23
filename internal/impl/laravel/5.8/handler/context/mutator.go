@@ -8,13 +8,15 @@ type Mutator struct {
 }
 
 func NewMutatorContext() *Mutator {
-	return &Mutator{}
+	return &Mutator{
+		mutatorGenerators: make(map[string]*generator.MutatorGenerator),
+	}
 }
 
 /**
 Store a MutatorInfo instance.
 */
-func (mutator *Mutator) AddToCtx(key string, value interface{})  {
+func (mutator *Mutator) AddToCtx(key string, value interface{}) {
 	mutator.mutatorGenerators[key] = value.(*generator.MutatorGenerator)
 }
 
@@ -25,4 +27,3 @@ The user of this method must cast and fetch appropriate data
 func (mutator *Mutator) GetCtx(key string) interface{} {
 	return mutator.mutatorGenerators[key]
 }
-

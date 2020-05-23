@@ -8,13 +8,15 @@ type Transactor struct {
 }
 
 func NewTransactorContext() *Transactor {
-	return &Transactor{}
+	return &Transactor{
+		transactorGenerators: make(map[string]*generator.TransactorGenerator),
+	}
 }
 
 /**
 Store a TransactorInfo instance.
 */
-func (transactor *Transactor) AddToCtx(key string, value interface{})  {
+func (transactor *Transactor) AddToCtx(key string, value interface{}) {
 	transactor.transactorGenerators[key] = value.(*generator.TransactorGenerator)
 }
 
@@ -25,4 +27,3 @@ The user of this method must cast and fetch appropriate data
 func (transactor *Transactor) GetCtx(key string) interface{} {
 	return transactor.transactorGenerators[key]
 }
-

@@ -13,7 +13,7 @@ type Class struct {
 
 /**
 Creates a new instance of this builder, with a new core.Class
- */
+*/
 func NewClassBuilder() *Class {
 	return &Class{
 		class: core.NewClass(),
@@ -22,8 +22,8 @@ func NewClassBuilder() *Class {
 
 /**
 Creates a new instance of this builder, with an existing core.Class
- */
-func NewClassBuilderFromClass(class *core.Class) *Class{
+*/
+func NewClassBuilderFromClass(class *core.Class) *Class {
 	return &Class{
 		class: class,
 	}
@@ -40,14 +40,14 @@ func (klass *Class) SetName(name string) interfaces.Class {
 /**
 Add a TabbedUnit to this this class's members list
 */
-func (klass *Class) AddMember(unit *api.TabbedUnit) interfaces.Class {
-	return klass.AddMembers([]*api.TabbedUnit{unit})
+func (klass *Class) AddMember(unit api.TabbedUnit) interfaces.Class {
+	return klass.AddMembers([]api.TabbedUnit{unit})
 }
 
 /**
 Adds a list of TabbedUnit to this class's members list
 */
-func (klass *Class) AddMembers(units []*api.TabbedUnit) interfaces.Class {
+func (klass *Class) AddMembers(units []api.TabbedUnit) interfaces.Class {
 	klass.class.Members = append(klass.class.Members, units...)
 	return klass
 }
@@ -67,13 +67,15 @@ func (klass *Class) AddFunction(function *core.Function) interfaces.Class {
 	klass.AddFunctions([]*core.Function{function})
 	return klass
 }
+
 /**
 Adds methods to the class. ENSURE the first method in this list is the constructor
- */
+*/
 func (klass *Class) AddFunctions(functions []*core.Function) interfaces.Class {
 	klass.class.Functions = append(klass.class.Functions, functions...)
 	return klass
 }
+
 /**
 Adds an interface to the implements field
 */
@@ -92,7 +94,7 @@ func (klass *Class) AddImports(imports []string) interfaces.Class {
 
 /**
 Add import to this class
- */
+*/
 func (klass *Class) AddImport(importPkg string) interfaces.Class {
 	return klass.AddImports([]string{importPkg})
 }
