@@ -61,3 +61,18 @@ class StudentAllotments extends Model {
 
 }
 `
+
+const ModelWithUpdateValidationRulesWithoutId = `namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class StudentAllotments extends Model {
+    public static function updateValidationRules($row_ids) {
+        return [
+'name' => [ 'string', 'max:255', 'unique:student_allotments,name,' . $row_ids['student_allotments'] ],
+'phone_number' => [ 'string', 'max:12', 'unique:users,phone_number,' . $row_ids['users'] ]];
+    }
+
+
+}
+`
