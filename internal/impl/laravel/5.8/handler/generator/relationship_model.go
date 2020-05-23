@@ -35,8 +35,10 @@ Example:
 func (relationshipModel *RelationshipModel) AddRelationshipToModel(relationshipType int, currentTableName string,
 	referenceTableName string, foreignKey string, primaryKey string) *helper.RelationshipDetail {
 
-	generatedFunction := relationshipModel.buildRelationshipFunction(relationshipType, referenceTableName, foreignKey, primaryKey)
-	relationshipDetailObj := helper.NewRelationshipDetail(relationshipType, generatedFunction, foreignKey, referenceTableName)
+	generatedFunction := relationshipModel.buildRelationshipFunction(relationshipType, referenceTableName, foreignKey,
+		primaryKey)
+	relationshipDetailObj := helper.NewRelationshipDetail(relationshipType, generatedFunction, foreignKey,
+		referenceTableName)
 	relationshipModel.modGen.classBuilder.AddFunction(generatedFunction)
 	return relationshipDetailObj
 
@@ -58,7 +60,8 @@ Example:
 			return $this->hasMany('App\OrderProducts', 'order_id', 'id')
 		}
 */
-func (relationshipModel *RelationshipModel) buildRelationshipFunction(relationshipType int, referenceTableName string, foreignKey string, primaryKey string) *core.Function {
+func (relationshipModel *RelationshipModel) buildRelationshipFunction(relationshipType int, referenceTableName string,
+	foreignKey string, primaryKey string) *core.Function {
 	relation := ""
 	if relationshipType == helper.HasMany {
 		relation = "hasMany"
@@ -67,7 +70,8 @@ func (relationshipModel *RelationshipModel) buildRelationshipFunction(relationsh
 	} else {
 		panic("This type of relation is not supported [relationshipType Number: ]" + string(relationshipType))
 	}
-	returnStatementStringFormatter := fmt.Sprintf(`return $this->%s('App\%s','%s','%s')`, relation, referenceTableName, foreignKey, primaryKey)
-	statement := api.TabbedUnit(core.NewSimpleStatement(returnStatementStringFormatter))
+	returnStatementStringFormatter := fmt.Sprintf(`return $this->%s('App\%s','%s','%s')`, relation,
+		referenceTableName, foreignKey, primaryKey)
+	statement := core.NewSimpleStatement(returnStatementStringFormatter)
 	return builder.NewFunctionBuilder().SetName(referenceTableName).AddStatement(statement).GetFunction()
 }
