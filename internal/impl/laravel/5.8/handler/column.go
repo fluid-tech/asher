@@ -35,12 +35,13 @@ func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []model
 	for _, singleColumn := range colArr {
 		columnHandler.handleHidden(modelGenerator, singleColumn.Hidden, singleColumn.Name)
 		columnHandler.handleGuarded(modelGenerator, singleColumn.Guarded, singleColumn.Name)
-		columnHandler.handleValidation(modelGenerator, singleColumn.Validations, singleColumn.Name)
+		columnHandler.handleValidation(modelGenerator, singleColumn.Validations, singleColumn.Name, modelName)
 	}
 	//fmt.Print(modelGenerator.Build().String())
 	context.GetFromRegistry("model").AddToCtx(modelName, modelGenerator)
-	modelGeneratorRef := api.Generator(modelGenerator)
-	phpEmitter := core.NewPhpEmitterFile(modelName, api.ModelPath, modelGeneratorRef, api.Model)
+
+	phpEmitter := core.NewPhpEmitterFile(modelName, api.ModelPath, modelGenerator, api.Model)
+
 	return phpEmitter
 }
 
@@ -56,15 +57,16 @@ func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr
 
 	migrationGenerator := generator.NewMigrationGenerator().SetName(identifier).AddColumns(statementsArr)
 	context.GetFromRegistry("migration").AddToCtx(identifier, migrationGenerator)
-	modelGeneratorRef := api.Generator(migrationGenerator)
-	phpEmitter := core.NewPhpEmitterFile(identifier, api.ModelPath, modelGeneratorRef, api.Model)
+
+	phpEmitter := core.NewPhpEmitterFile(identifier, api.ModelPath, migrationGenerator, api.Model)
+
 	return phpEmitter
 }
 
-func (columnHandler *ColumnHandler) handleValidation(modelGenerator *generator.ModelGenerator, validations string, colName string) {
+func (columnHandler *ColumnHandler) handleValidation(modelGenerator *generator.ModelGenerator, validations string, colName string, modelName string) {
 	if validations != "" {
-		modelGenerator.AddCreateValidationRule(colName, validations)
-		modelGenerator.AddUpdateValidationRule(colName, validations)
+		modelGenerator.AddCreateValidationRule(colName, validations, modelName)
+		modelGenerator.AddUpdateValidationRule(colName, validations, modelName)
 	}
 }
 
@@ -98,7 +100,7 @@ func (columnHandler *ColumnHandler) handleGuarded(modelGenerator *generator.Mode
 func (columnHandler *ColumnHandler) handlePrimary(colType string, colName string, genStrat string) *core.SimpleStatement {
 	var generatedLine string
 	if genStrat == "auto_increment" {
-		primaryKeyMethodName := columnHandler.primaryKeyMethodNameGenerator(colType)
+		primaryKeyMethodName := helper.PrimaryKeyMethodNameGenerator(colType)
 		generatedLine = fmt.Sprintf("$table->%s('%s')", primaryKeyMethodName, colName)
 	} else if genStrat == "uuid" {
 		//$table->uuid('id')->primary();
@@ -139,6 +141,15 @@ func (columnHandler *ColumnHandler) handleForeign(colName string, colTable strin
 	}
 }
 
+/**
+ An UniqueHandler function to generate a String for column if the parameter is set TRUE.
+ Parameters:
+	- isIndex: if this value is true then the column is to be unique
+ Returns:
+	- "->unique()" string if the parameter is TRUE else BLANK ""
+ Example:
+	- handleUnique(true)
+*/
 func (columnHandler *ColumnHandler) handleUnique(isUnique bool) string {
 	if isUnique {
 		return "->unique()"
@@ -153,6 +164,15 @@ func (columnHandler *ColumnHandler) handleDefaultValue(defaultVal string) string
 	return ""
 }
 
+/**
+ An IndexHandler function to generate a String for column if the parameter is set TRUE.
+ Parameters:
+	- isIndex: if this value is true then the column is to be indexed
+ Returns:
+	- "->index()" string if the parameter is TRUE else BLANK ""
+ Example:
+	- handleIndex(true)
+*/
 func (columnHandler *ColumnHandler) handleIndex(isIndex bool) string {
 	if isIndex {
 		return "->index()"
@@ -160,26 +180,18 @@ func (columnHandler *ColumnHandler) handleIndex(isIndex bool) string {
 	return ""
 }
 
+/**
+ A NullableHandler function to generate a String for column if the parameter is set TRUE.
+ Parameters:
+	- isNullable: if this value is true then the column is to be Nullable
+ Returns:
+	- "->nullable()" string if the parameter is TRUE else BLANK ""
+ Example:
+	- handleNullable(true)
+*/
 func (columnHandler *ColumnHandler) handleNullable(isNullable bool) string {
 	if isNullable {
 		return "->nullable()"
 	}
 	return ""
-}
-
-func (columnHandler *ColumnHandler) primaryKeyMethodNameGenerator(colType string) string {
-	switch colType {
-	case "integer":
-		return "increments"
-	case "mediumInteger":
-		return "mediumIncrements"
-	case "smallInteger":
-		return "smallIncrements"
-	case "tinyInteger":
-		return "tinyIncrements"
-	case "bigInteger":
-		return "bigIncrements"
-	default:
-		panic("Type not supported or invalid inputs")
-	}
 }

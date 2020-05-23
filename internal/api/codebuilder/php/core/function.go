@@ -13,6 +13,7 @@ type Function struct {
 	tabs       int
 	Name       string
 	Visibility string
+	Static     bool
 	Arguments  []string
 	Statements []api.TabbedUnit
 }
@@ -23,6 +24,7 @@ func NewFunction() *Function {
 		tabs:       0,
 		Name:       "",
 		Visibility: "",
+		Static:     false,
 		Arguments:  []string{},
 		Statements: []api.TabbedUnit{},
 	}
@@ -42,8 +44,7 @@ func (f *Function) Id() string {
 func (f *Function) String() string {
 	var builder strings.Builder
 	tabbedString := api.TabbedString(uint(f.tabs))
-	fmt.Fprint(&builder, tabbedString, f.Visibility, " function ", f.Name, "(")
-
+	fmt.Fprint(&builder, tabbedString, f.Visibility, getStaticValue(f.Static), " function ", f.Name, "(")
 	fmt.Fprint(&builder, strings.Join(f.Arguments, ", "), ") {\n")
 	for _, element := range f.Statements {
 		element.SetNumTabs(f.tabs + 1)
@@ -51,6 +52,13 @@ func (f *Function) String() string {
 	}
 	fmt.Fprint(&builder, tabbedString, "}\n\n")
 	return builder.String()
+}
+
+func getStaticValue(isStatic bool) string {
+	if isStatic {
+		return " static"
+	}
+	return ""
 }
 
 /**
@@ -73,9 +81,11 @@ func (f *Function) AppendStatement(unit api.TabbedUnit) {
 	f.Statements = append(f.Statements, unit)
 }
 
+
 /**
 Appends Argument
 */
 func (f *Function) AppendArgument(unit string) {
 	f.Arguments = append(f.Arguments, unit)
 }
+

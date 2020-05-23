@@ -41,7 +41,8 @@ func (auditColModel *AuditColModel) SetSoftDeletes(softDeletes bool) *AuditColMo
 	if softDeletes {
 		auditColModel.modelGen.classBuilder.AddMember(core.NewSimpleStatement(UseSoftDeletesStr))
 		// todo make date format configurable
-		auditColModel.modelGen.AddUpdateValidationRule(DeletedAtStr, DeletedAtValidationRule)
+		// Passing auditColModel.modelName as argument below just to show the intent although it will bot be used in this case
+		auditColModel.modelGen.AddUpdateValidationRule(DeletedAtStr, DeletedAtValidationRule, "auditColModel.modelName")
 		auditColModel.modelGen.AddFillable(DeletedAtStr)
 	}
 	return auditColModel
@@ -59,8 +60,9 @@ func (auditColModel *AuditColModel) SetSoftDeletes(softDeletes bool) *AuditColMo
 */
 func (auditColModel *AuditColModel) SetAuditCol(auditCol bool) *AuditColModel {
 	if auditCol {
-		auditColModel.modelGen.AddCreateValidationRule(CreatedByStr, DefaultAuditColValidation)
-		auditColModel.modelGen.AddUpdateValidationRule(UpdatedByStr, DefaultAuditColValidation)
+		// Passing auditColModel.modelName as argument below just to show the intent although it will bot be used in this case
+		auditColModel.modelGen.AddCreateValidationRule(CreatedByStr, DefaultAuditColValidation, "auditColModel.modelName")
+		auditColModel.modelGen.AddUpdateValidationRule(UpdatedByStr, DefaultAuditColValidation, "auditColModel.modelName")
 		auditColModel.modelGen.AddFillable(CreatedByStr).AddFillable(UpdatedByStr)
 	}
 	return auditColModel

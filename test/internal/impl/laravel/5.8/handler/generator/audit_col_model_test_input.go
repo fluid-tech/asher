@@ -12,16 +12,16 @@ class Hello extends Model {
 "deleted_at"
 ];
 
-    public function createValidationRules() {
+    public static function createValidationRules() {
         return [
-"created_by" => "exists:users,id"];
+'created_by' => [ 'exists:users,id' ]];
     }
 
 
-    public function updateValidationRules() {
+    public static function updateValidationRules(array $rowIds) {
         return [
-"deleted_at" => "required|date_format:Y-m-d H:i:s",
-"updated_by" => "exists:users,id"];
+'deleted_at' => [ 'required', 'date_format:Y-m-d H:i:s' ],
+'updated_by' => [ 'exists:users,id' ]];
     }
 
 
@@ -37,15 +37,15 @@ class Rnadom extends Model {
 "updated_by"
 ];
 
-    public function createValidationRules() {
+    public static function createValidationRules() {
         return [
-"created_by" => "exists:users,id"];
+'created_by' => [ 'exists:users,id' ]];
     }
 
 
-    public function updateValidationRules() {
+    public static function updateValidationRules(array $rowIds) {
         return [
-"updated_by" => "exists:users,id"];
+'updated_by' => [ 'exists:users,id' ]];
     }
 
 
@@ -62,9 +62,15 @@ class Random extends Model {
     protected $fillable = ["deleted_at"
 ];
 
-    public function updateValidationRules() {
+    public static function createValidationRules() {
         return [
-"deleted_at" => "required|date_format:Y-m-d H:i:s"];
+];
+    }
+
+
+    public static function updateValidationRules(array $rowIds) {
+        return [
+'deleted_at' => [ 'required', 'date_format:Y-m-d H:i:s' ]];
     }
 
 
@@ -76,5 +82,20 @@ const EmptyAuditCol = `namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 class HelloW extends Model {
+<<<<<<< HEAD
+=======
+    public static function createValidationRules() {
+        return [
+];
+    }
+
+
+    public static function updateValidationRules(array $rowIds) {
+        return [
+];
+    }
+
+
+>>>>>>> 870e47687678b640197bbdea5277941971d34423
 }
 `

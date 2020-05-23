@@ -5,8 +5,9 @@ import (
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/builder/interfaces"
 	"asher/internal/api/codebuilder/php/core"
-	"asher/internal/impl/laravel/5.8/handler/helper"
+	"fmt"
 	"github.com/iancoleman/strcase"
+	"strings"
 )
 
 type ModelGenerator struct {
@@ -16,8 +17,10 @@ type ModelGenerator struct {
 	hidden                []string
 	createValidationRules map[string]string
 	updateValidationRules map[string]string
-	relationshipDetails   []*helper.RelationshipDetail
 }
+
+const RowIdsArr = "array $rowIds"
+const RowIdVar = "$rowIds"
 
 /**
 Creates a new instance of this generator with a new interfaces.Class
@@ -31,7 +34,6 @@ func NewModelGenerator() *ModelGenerator {
 		hidden:                []string{},
 		createValidationRules: map[string]string{},
 		updateValidationRules: map[string]string{},
-		relationshipDetails:   []*helper.RelationshipDetail{},
 	}
 }
 
@@ -45,8 +47,30 @@ Returns:
 Example:
 	- AddCreateValidationRule('student_name', 'max:255|string')
 */
-func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, colRule string) *ModelGenerator {
-	modelGenerator.createValidationRules[colName] = colRule
+func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, colRule string, modelName string) *ModelGenerator {
+
+	returnString := "[ "
+	var ruleArray = strings.Split(colRule, "|")
+	for i := 0; i < len(ruleArray); i++ {
+		if strings.HasPrefix(ruleArray[i], "unique:") {
+			tableDataSplitter := strings.Split(ruleArray[i], ",")
+			//tableName := strings.TrimPrefix(tableDataSplitter[0], "unique:")
+			if len(tableDataSplitter) == 1 {
+				ruleArray[i] = fmt.Sprintf(`'%s,%s'`, ruleArray[i], colName)
+			} else {
+				ruleArray[i] = fmt.Sprintf(`'%s'`, ruleArray[i])
+			}
+		} else if ruleArray[i] == "unique" {
+			ruleArray[i] = fmt.Sprintf(`'%s:%s,%s'`, ruleArray[i], modelName, colName)
+			//ruleArray[i] = `'` + ruleArray[i] + ":" + modelName + "," + colName + `'`
+		} else {
+			ruleArray[i] = fmt.Sprintf(`'%s'`, ruleArray[i])
+		}
+	}
+
+	returnString = returnString + strings.Join(ruleArray, ", ")
+
+	modelGenerator.createValidationRules[colName] = returnString + ` ]`
 	return modelGenerator
 }
 
@@ -60,8 +84,32 @@ Returns:
 Example:
 	- AddUpdateValidationRule('student_name', 'string|max:255')
 */
-func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, colRule string) *ModelGenerator {
-	modelGenerator.updateValidationRules[colName] = colRule
+func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, colRule string, modelName string) *ModelGenerator {
+
+	returnString := "[ "
+	var ruleArray = strings.Split(colRule, "|")
+	for i := 0; i < len(ruleArray); i++ {
+		if strings.HasPrefix(ruleArray[i], "unique:") {
+			tableDataSplitter := strings.Split(ruleArray[i], ",")
+			tableName := strings.TrimPrefix(tableDataSplitter[0], "unique:")
+			if len(tableDataSplitter) == 1 {
+				ruleArray[i] = fmt.Sprintf(`'%s,%s,' . %s['%s']`, ruleArray[i], colName, RowIdVar, tableName)
+				//ruleArray[i] = `'` + ruleArray[i] + `,` + colName + `,' . RowId'` + tableName + `']`
+			} else {
+				ruleArray[i] = fmt.Sprintf(`'%s,' . %s['%s']`, ruleArray[i], RowIdVar, tableName)
+				//ruleArray[i] = `'` + ruleArray[i] + `,' . RowId'` + tableName + `']`
+			}
+		} else if ruleArray[i] == "unique" {
+			ruleArray[i] = fmt.Sprintf(`'%s:%s,%s,' . %s['%s']`, ruleArray[i], modelName, colName, RowIdVar, modelName)
+			//ruleArray[i] = `'` + ruleArray[i] + ":" + modelName + "," + colName + `,' . RowId'` + modelName + `']`
+		} else {
+			ruleArray[i] = fmt.Sprintf(`'%s'`, ruleArray[i])
+		}
+	}
+
+	returnString = returnString + strings.Join(ruleArray, ", ")
+
+	modelGenerator.updateValidationRules[colName] = returnString + ` ]`
 	return modelGenerator
 }
 
@@ -109,28 +157,15 @@ func (modelGenerator *ModelGenerator) AddHiddenField(columnName string) *ModelGe
 }
 
 /**
- Adds Relationship method of various tables inside the model
- Returns:
-	- instance of the generator object
- Example:
-	details := helper.RelationshipDetail{1, <object of function>}
-	- AddRelationship(details)
-*/
-func (modelGenerator *ModelGenerator) AddRelationship(detail *helper.RelationshipDetail) *ModelGenerator {
-	modelGenerator.relationshipDetails = append(modelGenerator.relationshipDetails, detail)
-	return modelGenerator
-}
-
-/**
 Builds the corresponding model from the given ingredients of input.
 Note: It returns a new core.Class object every time it's called.
 Returns:
 	- The corresponding model core.Class from the given ingredients of input.
 */
 func (modelGenerator *ModelGenerator) Build() *core.Class {
-	modelGenerator.classBuilder = modelGenerator.classBuilder.SetPackage("App").AddImports([]string{
+	modelGenerator.classBuilder = modelGenerator.classBuilder.SetPackage("App").AddImport(
 		`Illuminate\Database\Eloquent\Model`,
-	}).SetExtends("Model")
+	).SetExtends("Model")
 
 	if len(modelGenerator.fillables) > 0 {
 		fillableArray := api.TabbedUnit(core.NewArrayAssignment("protected", "fillable",
@@ -144,23 +179,11 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 		modelGenerator.classBuilder.AddMember(hiddenArray)
 	}
 
-	if len(modelGenerator.createValidationRules) > 0 {
-		createFunction := getValidationRulesFunction("createValidationRules",
-			modelGenerator.createValidationRules)
-		modelGenerator.classBuilder.AddFunction(createFunction)
-	}
+	createFunction := getCreateValidationRulesFunction(modelGenerator.createValidationRules)
+	modelGenerator.classBuilder.AddFunction(createFunction)
 
-	if len(modelGenerator.updateValidationRules) > 0 {
-		updateFunction := getValidationRulesFunction("updateValidationRules",
-			modelGenerator.updateValidationRules)
-		modelGenerator.classBuilder.AddFunction(updateFunction)
-	}
-
-	if len(modelGenerator.relationshipDetails) > 0 {
-		for _, relnFunc := range modelGenerator.relationshipDetails {
-			modelGenerator.classBuilder.AddFunction(relnFunc.Function)
-		}
-	}
+	updateFunction := getUpdateValidationRulesFunction(modelGenerator.updateValidationRules)
+	modelGenerator.classBuilder.AddFunction(updateFunction)
 
 	return modelGenerator.classBuilder.GetClass()
 }
@@ -177,16 +200,31 @@ func (modelGenerator *ModelGenerator) String() string {
 /**
  A helper function to generate a ReturnArray for rules with the given method name.
  Parameters:
-	- functionName: name of the function that returns these validation rules.
 	- rules: a map of columns and their validation rules.
  Returns:
 	- instance of core.Function for the given input.
  Example:
-	- getValidationRulesFunction('createValidationRules', map[string]string{'name':'max:255'})
+	- getValidationRulesFunction(map[string]string{'name':'max:255'})
 */
-func getValidationRulesFunction(functionName string, rules map[string]string) *core.Function {
-	returnArray := api.TabbedUnit(core.NewReturnArrayFromMap(rules))
-	function := builder.NewFunctionBuilder().SetName(functionName).
-		SetVisibility("public").AddStatement(returnArray).GetFunction()
+func getUpdateValidationRulesFunction(rules map[string]string) *core.Function {
+	returnArray := api.TabbedUnit(core.NewReturnArrayFromMapRaw(rules))
+	function := builder.NewFunctionBuilder().SetName("updateValidationRules").
+		SetVisibility("public").AddStatement(returnArray).SetStatic(true).AddArgument(RowIdsArr).GetFunction()
+	return function
+}
+
+/**
+ A helper function to generate a ReturnArray for rules with the given method name.
+ Parameters:
+	- rules: a map of columns and their validation rules.
+ Returns:
+	- instance of core.Function for the given input.
+ Example:
+	- getValidationRulesFunction(map[string]string{'name':'max:255'})
+*/
+func getCreateValidationRulesFunction(rules map[string]string) *core.Function {
+	returnArray := api.TabbedUnit(core.NewReturnArrayFromMapRaw(rules))
+	function := builder.NewFunctionBuilder().SetName("createValidationRules").
+		SetVisibility("public").AddStatement(returnArray).SetStatic(true).GetFunction()
 	return function
 }

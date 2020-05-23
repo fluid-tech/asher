@@ -42,6 +42,8 @@ func (f *PhpEmitterFile) FileType() int {
 func (f *PhpEmitterFile) String() string {
 	var builder strings.Builder
 	fmt.Fprintf(&builder, "<?php\n")
-	fmt.Fprint(&builder, f.Content().String(), "\n")
+
+	fmt.Fprint(&builder, f.content.String(), "\n")
+
 	return builder.String()
 }

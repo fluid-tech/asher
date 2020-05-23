@@ -12,14 +12,22 @@ func TestModelGenerator(t *testing.T) {
 	fillableArr := []string{"name", "phone_number"}
 	hiddenFields := []string{"password", "gender"}
 	createRules := map[string]string{
-		"name":         "string|max:255|unique:users",
-		"phone_number": "string|max:12|unique:users",
+
+		"name":         "string|max:255|unique",
+		"phone_number": "string|max:12|unique:users,id",
 	}
 	updateRules := map[string]string{
-		"name":         "string|max:255|unique:users",
+		"name":         "string|max:255|unique",
+		"phone_number": "string|max:12|unique:users,id",
+	}
+	createRules2 := map[string]string{
+		"name":         "string|max:255|unique",
 		"phone_number": "string|max:12|unique:users",
 	}
-
+	updateRules2 := map[string]string{
+		"name":         "string|max:255|unique",
+		"phone_number": "string|max:12|unique:users",
+	}
 	var table = []*api.GeneralTest{
 		genModelGeneratorTest("student_allotments", emptyArr, emptyArr, emptyMap, emptyMap, EmptyModel),
 		genModelGeneratorTest("student_allotments", fillableArr, emptyArr, emptyMap, emptyMap, ModelWithFillable),
@@ -28,6 +36,8 @@ func TestModelGenerator(t *testing.T) {
 			ModelWithCreateValidationRules),
 		genModelGeneratorTest("student_allotments", emptyArr, emptyArr, emptyMap, updateRules,
 			ModelWithUpdateValidationRules),
+		genModelGeneratorTest("student_allotments", emptyArr, emptyArr, createRules2, updateRules2,
+			ModelWithUpdateValidationRulesWithoutId),
 	}
 
 	api.IterateAndTest(table, t)
@@ -46,10 +56,11 @@ func genModelGeneratorTest(name string, fillables []string, hiddenFields []strin
 		modelGenerator.AddHiddenField(hiddenField)
 	}
 	for column, rules := range createRules {
-		modelGenerator.AddCreateValidationRule(column, rules)
+		modelGenerator.AddCreateValidationRule(column, rules, name)
 	}
 	for column, rules := range updateRules {
-		modelGenerator.AddUpdateValidationRule(column, rules)
+		modelGenerator.AddUpdateValidationRule(column, rules, name)
 	}
-	return api.NewGeneralTest(modelGenerator.Build().String(), expectedCode)
+	stringer := modelGenerator.Build().String()
+	return api.NewGeneralTest(stringer, expectedCode)
 }

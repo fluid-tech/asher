@@ -13,6 +13,12 @@ type ReturnArray struct {
 	Statements []string
 }
 
+func NewReturnArrayFromMapRaw(arr map[string]string) *ReturnArray {
+	return &ReturnArray{
+		Statements: rawConvertMapToStringAssociativeArray(arr),
+	}
+}
+
 func NewReturnArrayFromMap(arr map[string]string) *ReturnArray {
 	return &ReturnArray{
 		Statements: convertMapToStringAssociativeArray(arr),
@@ -58,7 +64,7 @@ func convertMapToStringAssociativeArray(rulesMap map[string]string) []string {
 /*
  Fetches keys from a map and sorts them in ascending order.
  Parameters
- -	baseMap[string]string - The map whose keys are to be sorted and retured
+ -	baseMap[string]string - The map whose keys are to be sorted and returned
  Returns
  - []string - A slice of keys sorted in the ascending order present in the map
  Usage
@@ -72,3 +78,13 @@ func sortedKeysFromMap(baseMap map[string]string) []string {
 	sort.Strings(keys)
 	return keys
 }
+
+func rawConvertMapToStringAssociativeArray(rulesMap map[string]string) []string {
+	var returnVal []string
+	keys := sortedKeysFromMap(rulesMap)
+	for _, key := range keys {
+		returnVal = append(returnVal, `'`+key+"' => "+rulesMap[key])
+	}
+	return returnVal
+}
+
