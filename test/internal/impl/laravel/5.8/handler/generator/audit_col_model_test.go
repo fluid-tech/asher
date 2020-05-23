@@ -1,9 +1,11 @@
 package generator
+
 import (
 	"asher/internal/impl/laravel/5.8/handler/generator"
 	"asher/test/api"
 	"testing"
 )
+
 func TestAuditColModel(t *testing.T) {
 	var table = []*api.GeneralTest{
 		genAuditColModelTest("Hello", true, true, true, AuditColModelWithAllSet),

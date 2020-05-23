@@ -24,6 +24,9 @@ type Function interface {
 	// Sets the visibility of the method
 	SetVisibility(vis string) Function
 
+	// Sets the visibility of the method
+	SetStatic(isStatic bool) Function
+
 	// returns the function
 	GetFunction() *core.Function
 }

@@ -13,7 +13,7 @@ func TestMigrationContext(t *testing.T) {
 	}{
 		{genMigration("Hello"), fromMigrationReg("Hello")},
 		{genMigration("World"), fromMigrationReg("World")},
-		{ nil, fromMigrationReg("NonExistant")},
+		{nil, fromMigrationReg("NonExistant")},
 	}
 	for _, element := range classes {
 		if element.MigrationMigExpected != element.MigrationMigOut {

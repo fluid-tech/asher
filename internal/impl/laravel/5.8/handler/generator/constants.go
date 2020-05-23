@@ -9,6 +9,6 @@ const (
 	DeletedAtStr              = "deleted_at"
 	DefaultAuditColValidation = "exists:users,id"
 	DeletedAtValidationRule   = "required|date_format:Y-m-d H:i:s"
-	UseSoftDeletesStr		  = "use SoftDeletes"
-	DefaultTimestampStr		  = "public $timestamps = true"
+	UseSoftDeletesStr         = "use SoftDeletes"
+	DefaultTimestampStr       = "public $timestamps = true"
 )

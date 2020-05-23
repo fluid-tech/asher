@@ -24,14 +24,10 @@ func (e Emitter) Emit(value interface{}) {
 	// todo make this work for everything apart from Model instances
 
 	model := value.(models.Model)
-	//arrayOfEmittedFiles, err := GetFromRegistry("cols").Handle(model.Name, model.Cols)
-	// todo add if
-	//GetFromRegistry("relations").Handle(model.Name, model.Cols)
-	//GetFromRegistry("softDeletes").Handle(model.Name, model.SoftDeletes)
-	//GetFromRegistry("timestamps").Handle(model.Name, model.Timestamps)
 	GetFromRegistry("columns").Handle(model.Name, model.Cols)
 	GetFromRegistry("auditCols").Handle(model.Name, helper.NewAuditCol(model.AuditCols,
 		model.SoftDeletes, model.Timestamps, pkColName(model.Cols)))
+	GetFromRegistry("relation").Handle(model.Name, model.Relations)
 
 }
 

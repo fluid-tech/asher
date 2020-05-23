@@ -15,7 +15,7 @@ func ToAsherObject(filePath string) (*models.Asher, error) {
 	}
 
 	err = json.Unmarshal(data, &asherObject)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	return asherObject, nil

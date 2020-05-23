@@ -5,18 +5,23 @@ import (
 )
 
 const (
-	HasOne   = 1
-	HasManny = 2
+	HasOne  = 1
+	HasMany = 2
 )
 
 type RelationshipDetail struct {
-	relationshipType int
+	RelationshipType int
 	Function         *core.Function
+	ForeignKey       string
+	ReferencingModel string
 }
 
-func NewRelationshipDetail(relationShipType int) *RelationshipDetail {
+// TODO: Dhano search Relationship context for order key returns array of RelationshipDetails
+func NewRelationshipDetail(relationShipType int, function *core.Function, foreignKey string, referencingModel string) *RelationshipDetail {
 	return &RelationshipDetail{
-		relationshipType: relationShipType,
-		Function:         nil,
+		RelationshipType: relationShipType,
+		Function:         function,
+		ForeignKey:       foreignKey,
+		ReferencingModel: referencingModel,
 	}
 }

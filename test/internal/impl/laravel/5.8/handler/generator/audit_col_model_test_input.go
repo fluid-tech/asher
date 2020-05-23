@@ -1,6 +1,6 @@
 package generator
 
-const AuditColModelWithAllSet =`namespace App;
+const AuditColModelWithAllSet = `namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,23 +12,23 @@ class Hello extends Model {
 "deleted_at"
 ];
 
-    public function createValidationRules() {
+    public static function createValidationRules() {
         return [
-"created_by" => "exists:users,id"];
+'created_by' => [ 'exists:users,id' ]];
     }
 
 
-    public function updateValidationRules() {
+    public static function updateValidationRules(array $rowIds) {
         return [
-"deleted_at" => "required|date_format:Y-m-d H:i:s",
-"updated_by" => "exists:users,id"];
+'deleted_at' => [ 'required', 'date_format:Y-m-d H:i:s' ],
+'updated_by' => [ 'exists:users,id' ]];
     }
 
 
 }
 `
 
-const AuditColModelWithAuditColOnly =`namespace App;
+const AuditColModelWithAuditColOnly = `namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -37,22 +37,22 @@ class Rnadom extends Model {
 "updated_by"
 ];
 
-    public function createValidationRules() {
+    public static function createValidationRules() {
         return [
-"created_by" => "exists:users,id"];
+'created_by' => [ 'exists:users,id' ]];
     }
 
 
-    public function updateValidationRules() {
+    public static function updateValidationRules(array $rowIds) {
         return [
-"updated_by" => "exists:users,id"];
+'updated_by' => [ 'exists:users,id' ]];
     }
 
 
 }
 `
 
-const AuditColModelWithAuditColUnset =`namespace App;
+const AuditColModelWithAuditColUnset = `namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -62,21 +62,37 @@ class Random extends Model {
     protected $fillable = ["deleted_at"
 ];
 
-    public function updateValidationRules() {
+    public static function createValidationRules() {
         return [
-"deleted_at" => "required|date_format:Y-m-d H:i:s"];
+];
+    }
+
+
+    public static function updateValidationRules(array $rowIds) {
+        return [
+'deleted_at' => [ 'required', 'date_format:Y-m-d H:i:s' ]];
     }
 
 
 }
 `
 
-const EmptyAuditCol =`namespace App;
+const EmptyAuditCol = `namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
 class HelloW extends Model {
+    public static function createValidationRules() {
+        return [
+];
+    }
+
+
+    public static function updateValidationRules(array $rowIds) {
+        return [
+];
+    }
+
+
 }
 `
-
-

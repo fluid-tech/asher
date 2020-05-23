@@ -54,6 +54,11 @@ func (f *Function) SetVisibility(vis string) interfaces.Function {
 	return f
 }
 
+func (f *Function) SetStatic(isStatic bool) interfaces.Function {
+	f.function.Static = isStatic
+	return f
+}
+
 func (f *Function) GetFunction() *core.Function {
 	return f.function
 }
