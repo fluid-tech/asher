@@ -74,7 +74,7 @@ func (auditColGen *AuditColMigration) SetPkCol(pkCol string) *AuditColMigration 
 */
 func (auditColGen *AuditColMigration) SetSoftDeletes(softDeletes bool) *AuditColMigration {
 	if softDeletes {
-		auditColGen.migrationGen.AddColumn(*core.NewSimpleStatement(SoftDeletesCol))
+		auditColGen.migrationGen.AddColumn(core.NewSimpleStatement(SoftDeletesCol))
 	}
 	return auditColGen
 }

@@ -25,7 +25,7 @@ func NewAuditColHandler() *AuditCol {
 	return &AuditCol{}
 }
 
-func (auditColHandler *AuditCol) Handle(identifier string, value interface{}) ([]*api.EmitterFile, error) {
+func (auditColHandler *AuditCol) Handle(identifier string, value interface{}) ([]api.EmitterFile, error) {
 	input := value.(*helper.AuditColInput)
 	// todo handle errors
 	err := auditColHandler.handleModel(identifier, input)
@@ -36,7 +36,7 @@ func (auditColHandler *AuditCol) Handle(identifier string, value interface{}) ([
 	if err != nil {
 		return nil, err
 	}
-	return []*api.EmitterFile{}, nil
+	return []api.EmitterFile{}, nil
 }
 
 /**

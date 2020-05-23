@@ -5,6 +5,7 @@ import (
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/builder/interfaces"
 	"asher/internal/api/codebuilder/php/core"
+	"fmt"
 	"github.com/iancoleman/strcase"
 	"strings"
 )
@@ -17,6 +18,9 @@ type ModelGenerator struct {
 	createValidationRules map[string]string
 	updateValidationRules map[string]string
 }
+
+const RowIdsArr = "array $rowIds"
+const RowIdVar = "$rowIds"
 
 /**
 Creates a new instance of this generator with a new interfaces.Class
@@ -52,14 +56,15 @@ func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, co
 			tableDataSplitter := strings.Split(ruleArray[i], ",")
 			//tableName := strings.TrimPrefix(tableDataSplitter[0], "unique:")
 			if len(tableDataSplitter) == 1 {
-				ruleArray[i] = `'` + ruleArray[i] + `,` + colName + `'`
+				ruleArray[i] = fmt.Sprintf(`'%s,%s'`, ruleArray[i], colName)
 			} else {
-				ruleArray[i] = `'` + ruleArray[i] + `'`
+				ruleArray[i] = fmt.Sprintf(`'%s'`, ruleArray[i])
 			}
 		} else if ruleArray[i] == "unique" {
-			ruleArray[i] = `'` + ruleArray[i] + ":" + modelName + "," + colName + `'`
+			ruleArray[i] = fmt.Sprintf(`'%s:%s,%s'`, ruleArray[i], modelName, colName)
+			//ruleArray[i] = `'` + ruleArray[i] + ":" + modelName + "," + colName + `'`
 		} else {
-			ruleArray[i] = `'` + ruleArray[i] + `'`
+			ruleArray[i] = fmt.Sprintf(`'%s'`, ruleArray[i])
 		}
 	}
 
@@ -88,14 +93,17 @@ func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, co
 			tableDataSplitter := strings.Split(ruleArray[i], ",")
 			tableName := strings.TrimPrefix(tableDataSplitter[0], "unique:")
 			if len(tableDataSplitter) == 1 {
-				ruleArray[i] = `'` + ruleArray[i] + `,` + colName + `' . $row_ids['` + tableName + `']`
+				ruleArray[i] = fmt.Sprintf(`'%s,%s,' . %s['%s']`, ruleArray[i], colName, RowIdVar, tableName)
+				//ruleArray[i] = `'` + ruleArray[i] + `,` + colName + `,' . RowId'` + tableName + `']`
 			} else {
-				ruleArray[i] = `'` + ruleArray[i] + `,' . $row_ids['` + tableName + `']`
+				ruleArray[i] = fmt.Sprintf(`'%s,' . %s['%s']`, ruleArray[i], RowIdVar, tableName)
+				//ruleArray[i] = `'` + ruleArray[i] + `,' . RowId'` + tableName + `']`
 			}
 		} else if ruleArray[i] == "unique" {
-			ruleArray[i] = `'` + ruleArray[i] + ":" + modelName + "," + colName + `,' . $row_ids['` + modelName + `']`
+			ruleArray[i] = fmt.Sprintf(`'%s:%s,%s,' . %s['%s']`, ruleArray[i], modelName, colName, RowIdVar, modelName)
+			//ruleArray[i] = `'` + ruleArray[i] + ":" + modelName + "," + colName + `,' . RowId'` + modelName + `']`
 		} else {
-			ruleArray[i] = `'` + ruleArray[i] + `'`
+			ruleArray[i] = fmt.Sprintf(`'%s'`, ruleArray[i])
 		}
 	}
 
@@ -171,15 +179,11 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 		modelGenerator.classBuilder.AddMember(hiddenArray)
 	}
 
-	if len(modelGenerator.createValidationRules) > 0 {
-		createFunction := getCreateValidationRulesFunction(modelGenerator.createValidationRules)
-		modelGenerator.classBuilder.AddFunction(createFunction)
-	}
+	createFunction := getCreateValidationRulesFunction(modelGenerator.createValidationRules)
+	modelGenerator.classBuilder.AddFunction(createFunction)
 
-	if len(modelGenerator.updateValidationRules) > 0 {
-		updateFunction := getUpdateValidationRulesFunction(modelGenerator.updateValidationRules)
-		modelGenerator.classBuilder.AddFunction(updateFunction)
-	}
+	updateFunction := getUpdateValidationRulesFunction(modelGenerator.updateValidationRules)
+	modelGenerator.classBuilder.AddFunction(updateFunction)
 
 	return modelGenerator.classBuilder.GetClass()
 }
@@ -205,7 +209,7 @@ func (modelGenerator *ModelGenerator) String() string {
 func getUpdateValidationRulesFunction(rules map[string]string) *core.Function {
 	returnArray := api.TabbedUnit(core.NewReturnArrayFromMapRaw(rules))
 	function := builder.NewFunctionBuilder().SetName("updateValidationRules").
-		SetVisibility("public").AddStatement(returnArray).SetStatic(true).AddArgument("$row_ids").GetFunction()
+		SetVisibility("public").AddStatement(returnArray).SetStatic(true).AddArgument(RowIdsArr).GetFunction()
 	return function
 }
 

@@ -4,13 +4,11 @@ import "asher/internal/api/codebuilder/php/core"
 
 type AuditColModel struct {
 	modelGen *ModelGenerator
-	//modelName string
 }
 
 func NewAuditColModel(generator *ModelGenerator) *AuditColModel {
 	return &AuditColModel{
 		modelGen: generator,
-		//modelName: generator.Build().Name,
 	}
 }
 

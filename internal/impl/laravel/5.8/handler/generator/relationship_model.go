@@ -30,12 +30,15 @@ Parameters:
 Returns:
 	- instance of the *RelationshipDetail
 Example:
-	- Input: buildRelationshipFunction(1, 'Orders', 'OrderProducts', 'order_id', 'id')
+	- Input: AddRelationshipToModel(1, 'Orders', 'OrderProducts', 'order_id', 'id')
 */
-func (relationshipModel *RelationshipModel) AddRelationshipToModel(relationshipType int, currentTableName string, referenceTableName string, foreignKey string, primaryKey string) *helper.RelationshipDetail {
+func (relationshipModel *RelationshipModel) AddRelationshipToModel(relationshipType int, currentTableName string,
+	referenceTableName string, foreignKey string, primaryKey string) *helper.RelationshipDetail {
 
-	generatedFunction := relationshipModel.buildRelationshipFunction(relationshipType, referenceTableName, foreignKey, primaryKey)
-	relationshipDetailObj := helper.NewRelationshipDetail(relationshipType, generatedFunction, foreignKey, referenceTableName)
+	generatedFunction := relationshipModel.buildRelationshipFunction(relationshipType, referenceTableName, foreignKey,
+		primaryKey)
+	relationshipDetailObj := helper.NewRelationshipDetail(relationshipType, generatedFunction, foreignKey,
+		referenceTableName)
 	relationshipModel.modGen.classBuilder.AddFunction(generatedFunction)
 	return relationshipDetailObj
 
@@ -57,16 +60,18 @@ Example:
 			return $this->hasMany('App\OrderProducts', 'order_id', 'id')
 		}
 */
-func (relationshipModel *RelationshipModel) buildRelationshipFunction(relationshipType int, referenceTableName string, foreignKey string, primaryKey string) *core.Function {
+func (relationshipModel *RelationshipModel) buildRelationshipFunction(relationshipType int, referenceTableName string,
+	foreignKey string, primaryKey string) *core.Function {
 	relation := ""
-	if relationshipType == helper.HasManny {
+	if relationshipType == helper.HasMany {
 		relation = "hasMany"
 	} else if relationshipType == helper.HasOne {
 		relation = "hasOne"
 	} else {
 		panic("This type of relation is not supported [relationshipType Number: ]" + string(relationshipType))
 	}
-	returnStatementStringFormatter := fmt.Sprintf(`return $this->%s('App\%s','%s','%s')`, relation, referenceTableName, foreignKey, primaryKey)
-	statement := api.TabbedUnit(core.NewSimpleStatement(returnStatementStringFormatter))
+	returnStatementStringFormatter := fmt.Sprintf(`return $this->%s('App\%s','%s','%s')`, relation,
+		referenceTableName, foreignKey, primaryKey)
+	statement := core.NewSimpleStatement(returnStatementStringFormatter)
 	return builder.NewFunctionBuilder().SetName(referenceTableName).AddStatement(statement).GetFunction()
 }

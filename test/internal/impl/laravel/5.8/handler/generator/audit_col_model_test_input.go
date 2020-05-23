@@ -18,7 +18,7 @@ class Hello extends Model {
     }
 
 
-    public static function updateValidationRules($row_ids) {
+    public static function updateValidationRules(array $rowIds) {
         return [
 'deleted_at' => [ 'required', 'date_format:Y-m-d H:i:s' ],
 'updated_by' => [ 'exists:users,id' ]];
@@ -43,7 +43,7 @@ class Rnadom extends Model {
     }
 
 
-    public static function updateValidationRules($row_ids) {
+    public static function updateValidationRules(array $rowIds) {
         return [
 'updated_by' => [ 'exists:users,id' ]];
     }
@@ -62,7 +62,13 @@ class Random extends Model {
     protected $fillable = ["deleted_at"
 ];
 
-    public static function updateValidationRules($row_ids) {
+    public static function createValidationRules() {
+        return [
+];
+    }
+
+
+    public static function updateValidationRules(array $rowIds) {
         return [
 'deleted_at' => [ 'required', 'date_format:Y-m-d H:i:s' ]];
     }
@@ -76,5 +82,17 @@ const EmptyAuditCol = `namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 class HelloW extends Model {
+    public static function createValidationRules() {
+        return [
+];
+    }
+
+
+    public static function updateValidationRules(array $rowIds) {
+        return [
+];
+    }
+
+
 }
 `

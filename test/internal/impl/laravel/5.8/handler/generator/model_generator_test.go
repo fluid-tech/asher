@@ -19,7 +19,14 @@ func TestModelGenerator(t *testing.T) {
 		"name":         "string|max:255|unique",
 		"phone_number": "string|max:12|unique:users,id",
 	}
-
+	createRules2 := map[string]string{
+		"name":         "string|max:255|unique",
+		"phone_number": "string|max:12|unique:users",
+	}
+	updateRules2 := map[string]string{
+		"name":         "string|max:255|unique",
+		"phone_number": "string|max:12|unique:users",
+	}
 	var table = []*api.GeneralTest{
 		genModelGeneratorTest("student_allotments", emptyArr, emptyArr, emptyMap, emptyMap, EmptyModel),
 		genModelGeneratorTest("student_allotments", fillableArr, emptyArr, emptyMap, emptyMap, ModelWithFillable),
@@ -28,6 +35,8 @@ func TestModelGenerator(t *testing.T) {
 			ModelWithCreateValidationRules),
 		genModelGeneratorTest("student_allotments", emptyArr, emptyArr, emptyMap, updateRules,
 			ModelWithUpdateValidationRules),
+		genModelGeneratorTest("student_allotments", emptyArr, emptyArr, createRules2, updateRules2,
+			ModelWithUpdateValidationRulesWithoutId),
 	}
 
 	api.IterateAndTest(table, t)

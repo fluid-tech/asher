@@ -42,7 +42,7 @@ func buildFunctionBuilderWithExistingFunction() *api.GeneralTest {
 	function.Name = "up"
 	function.Visibility = "protected"
 	function.Arguments = []string{"$hello", "$world"}
-	s := api2.TabbedUnit(core.NewSimpleStatement("return $world+$hello"))
+	s := core.NewSimpleStatement("return $world+$hello")
 	b := builder.NewFunctionBuilderFromFunction(function).AddStatement(s)
 	return api.NewGeneralTest(b.GetFunction().String(), TestFunction)
 }

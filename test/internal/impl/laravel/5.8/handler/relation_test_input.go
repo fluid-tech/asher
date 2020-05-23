@@ -38,5 +38,17 @@ class Orders extends Model {
     }
 
 
+    public static function createValidationRules() {
+        return [
+];
+    }
+
+
+    public static function updateValidationRules(array $rowIds) {
+        return [
+];
+    }
+
+
 }
 `

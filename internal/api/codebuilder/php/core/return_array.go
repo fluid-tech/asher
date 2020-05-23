@@ -64,7 +64,7 @@ func convertMapToStringAssociativeArray(rulesMap map[string]string) []string {
 /*
  Fetches keys from a map and sorts them in ascending order.
  Parameters
- -	baseMap[string]string - The map whose keys are to be sorted and retured
+ -	baseMap[string]string - The map whose keys are to be sorted and returned
  Returns
  - []string - A slice of keys sorted in the ascending order present in the map
  Usage
