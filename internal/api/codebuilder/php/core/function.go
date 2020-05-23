@@ -46,8 +46,8 @@ func (f *Function) String() string {
 	tabbedString := api.TabbedString(uint(f.tabs))
 	fmt.Fprint(&builder, tabbedString, f.Visibility, getStaticValue(f.Static), " function ", f.Name, "(")
 
-	fmt.Fprint(&builder, strings.Join(f.Arguments, ", "),") {\n")
-	for _, element := range f.Statements{
+	fmt.Fprint(&builder, strings.Join(f.Arguments, ", "), ") {\n")
+	for _, element := range f.Statements {
 		element.SetNumTabs(f.tabs + 1)
 		fmt.Fprint(&builder, element.String(), "\n")
 	}
@@ -64,11 +64,11 @@ func getStaticValue(isStatic bool) string {
 
 /**
 Finds a statement with a regex
- */
+*/
 func (f *Function) FindStatement(pattern string) (api.TabbedUnit, error) {
 	for _, element := range f.Statements {
 		found, err := regexp.Match(pattern, []byte(element.Id()))
-		if  err == nil && found {
+		if err == nil && found {
 			return element, nil
 		}
 	}
@@ -77,7 +77,7 @@ func (f *Function) FindStatement(pattern string) (api.TabbedUnit, error) {
 
 /**
 Append Statement
- */
+*/
 func (f *Function) AppendStatement(unit api.TabbedUnit) {
 	f.Statements = append(f.Statements, unit)
 }
