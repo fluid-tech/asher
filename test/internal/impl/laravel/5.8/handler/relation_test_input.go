@@ -1,5 +1,8 @@
 package handler
 
+var inputHasManyAllCases []string = []string{"OrderProducts:order_id,pk_col", "OrderProducts", "OrderProducts:order_id"}
+var inputHasOneAllCases []string = []string{"OrderProducts:order_id,pk_col", "OrderProducts", "OrderProducts:order_id"}
+
 const output1CheckForeignkeyConstraint = `namespace App;
 
 use Illuminate\Database\Eloquent\Model;
