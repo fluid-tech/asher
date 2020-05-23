@@ -3,14 +3,12 @@ package generator
 import "asher/internal/api/codebuilder/php/core"
 
 type AuditColModel struct {
-	modelGen  *ModelGenerator
-	//modelName string
+	modelGen *ModelGenerator
 }
 
 func NewAuditColModel(generator *ModelGenerator) *AuditColModel {
 	return &AuditColModel{
-		modelGen:  generator,
-		//modelName: generator.Build().Name,
+		modelGen: generator,
 	}
 }
 
