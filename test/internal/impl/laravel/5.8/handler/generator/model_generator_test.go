@@ -11,12 +11,12 @@ func TestModelGenerator(t *testing.T) {
 	emptyMap := map[string]string{}
 	fillableArr := []string{"name", "phone_number"}
 	hiddenFields := []string{"password", "gender"}
-	createRules := map[string]string {
-		"name": "string|max:255|unique",
+	createRules := map[string]string{
+		"name":         "string|max:255|unique",
 		"phone_number": "string|max:12|unique:users,id",
 	}
-	updateRules := map[string]string {
-		"name": "string|max:255|unique",
+	updateRules := map[string]string{
+		"name":         "string|max:255|unique",
 		"phone_number": "string|max:12|unique:users,id",
 	}
 
@@ -34,8 +34,8 @@ func TestModelGenerator(t *testing.T) {
 }
 
 /**
- A helper function to generate GeneralTest cases for ModelGenerator
- */
+A helper function to generate GeneralTest cases for ModelGenerator
+*/
 func genModelGeneratorTest(name string, fillables []string, hiddenFields []string, createRules map[string]string,
 	updateRules map[string]string, expectedCode string) *api.GeneralTest {
 	modelGenerator := generator.NewModelGenerator().SetName(name)

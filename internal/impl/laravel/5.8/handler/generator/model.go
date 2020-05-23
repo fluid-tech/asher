@@ -47,7 +47,7 @@ func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, co
 
 	returnString := "[ "
 	var ruleArray = strings.Split(colRule, "|")
-	for i:=0; i< len(ruleArray); i++ {
+	for i := 0; i < len(ruleArray); i++ {
 		if strings.HasPrefix(ruleArray[i], "unique:") {
 			tableDataSplitter := strings.Split(ruleArray[i], ",")
 			//tableName := strings.TrimPrefix(tableDataSplitter[0], "unique:")
@@ -65,7 +65,7 @@ func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, co
 
 	returnString = returnString + strings.Join(ruleArray, ", ")
 
-	modelGenerator.createValidationRules[colName] =  returnString + ` ]`
+	modelGenerator.createValidationRules[colName] = returnString + ` ]`
 	return modelGenerator
 }
 
@@ -83,7 +83,7 @@ func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, co
 
 	returnString := "[ "
 	var ruleArray = strings.Split(colRule, "|")
-	for i:=0; i< len(ruleArray); i++ {
+	for i := 0; i < len(ruleArray); i++ {
 		if strings.HasPrefix(ruleArray[i], "unique:") {
 			tableDataSplitter := strings.Split(ruleArray[i], ",")
 			tableName := strings.TrimPrefix(tableDataSplitter[0], "unique:")
@@ -101,7 +101,7 @@ func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, co
 
 	returnString = returnString + strings.Join(ruleArray, ", ")
 
-	modelGenerator.updateValidationRules[colName] =  returnString + ` ]`
+	modelGenerator.updateValidationRules[colName] = returnString + ` ]`
 	return modelGenerator
 }
 
@@ -147,7 +147,6 @@ func (modelGenerator *ModelGenerator) AddHiddenField(columnName string) *ModelGe
 	modelGenerator.hidden = append(modelGenerator.hidden, `"`+columnName+`"`)
 	return modelGenerator
 }
-
 
 /**
 Builds the corresponding model from the given ingredients of input.

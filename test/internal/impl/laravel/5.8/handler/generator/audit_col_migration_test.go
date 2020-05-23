@@ -6,13 +6,13 @@ import (
 	"testing"
 )
 
-func  TestAuditColMigration(t *testing.T)  {
+func TestAuditColMigration(t *testing.T) {
 	var table = []*api.GeneralTest{
 		genAuditColMigrationTest("Hello", true, true, true, "unsignedInteger",
 			ClassWithAllArgsSet),
 		genAuditColMigrationTest("Rnadom", false, false, true, "unsignedBigInteger",
 			ClassNoSoftDeletesAndNotTimestamp),
-		genAuditColMigrationTest("Random", true, true,  false,"unsignedInteger",
+		genAuditColMigrationTest("Random", true, true, false, "unsignedInteger",
 			ClassWithSoftDeletesAndTimestamp),
 		genAuditColMigrationTest("HelloW", false, false, false, "unsignedInteger",
 			ClassWithNoArgs),

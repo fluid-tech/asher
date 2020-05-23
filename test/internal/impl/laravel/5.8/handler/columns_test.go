@@ -56,7 +56,6 @@ func MigrationTester(t *testing.T, tableName string, array []models.Column, fill
 	api.IterateAndTest(testArray, t)
 }
 
-
 func ModelTester(t *testing.T, tableName string, columnArray []models.Column, fillableExpectedOutput []string, hiddenExpectedOutput []string) {
 
 	modelClass := context.GetFromRegistry("model").GetCtx(tableName).(*generator.ModelGenerator).Build()

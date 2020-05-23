@@ -12,11 +12,11 @@ func Test_Relations(t *testing.T) {
 	modelGen := generator.NewModelGenerator().SetName("Orders")
 	context.GetFromRegistry("model").AddToCtx("Orders", modelGen)
 	handler.NewRelationshipHandler().Handle("Orders", models.Relation{
-		HasMany: []string{ "OrderProducts:order_id,pk_col", "OrderProducts", "OrderProducts:order_id" },
-		HasOne:  []string{ "OrderProducts:order_id,pk_col", "OrderProducts", "OrderProducts:order_id" },
+		HasMany: []string{"OrderProducts:order_id,pk_col", "OrderProducts", "OrderProducts:order_id"},
+		HasOne:  []string{"OrderProducts:order_id,pk_col", "OrderProducts", "OrderProducts:order_id"},
 	})
 	stringOp := modelGen.String()
-	if stringOp != output_1 {
-		t.Error("Test Failed Expected '" + output_1 + "' But Found '" + stringOp + "'" )
+	if stringOp != output1CheckForeignkeyConstraint {
+		t.Error("Test Failed Expected '" + output1CheckForeignkeyConstraint + "' But Found '" + stringOp + "'")
 	}
 }

@@ -5,6 +5,7 @@ import (
 )
 
 const test_1_tableName = "student_enrollments"
+
 var test_1_columnInputArray = []models.Column{
 
 	{
@@ -219,7 +220,6 @@ var test_1_columnInputArray = []models.Column{
 
 var test_1_fillableExpectedOutput = []string{`"id_int"`, `"id_medium"`, `"id_small"`, `"id_tiny"`, `"id_big"`, `"id_uuid"`, `"order_id"`, `"order_id"`, `"order_id"`}
 var test_1_hiddenExpectedOutput = []string{`"id_int"`, `"id_medium"`, `"id_small"`, `"id_tiny"`, `"id_big"`, `"id_uuid"`, `"order_id"`, `"order_id"`, `"order_id"`, `"name"`, `"dummy_column"`}
-
 
 const migration_output_up = `public function up() {
     Schema::create('student_enrollments',  function (Blueprint $table) {

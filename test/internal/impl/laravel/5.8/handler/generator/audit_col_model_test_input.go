@@ -1,6 +1,6 @@
 package generator
 
-const AuditColModelWithAllSet =`namespace App;
+const AuditColModelWithAllSet = `namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,7 +28,7 @@ class Hello extends Model {
 }
 `
 
-const AuditColModelWithAuditColOnly =`namespace App;
+const AuditColModelWithAuditColOnly = `namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -52,7 +52,7 @@ class Rnadom extends Model {
 }
 `
 
-const AuditColModelWithAuditColUnset =`namespace App;
+const AuditColModelWithAuditColUnset = `namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -71,12 +71,10 @@ class Random extends Model {
 }
 `
 
-const EmptyAuditCol =`namespace App;
+const EmptyAuditCol = `namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
 class HelloW extends Model {
 }
 `
-
-
