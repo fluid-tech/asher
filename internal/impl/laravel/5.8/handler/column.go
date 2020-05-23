@@ -39,8 +39,7 @@ func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []model
 	}
 	//fmt.Print(modelGenerator.Build().String())
 	context.GetFromRegistry("model").AddToCtx(modelName, modelGenerator)
-	modelGeneratorRef := api.Generator(modelGenerator)
-	phpEmitter := core.NewPhpEmitterFile(modelName, api.ModelPath, &modelGeneratorRef, api.Model)
+	phpEmitter := core.NewPhpEmitterFile(modelName, api.ModelPath, modelGenerator, api.Model)
 	return phpEmitter
 }
 
@@ -55,10 +54,9 @@ func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr
 	}
 
 	migrationGenerator := generator.NewMigrationGenerator().SetName(identifier).AddColumns(statementsArr)
-	_ = migrationGenerator.Build()
+	//_ = migrationGenerator.Build()
 	context.GetFromRegistry("migration").AddToCtx(identifier, migrationGenerator)
-	modelGeneratorRef := api.Generator(migrationGenerator)
-	phpEmitter := core.NewPhpEmitterFile(identifier, api.ModelPath, &modelGeneratorRef, api.Model)
+	phpEmitter := core.NewPhpEmitterFile(identifier, api.ModelPath, migrationGenerator, api.Model)
 	return phpEmitter
 }
 
