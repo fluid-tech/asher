@@ -53,6 +53,6 @@ func (catchBlock *CatchBlock) String() string {
 		(*element).SetNumTabs(catchBlock.tabs)
 		fmt.Fprint(&builder, tabbedString, (*element).String(), "\n")
 	}
-	fmt.Fprint(&builder, tabbedString, " }\n")
+	fmt.Fprint(&builder, tabbedString, "}\n")
 	return builder.String()
 }
