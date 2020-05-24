@@ -91,7 +91,7 @@ func (conGen *ControllerGenerator) AddCreateFunction() *ControllerGenerator {
 	functionCallStatement.AddArg(core.NewParameter("$request->all()"))
 	createCallStatement := functionCallStatement
 
-	returnStatement := core.NewReturnStatement(conGen.identifier)
+	returnStatement := core.NewReturnStatement(`ResponseHelper::create($`+loweCamelCaseIdentifier+`)`)
 
 	createFunctionStatement := []api.TabbedUnit{
 		createCallStatement,
@@ -121,7 +121,7 @@ func (conGen *ControllerGenerator) AddUpdateFunction() *ControllerGenerator {
 	functionCallStatement.AddArg(core.NewParameter("Auth::id()"))
 	functionCallStatement.AddArg(core.NewParameter("$request->all()"))
 
-	returnStatement := core.NewReturnStatement("$" + loweCamelCaseIdentifier)
+	returnStatement := core.NewReturnStatement(`ResponseHelper::update($`+loweCamelCaseIdentifier+`)`)
 
 	updateFunctionStatement := []api.TabbedUnit{
 		functionCallStatement,
@@ -149,7 +149,7 @@ func (conGen *ControllerGenerator) AddDeleteFunction() *ControllerGenerator {
 	functionCallStatement.AddArg(core.NewParameter("$id"))
 	functionCallStatement.AddArg(core.NewParameter("$request->user->id"))
 
-	returnStatement := core.NewReturnStatement("$" + loweCamelCaseIdentifier)
+	returnStatement := core.NewReturnStatement(`ResponseHelper::delete($`+loweCamelCaseIdentifier+`)`)
 
 	deleteFunctionArgument := []string{
 		"Request $request",
@@ -176,7 +176,7 @@ Sample Usage:
 func (conGen *ControllerGenerator) AddFindByIdFunction() *ControllerGenerator {
 	queryVariableName := strcase.ToLowerCamel(conGen.identifier) + `Query`
 	returnTryStatement := []api.TabbedUnit{
-		core.NewReturnStatement(`response(['data' => $this->` + queryVariableName + `->findById($id)])`),
+		core.NewReturnStatement(`response()->json(['data' => $this->` + queryVariableName + `->findById($id)], 200)`),
 	}
 	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName("findById").
 		AddArgument("$id").SetVisibility("public").AddStatements(returnTryStatement).GetFunction())
@@ -192,7 +192,8 @@ Sample Usage:
 */
 func (conGen *ControllerGenerator) AddGetAllFunction() *ControllerGenerator {
 	queryVariableName := strcase.ToLowerCamel(conGen.identifier) + `Query`
-	returnStatement := core.NewReturnStatement(`$this->` + queryVariableName + `->datatables()`)
+	returnStatement := core.NewReturnStatement(
+		`response()->json(['data' => $this->` + queryVariableName + `->paginate()], 200)`)
 	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().
 		SetName("getAll").SetVisibility("public").
 		AddStatement(returnStatement).GetFunction())
@@ -279,6 +280,7 @@ func (conGen *ControllerGenerator) BuildRestController() *core.Class {
 		`App\Transactors\` + conGen.identifier + `Transactor`,
 		`App\Query\` + conGen.identifier + `Query`,
 		`Illuminate\Http\Request`,
+		`App\Helpers\ResponseHelper`,
 	}
 
 	conGen.AppendImports(restControllerImports)

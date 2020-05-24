@@ -29,6 +29,5 @@ func genControllerGeneratorTest(array []string, expectedCodeString string) *api.
 	conGen := generator.NewControllerGenerator()
 	conGen.SetIdentifier("Order")
 	conGen.AddFunctionsInController(array)
-	//fmt.Print(conGen)
 	return api.NewGeneralTest(conGen.String(), expectedCodeString)
 }
