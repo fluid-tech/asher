@@ -7,7 +7,7 @@ use App\Transactors\Mutations\OrderMutator;
 
 class OrderTransactor extends BaseTransactor {
     private const CLASS_NAME = 'OrderTransactor';
-    public function __construct(OrderQuery $orderQuery, OrderMutator $orderMutator, $bulkDeleteColumn) {
+    public function __construct(OrderQuery $orderQuery, OrderMutator $orderMutator) {
         parent::__construct($orderQuery, $orderMutator, "id");
         $this->className = self::CLASS_NAME;
     }
@@ -15,6 +15,7 @@ class OrderTransactor extends BaseTransactor {
 
 }
 `
+
 
 const FileTransactor = `namespace App\Transactors;
 
@@ -27,8 +28,9 @@ class OrderTransactor extends FileTransactor {
         'file' => 'required|mimes:jpeg,jpg,png|max:3000'
     );
     private const CLASS_NAME = 'OrderTransactor';
-    public function __construct(OrderQuery $orderQuery, OrderMutator $orderMutator, $bulkDeleteColumn) {
-        parent::__construct($orderQuery, $orderMutator, "id", new FileUploadHelper(order, self::IMAGE_VALIDATION_RULES,"png"));
+	private const BASE_PATH = "order"
+    public function __construct(OrderQuery $orderQuery, OrderMutator $orderMutator) {
+        parent::__construct($orderQuery, $orderMutator, "id", new BaseFileUploadHelper(self::BASE_PATH, self::IMAGE_VALIDATION_RULES,"png"));
         $this->className = self::CLASS_NAME;
     }
 
@@ -36,17 +38,19 @@ class OrderTransactor extends FileTransactor {
 }
 `
 
+//TODO REfatcor
 const ImageTransactor = `namespace App\Transactors;
 
 use App\Query\OrderQuery;
 use App\Transactors\Mutations\OrderMutator;
+use App\Helpers\ImageUploadHelper
 
 class OrderTransactor extends ImageTransactor {
     public const IMAGE_VALIDATION_RULES = array(
         'file' => 'required|mimes:jpeg,jpg,png|max:3000'
     );
     private const CLASS_NAME = 'OrderTransactor';
-    public function __construct(OrderQuery $orderQuery, OrderMutator $orderMutator, $bulkDeleteColumn, use App\Helpers\ImageUploadHelper) {
+    public function __construct(OrderQuery $orderQuery, OrderMutator $orderMutator) {
         parent::__construct($orderQuery, $orderMutator, "id", new ImageUploadHelper(order, self::IMAGE_VALIDATION_RULES));
         $this->className = self::CLASS_NAME;
     }

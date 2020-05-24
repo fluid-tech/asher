@@ -1,6 +1,6 @@
 package generator
 
-const BasicQuery=`namespace App\Queries;
+const BasicQuery = `namespace App\Queries;
 
 use App\Order;
 

@@ -111,7 +111,7 @@ func (controllerHandler *ControllerHandler) handleDefaultTransactor(identifier s
 	//controller := value.(models.Controller)
 	var filesToEmmit []api.EmitterFile
 
-	transactorGen := generator.NewTransactorGenerator(identifier,"default")
+	transactorGen := generator.NewTransactorGenerator(identifier, "default")
 
 	context.GetFromRegistry("transactor").AddToCtx(identifier, transactorGen)
 
@@ -127,18 +127,18 @@ func (controllerHandler *ControllerHandler) handleFileTransactor(identifier stri
 	var filesToEmmit []api.EmitterFile
 
 	/*controller argumtn something while merging with master*/
-	modelGen.AddCreateValidationRule("file_urls", "required").
-		AddCreateValidationRule("file_urls.urls", "array")
+	modelGen.AddCreateValidationRule("file_urls", "required", "").
+		AddCreateValidationRule("file_urls.urls", "array", "")
 
-	modelGen.AddUpdateValidationRule("file_urls", "required").
-		AddUpdateValidationRule("file_urls.urls", "array")
+	modelGen.AddUpdateValidationRule("file_urls", "required", "").
+		AddUpdateValidationRule("file_urls.urls", "array", "")
 
 	modelGen.AddFillable("file_urls")
 
 	/*TODO DATA type should be configurable in 2nd iteration*/
 	migrationGen.AddColumn(core.NewSimpleStatement(`$table->longText('file_urls')->nullable();`))
 
-	transactorGen := generator.NewTransactorGenerator(identifier,"file")
+	transactorGen := generator.NewTransactorGenerator(identifier, "file")
 
 	context.GetFromRegistry("transactor").AddToCtx(identifier, transactorGen)
 
@@ -157,17 +157,17 @@ func (controllerHandler *ControllerHandler) handleImageTransactor(identifier str
 	var filesToEmmit []api.EmitterFile
 
 	/*controller argumtn something while merging with master*/
-	modelGen.AddCreateValidationRule("file_urls", "required").
-		AddCreateValidationRule("file_urls.urls", "array")
+	modelGen.AddCreateValidationRule("file_urls", "required", "").
+		AddCreateValidationRule("file_urls.urls", "array", "")
 
-	modelGen.AddUpdateValidationRule("file_urls", "required").
-		AddUpdateValidationRule("file_urls.urls", "array")
+	modelGen.AddUpdateValidationRule("file_urls", "required", "").
+		AddUpdateValidationRule("file_urls.urls", "array", "")
 
 	modelGen.AddFillable("file_urls")
 
 	migrationGen.AddColumn(core.NewSimpleStatement(`$table->longText('img_urls')->nullable();`))
 
-	transactorGen := generator.NewTransactorGenerator(identifier,"image")
+	transactorGen := generator.NewTransactorGenerator(identifier, "image")
 
 	context.GetFromRegistry("transactor").AddToCtx(identifier, transactorGen)
 
@@ -218,11 +218,9 @@ Returns:
 func (controllerHandler *ControllerHandler) handleRoutes(identifier string, controllerConfig models.Controller) []api.EmitterFile {
 	var filesToEmit []api.EmitterFile
 
-
 	addRouteToEmmitFiles := false
 
 	gen := context.GetFromRegistry("route").GetCtx("api").(*generator.RouteGenerator)
-
 
 	if gen == nil {
 		addRouteToEmmitFiles = true
@@ -230,9 +228,7 @@ func (controllerHandler *ControllerHandler) handleRoutes(identifier string, cont
 		gen = context.GetFromRegistry("route").GetCtx("api").(*generator.RouteGenerator)
 	}
 
-
 	gen.AddDefaultRestRoutes(identifier, controllerConfig)
-
 
 	if addRouteToEmmitFiles {
 		emitFile := core.NewPhpEmitterFile("asher_api.php", api.RouteFilePath, gen, api.RouterFile)

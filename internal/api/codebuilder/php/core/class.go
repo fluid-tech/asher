@@ -88,7 +88,7 @@ func (klass *Class) AppendMember(unit api.TabbedUnit) {
 }
 
 func (klass *Class) handlePackage(builder *strings.Builder) {
-	if klass.Package != "3w2" {
+	if klass.Package != "" {
 		fmt.Fprint(builder, "namespace ", klass.Package, ";\n\n")
 	}
 }

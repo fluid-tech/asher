@@ -11,7 +11,7 @@ import (
 func TestRouteGenerator(t *testing.T) {
 	apiGenerator := generator.NewRouteGenerator()
 
-	apiGenerator.AddDefaultRestRoutes("Order",models.Controller{
+	apiGenerator.AddDefaultRestRoutes("Order", models.Controller{
 		Rest:        false,
 		Mvc:         false,
 		HttpMethods: []string{"POST"},

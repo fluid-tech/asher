@@ -87,4 +87,3 @@ func rawConvertMapToStringAssociativeArray(rulesMap map[string]string) []string 
 	}
 	return returnVal
 }
-

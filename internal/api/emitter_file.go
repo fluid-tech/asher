@@ -15,7 +15,7 @@ const (
 
 	Controller = 5
 	RouterFile = 6
-	Query = 7
+	Query      = 7
 )
 
 const (
@@ -23,7 +23,7 @@ const (
 	ModelPath      = `app/`
 	MutatorPath    = `app/Http/Mutators`
 	TransactorPath = `app/Http/Transactors`
-	QueryPath = `app/Http/Query`
+	QueryPath      = `app/Http/Query`
 	ControllerPath = `app/Http/Controllers`
 	RouteFilePath  = `routes/`
 )

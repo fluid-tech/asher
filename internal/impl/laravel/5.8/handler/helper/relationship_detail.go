@@ -14,7 +14,6 @@ type RelationshipDetail struct {
 	Function         *core.Function
 	ForeignKey       string
 	ReferencingModel string
-
 }
 
 // TODO: Dhano search Relationship context for order key returns array of RelationshipDetails

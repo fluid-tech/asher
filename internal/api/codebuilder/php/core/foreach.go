@@ -20,8 +20,7 @@ func NewForEach() *ForEach {
 	}
 }
 
-
-func (forEach *ForEach)  Id() string{
+func (forEach *ForEach) Id() string {
 	return "for"
 }
 
@@ -48,7 +47,7 @@ func (forEach *ForEach) String() string {
 	var builder strings.Builder
 	tabbedString := api.TabbedString(uint(forEach.tabs))
 
-	fmt.Fprint(&builder, tabbedString, "foreach ( "+forEach.Condition +") {\n")
+	fmt.Fprint(&builder, tabbedString, "foreach ( "+forEach.Condition+") {\n")
 
 	for _, element := range forEach.Statements {
 		(*element).SetNumTabs(forEach.tabs + 1)

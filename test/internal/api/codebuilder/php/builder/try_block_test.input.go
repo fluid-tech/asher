@@ -1,6 +1,5 @@
 package builder
 
-
 const BasicTryCatch = `try {
     $error = 5/0;
 }

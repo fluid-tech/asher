@@ -47,7 +47,6 @@ Sample Usage:
 	- addSimpleStatement("Just A Simple Statement String")
 */
 
-
 /**
 Adds a FunctionCall String
 Parameters:
@@ -62,10 +61,6 @@ func (conGen *ControllerGenerator) addFunctionCall(identifier string) *api.Tabbe
 	functionCallStatement := api.TabbedUnit(core.NewFunctionCall(identifier))
 	return &functionCallStatement
 }
-
-
-
-
 
 /**
 Sets the identifier of the current class
@@ -91,7 +86,6 @@ func (conGen *ControllerGenerator) AddCreateFunction() *ControllerGenerator {
 
 	functionCallStatement := core.NewFunctionCall(
 		`$` + loweCamelCaseIdentifier + ` = $this->` + transactorVariableName + `->create`)
-
 
 	functionCallStatement.AddArg(core.NewParameter("Auth::id()"))
 	functionCallStatement.AddArg(core.NewParameter("$request->all()"))
@@ -126,7 +120,6 @@ func (conGen *ControllerGenerator) AddUpdateFunction() *ControllerGenerator {
 
 	functionCallStatement.AddArg(core.NewParameter("Auth::id()"))
 	functionCallStatement.AddArg(core.NewParameter("$request->all()"))
-
 
 	returnStatement := core.NewReturnStatement("$" + loweCamelCaseIdentifier)
 
@@ -222,11 +215,8 @@ func (conGen *ControllerGenerator) AddConstructorFunction() *ControllerGenerator
 		conGen.identifier + `Transactor $` + transactorVariableName,
 	}
 
-
 	conGen.classBuilder.AddMember(core.NewVarDeclaration("private", queryVariableName))
 	conGen.classBuilder.AddMember(core.NewVarDeclaration("private", transactorVariableName))
-
-
 
 	constructorStatements := []api.TabbedUnit{
 		core.NewSimpleStatement("$this->" + queryVariableName + " = $" + queryVariableName),

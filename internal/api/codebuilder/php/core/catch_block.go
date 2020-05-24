@@ -47,8 +47,8 @@ func (catchBlock *CatchBlock) SetNumTabs(tabs int) {
 func (catchBlock *CatchBlock) String() string {
 	var builder strings.Builder
 	tabbedString := api.TabbedString(uint(catchBlock.tabs))
-	fmt.Fprint(&builder, tabbedString, " catch ( ")
-	fmt.Fprint(&builder, catchBlock.CatchArg+" "+") { \n")
+	fmt.Fprint(&builder, tabbedString, "catch ( ")
+	fmt.Fprint(&builder, catchBlock.CatchArg+" "+") {\n")
 	for _, element := range catchBlock.CatchStatements {
 		(*element).SetNumTabs(catchBlock.tabs)
 		fmt.Fprint(&builder, tabbedString, (*element).String(), "\n")

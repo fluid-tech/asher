@@ -8,6 +8,7 @@ var registry = map[string]BaseContext{
 	"mutator":    NewMutatorContext(),
 	"transactor": NewTransactorContext(),
 	"query":      NewQueryContext(),
+	"relation":   NewRelationshipContext(),
 }
 
 /*

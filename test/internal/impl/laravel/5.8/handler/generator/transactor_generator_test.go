@@ -16,7 +16,7 @@ func TestTransactorGenerator(t *testing.T) {
 	api.IterateAndTest(table, t)
 }
 
-func genTransactorTest(modelName string,  transactorType string, expectedOut string) *api.GeneralTest {
+func genTransactorTest(modelName string, transactorType string, expectedOut string) *api.GeneralTest {
 	transactorGenerator := generator.NewTransactorGenerator(modelName, transactorType)
 
 	return api.NewGeneralTest(transactorGenerator.String(), expectedOut)

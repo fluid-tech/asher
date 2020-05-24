@@ -15,5 +15,5 @@ func TestForEach(t *testing.T) {
 	test := api2.NewGeneralTest(forEach.String(), BasicForEach)
 	api2.IterateAndTest([]*api2.GeneralTest{
 		test,
-	},t)
+	}, t)
 }

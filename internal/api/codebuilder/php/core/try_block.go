@@ -66,21 +66,23 @@ func (tryBlock *TryBlock) String() string {
 	tabbedString := api.TabbedString(uint(tryBlock.tabs))
 
 	fmt.Fprint(&builder, tabbedString, "try {\n")
-	for _,element := range tryBlock.Statements {
-		(*element).SetNumTabs(tryBlock.tabs+ 1)
+	for _, element := range tryBlock.Statements {
+		(*element).SetNumTabs(tryBlock.tabs + 1)
 		fmt.Fprint(&builder, (*element).String(), "\n")
 	}
 	fmt.Fprint(&builder, tabbedString, "}\n")
-	for _,element := range tryBlock.CatchBlock {
+
+	for _, element := range tryBlock.CatchBlock {
 
 		(*element).SetNumTabs(tryBlock.tabs)
 		fmt.Fprint(&builder, element.String())
 	}
+
 	if len(tryBlock.FinallyStatements) > 0 {
 
 		fmt.Fprint(&builder, tabbedString, "finally {\n")
-		for _,element := range tryBlock.FinallyStatements {
-			(*element).SetNumTabs(tryBlock.tabs+ 1)
+		for _, element := range tryBlock.FinallyStatements {
+			(*element).SetNumTabs(tryBlock.tabs + 1)
 			fmt.Fprint(&builder, (*element).String(), "\n")
 		}
 		fmt.Fprint(&builder, tabbedString, "}\n")

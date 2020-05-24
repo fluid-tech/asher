@@ -83,7 +83,6 @@ Sample Usage:
 */
 func (mutatorGenerator *MutatorGenerator) AddConstructorFunction() *MutatorGenerator {
 
-
 	parentConstructorCall := api.TabbedUnit(
 		core.NewFunctionCall("parent::__construct").AddArg(core.NewParameter(
 			`'App\` + mutatorGenerator.identifier + `', 'id'`)))

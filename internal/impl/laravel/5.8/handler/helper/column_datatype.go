@@ -5,7 +5,6 @@ import (
 	"strings"
 )
 
-
 /**
  This Method will return a functionName along with column name. we did this so that we can  handle multiple datatype.
  The implementation of each datatypes belongs to the helper package.
@@ -119,7 +118,6 @@ func ColTypeSwitcher(colType string, colName string, allowed []string) string {
 	}
 }
 
-
 /**
  This Method will return a laravel version of the function name for the passed datatype Primary Key generation
  Parameters:
@@ -146,7 +144,6 @@ func PrimaryKeyMethodNameGenerator(colType string) string {
 		panic("Type not supported or invalid inputs")
 	}
 }
-
 
 func UnsignedBigInteger(colName string) string {
 	return normalStringDataProcessor("unsignedBigInteger", colName)
@@ -335,7 +332,6 @@ func handleAllowedKeywordsToString(allowed []string) string {
 	bldr := "'" + strings.Join(allowed, "', '") + "'"
 	return "[" + bldr + "]"
 }
-
 
 func normalStringDataProcessor(colFunctionName string, colName string) string {
 	return fmt.Sprintf("%s('%s')", colFunctionName, colName)

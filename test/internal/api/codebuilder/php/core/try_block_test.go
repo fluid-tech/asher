@@ -3,7 +3,6 @@ package core
 import (
 	"asher/internal/api"
 	"asher/internal/api/codebuilder/php/core"
-	"fmt"
 	"testing"
 )
 
@@ -22,5 +21,4 @@ func TestTryBlock(t *testing.T) {
 		catchBlockVar.AddArgument("hello $world"),
 	}
 	tryBlockVar.AddFinallyStatement(&newStatement)
-	fmt.Printf(tryBlockVar.String())
 }

@@ -7,14 +7,14 @@ import (
 	"testing"
 )
 
-func TestTryBlock(t *testing.T)  {
+func TestTryBlock(t *testing.T) {
 
 	table := []*api2.GeneralTest{
-		genTryCatchBlock(true,false, BasicTryCatch),
+		genTryCatchBlock(true, false, BasicTryCatch),
 		genTryCatchBlock(false, true, BasicTryFinally),
 		genTryCatchBlock(true, true, BasicTryCatchFinally),
 	}
-	api2.IterateAndTest(table,t)
+	api2.IterateAndTest(table, t)
 }
 
 func genTryCatchBlock(catch bool, finally bool, expectedCode string) *api2.GeneralTest {

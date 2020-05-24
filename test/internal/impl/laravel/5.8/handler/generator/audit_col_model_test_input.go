@@ -82,8 +82,6 @@ const EmptyAuditCol = `namespace App;
 use Illuminate\Database\Eloquent\Model;
 
 class HelloW extends Model {
-<<<<<<< HEAD
-=======
     public static function createValidationRules() {
         return [
 ];
@@ -96,6 +94,5 @@ class HelloW extends Model {
     }
 
 
->>>>>>> 870e47687678b640197bbdea5277941971d34423
 }
 `

@@ -8,9 +8,7 @@ import (
 	"testing"
 )
 
-
 func TestController(t *testing.T) {
-
 
 	RESTControllerConfigWithNoHttpMethods := models.Controller{
 		Rest:        true,
@@ -22,7 +20,7 @@ func TestController(t *testing.T) {
 	RESTControllerConfigWithAllHttpMethodsAndFileType := models.Controller{
 		Rest:        true,
 		Mvc:         false,
-		HttpMethods: []string{"GET","POST","PATCH","DELETE"},
+		HttpMethods: []string{"GET", "POST", "PATCH", "DELETE"},
 		Type:        "file",
 	}
 
@@ -37,11 +35,17 @@ func TestController(t *testing.T) {
 		in  []string
 		out []string
 	}{
-		{genControllerTest("Order1", RESTControllerConfigWithNoHttpMethods,t,true), []string{CTOrder1Controller,CTOrder1Transactor,CTOrder1Mutator,CTOrder1Query,CTRouteFileAfterOrder1}},
+		{genControllerTest("Order1", RESTControllerConfigWithNoHttpMethods, t, true),
+			[]string{CTOrder1Controller, CTOrder1Transactor, CTOrder1Mutator, CTOrder1Query,
+				CTRouteFileAfterOrder1}},
 
-		{genControllerTest("Order2", RESTControllerConfigWithAllHttpMethodsAndFileType, t,false), []string{CTOrder2Controller,CTOrder2Transactor,CTOrder2Mutator,CTOrder2Query,CTRouteFileAfterOrder2}},
+		{genControllerTest("Order2", RESTControllerConfigWithAllHttpMethodsAndFileType, t, false),
+			[]string{CTOrder2Controller, CTOrder2Transactor, CTOrder2Mutator, CTOrder2Query,
+				CTRouteFileAfterOrder2}},
 
-		{genControllerTest("Order3", RESTControllerConfigWithGETMethodAndImageType,t,false), []string{CTOrder3Controller,CTOrder3Transactor,CTOrder3Mutator,CTOrder3Query,CTRouteFileAfterOrder3}},
+		{genControllerTest("Order3", RESTControllerConfigWithGETMethodAndImageType, t, false),
+			[]string{CTOrder3Controller, CTOrder3Transactor, CTOrder3Mutator, CTOrder3Query,
+				CTRouteFileAfterOrder3}},
 	}
 
 	//if table[0].in[0] == ""  {
@@ -49,7 +53,7 @@ func TestController(t *testing.T) {
 	//}
 
 	for _, element := range table {
-		for j:=0 ; j<5 ;j++ {
+		for j := 0; j < 5; j++ {
 			if element.in[j] != element.out[j] {
 				t.Errorf("in test case %d expected '%s' found '%s'", j, element.out[j], element.in[j])
 			}
@@ -73,7 +77,6 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 
 	emitterFiles, error := handler.NewControllerHandler().Handle(className, controllerConfig)
 
-
 	if error != nil {
 		t.Error(error)
 	}
@@ -89,14 +92,14 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 
 	/*Second and greater controllerHandlerCall should return only 3 files*/
 	if !isFirstCall && !(len(emitterFiles) == 4) {
-		t.Error("Not returend 3 files returned ",len(emitterFiles))
+		t.Error("Not returend 3 files returned ", len(emitterFiles))
 	}
 
 	retrivedControllerGen := fromControllerReg(className)
-	retrivedTransactorGen :=fromTransactorReg(className)
-	retrivedMutatorGen :=fromMutattorReg(className)
-	retrivedRouteGen :=fromRouteReg("api")
-	retrivedQueryGen :=fromQueryReg(className)
+	retrivedTransactorGen := fromTransactorReg(className)
+	retrivedMutatorGen := fromMutattorReg(className)
+	retrivedRouteGen := fromRouteReg("api")
+	retrivedQueryGen := fromQueryReg(className)
 
 	//fmt.Print(retrivedControllerGen)
 	//fmt.Print(retrivedTransactorGen)
@@ -105,7 +108,6 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 	//fmt.Print(retrivedQueryGen)
 	//
 	//fmt.Print("--------------------------------------------------------------")
-
 
 	if retrivedControllerGen == nil {
 		t.Errorf("controller for %s doesnt exist ", className)
@@ -127,10 +129,9 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 		t.Errorf("query for %s doesnt exist ", className)
 	}
 
-	return []string{retrivedControllerGen.String(), retrivedTransactorGen.String(), retrivedMutatorGen.String(), retrivedQueryGen.String(),retrivedRouteGen.String()}
+	return []string{retrivedControllerGen.String(), retrivedTransactorGen.String(), retrivedMutatorGen.String(),
+		retrivedQueryGen.String(), retrivedRouteGen.String()}
 }
-
-
 
 func fromControllerReg(className string) *generator.ControllerGenerator {
 	return context.GetFromRegistry("controller").GetCtx(className).(*generator.ControllerGenerator)
@@ -151,6 +152,3 @@ func fromQueryReg(className string) *generator.QueryGenerator {
 func fromRouteReg(className string) *generator.RouteGenerator {
 	return context.GetFromRegistry("route").GetCtx(className).(*generator.RouteGenerator)
 }
-
-
-

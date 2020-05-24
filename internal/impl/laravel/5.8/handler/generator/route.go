@@ -66,11 +66,11 @@ func (routeGenerator *RouteGenerator) AddDefaultRestRoutes(modelName string, con
 	}
 
 	var apiRouteConfig = []RouteConfig{
-		{actionFunction: "get-by-id", method: "GET", subURI: "{id}"},
-		{actionFunction: "all", method: "GET", subURI: "all"},
-		{actionFunction: "create", method: "POST", subURI: "create"},
-		{actionFunction: "edit", method: "PATCH", subURI: "edit/{id}"},
-		{actionFunction: "delete", method: "DELETE", subURI: "delete/{id}"},
+		{actionFunction: "getById", method: "GET", subURI: "{id}"},
+		{actionFunction: "getAll", method: "GET", subURI: "all"},
+		{actionFunction: "create", method: "POST", subURI: ""},
+		{actionFunction: "edit", method: "PATCH", subURI: "{id}"},
+		{actionFunction: "delete", method: "DELETE", subURI: "{id}"},
 	}
 
 	for _, routeConfig := range apiRouteConfig {
@@ -78,7 +78,11 @@ func (routeGenerator *RouteGenerator) AddDefaultRestRoutes(modelName string, con
 		/*CHECK IF METHOD IS PRESENT IN SUPPORTEDMETHODS ARRAY OF CONTROLLER IN JSON FILE
 		IF PRESENT ADD THE METHOD ELSE DONT ADD*/
 		if contains(controller.HttpMethods, routeConfig.method) {
-			uri := "/" + strings.ToLower(modelName) + "/" + routeConfig.subURI
+			uri := "/" + strings.ToLower(modelName)
+			if routeConfig.subURI != ""  {
+				uri = uri + "/" + routeConfig.subURI
+
+			}
 			action := modelName + "Controller" + "@" + routeConfig.actionFunction
 			routeGenerator.AddRoute(strings.ToLower(routeConfig.method), uri, action)
 		}

@@ -20,4 +20,3 @@ func genQueryTest(modelName string, expectedOut string) *api.GeneralTest {
 	transactorGenerator := generator.NewQueryGenerator(modelName, true)
 	return api.NewGeneralTest(transactorGenerator.String(), expectedOut)
 }
-
