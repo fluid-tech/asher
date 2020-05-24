@@ -1,12 +1,39 @@
 package generator
 
-const BasicQuery = `namespace App\Queries;
+const AdminBasicQuery = `namespace App\Queries;
 
-use App\Order;
+use App\Admin;
 
-class OrderQuery extends BaseQuery {
+class AdminQuery extends BaseQuery {
     public function __construct() {
-        parent::__construct("App\Order");
+        parent::__construct("App\Admin");
+    }
+
+
+}
+`
+
+const TeacherBasicQuery = `namespace App\Queries;
+
+use App\Teacher;
+
+class TeacherQuery extends BaseQuery {
+    public function __construct() {
+        parent::__construct("App\Teacher");
+    }
+
+
+}
+`
+
+
+const StudentBasicQuery = `namespace App\Queries;
+
+use App\Student;
+
+class StudentQuery extends BaseQuery {
+    public function __construct() {
+        parent::__construct("App\Student");
     }
 
 

@@ -5,47 +5,51 @@ import (
 	"asher/internal/impl/laravel/5.8/handler/context"
 	"asher/internal/impl/laravel/5.8/handler/generator"
 	"asher/internal/models"
+	generator2 "asher/test/internal/impl/laravel/5.8/handler/generator"
 	"testing"
 )
 
 func TestController(t *testing.T) {
 
-	RESTControllerConfigWithNoHttpMethods := models.Controller{
+	/*Demo strings for Model Student have all HTTP methods  BASIC Transactor*/
+	/*Demo strings for Model Teacher have all GET HTTP methods Teacher Image Transactor*/
+	/*Demo strings for Model Admin have all PUT DELETE POST HTTP methods Admin FIle Transactor*/
+
+	RESTControllerConfigWithALLHttpMethods := models.Controller{
 		Rest:        true,
 		Mvc:         false,
-		HttpMethods: []string{"GET"},
-		Type:        "",
+		HttpMethods: []string{},
+		Type:        "default",
 	}
-
-	RESTControllerConfigWithAllHttpMethodsAndFileType := models.Controller{
-		Rest:        true,
-		Mvc:         false,
-		HttpMethods: []string{"GET", "POST", "PATCH", "DELETE"},
-		Type:        "file",
-	}
-
-	RESTControllerConfigWithGETMethodAndImageType := models.Controller{
+	RESTControllerConfigWithGETHttpMethods := models.Controller{
 		Rest:        true,
 		Mvc:         false,
 		HttpMethods: []string{"GET"},
 		Type:        "image",
 	}
+	RESTControllerConfigWithPOSTPUTDELETEHttpMethods := models.Controller{
+		Rest:        true,
+		Mvc:         false,
+		HttpMethods: []string{"POST","DELETE","PUT"},
+		Type:        "file",
+	}
+
 
 	var table = []*struct {
 		in  []string
 		out []string
 	}{
-		{genControllerTest("Order1", RESTControllerConfigWithNoHttpMethods, t, true),
-			[]string{CTOrder1Controller, CTOrder1Transactor, CTOrder1Mutator, CTOrder1Query,
-				CTRouteFileAfterOrder1}},
+		{genControllerTest("Student", RESTControllerConfigWithALLHttpMethods, t, true),
+			[]string{generator2.StudentController, generator2.StudentBasicTransactor, generator2.StudentBasicMutator, generator2.StudentBasicQuery,
+				generator2.ApiRouteFileAfterStudentWithAllRoutes}},
 
-		{genControllerTest("Order2", RESTControllerConfigWithAllHttpMethodsAndFileType, t, false),
-			[]string{CTOrder2Controller, CTOrder2Transactor, CTOrder2Mutator, CTOrder2Query,
-				CTRouteFileAfterOrder2}},
+		{genControllerTest("Teacher", RESTControllerConfigWithGETHttpMethods, t, false),
+			[]string{generator2.TeacherController, generator2.TeacherImageTransactor, generator2.TeacherBasicMutator, generator2.TeacherBasicQuery,
+				generator2.ApiRouteFileAfterTeacherWithGetRoutes}},
 
-		{genControllerTest("Order3", RESTControllerConfigWithGETMethodAndImageType, t, false),
-			[]string{CTOrder3Controller, CTOrder3Transactor, CTOrder3Mutator, CTOrder3Query,
-				CTRouteFileAfterOrder3}},
+		{genControllerTest("Admin", RESTControllerConfigWithPOSTPUTDELETEHttpMethods, t, false),
+			[]string{generator2.AdminController, generator2.AdminFileTransactor, generator2.AdminBasicMutator, generator2.AdminBasicQuery,
+				generator2.ApiRouteFileAfterAdminWithPATCHPOSTDELTERoutes}},
 	}
 
 	//if table[0].in[0] == ""  {
@@ -76,6 +80,9 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 	context.GetFromRegistry("model").AddToCtx(className, modelGen)
 
 	emitterFiles, error := handler.NewControllerHandler().Handle(className, controllerConfig)
+
+	//fmt.Print(modelGen)
+	//fmt.Print(migGen)
 
 	if error != nil {
 		t.Error(error)

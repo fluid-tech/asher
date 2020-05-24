@@ -22,7 +22,7 @@ func NewRouteGenerator() *RouteGenerator {
 
 func contains(s []string, e string) bool {
 	for _, a := range s {
-		if a == e {
+		if strings.ToLower(a) == strings.ToLower(e) {
 			return true
 		}
 	}
@@ -66,7 +66,7 @@ func (routeGenerator *RouteGenerator) AddDefaultRestRoutes(modelName string, sup
 
 	var apiRouteConfig = []RouteConfig{
 		{actionFunction: "create", method: "POST", subURI: ""},
-		{actionFunction: "edit", method: "PATCH", subURI: "{id}"},
+		{actionFunction: "edit", method: "PUT", subURI: "{id}"},
 		{actionFunction: "delete", method: "DELETE", subURI: "{id}"},
 		{actionFunction: "getById", method: "GET", subURI: "{id}"},
 		{actionFunction: "getAll", method: "GET", subURI: "all"},

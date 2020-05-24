@@ -240,20 +240,18 @@ func (conGen *ControllerGenerator) AddAllRESTFunctionsInController() {
 }
 
 func (conGen *ControllerGenerator) AddFunctionsInController(methods []string) {
-	if methods != nil {
-		if len(methods) >= 0 {
-			conGen.AddConstructorFunction()
-			for _, element := range methods {
-				switch strings.ToUpper(element) {
-				case "POST":
-					conGen.AddCreateFunction()
-				case "GET":
-					conGen.AddFindByIdFunction().AddGetAllFunction()
-				case "PUT":
-					conGen.AddUpdateFunction()
-				case "DELETE":
-					conGen.AddDeleteFunction()
-				}
+	if methods != nil && len(methods) > 0 {
+		conGen.AddConstructorFunction()
+		for _, element := range methods {
+			switch strings.ToUpper(element) {
+			case "POST":
+				conGen.AddCreateFunction()
+			case "GET":
+				conGen.AddFindByIdFunction().AddGetAllFunction()
+			case "PUT":
+				conGen.AddUpdateFunction()
+			case "DELETE":
+				conGen.AddDeleteFunction()
 			}
 		}
 	} else {

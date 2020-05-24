@@ -251,9 +251,21 @@ class AdminRestController extends Controller {
     }
 
 
+    public function create(Request $request) {
+        $admin = $this->adminTransactor->create(Auth::id(), $request->all());
+        return ResponseHelper::create($admin);
+    }
+
+
     public function delete(Request $request, $id) {
         $admin = $this->adminTransactor->delete($id, $request->user->id);
         return ResponseHelper::delete($admin);
+    }
+
+
+    public function update(Request $request) {
+        $admin = $this->adminTransactor->update(Auth::id(), $request->all());
+        return ResponseHelper::update($admin);
     }
 
 

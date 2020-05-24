@@ -136,7 +136,7 @@ func (controllerHandler *ControllerHandler) handleFileTransactor(identifier stri
 	modelGen.AddFillable("file_urls")
 
 	/*TODO DATA type should be configurable in 2nd iteration*/
-	migrationGen.AddColumn(core.NewSimpleStatement(`$table->longText('file_urls')->nullable();`))
+	migrationGen.AddColumn(core.NewSimpleStatement(`$table->longText('file_urls')->nullable()`))
 
 	transactorGen := generator.NewTransactorGenerator(identifier, "file")
 
@@ -165,7 +165,7 @@ func (controllerHandler *ControllerHandler) handleImageTransactor(identifier str
 
 	modelGen.AddFillable("file_urls")
 
-	migrationGen.AddColumn(core.NewSimpleStatement(`$table->longText('img_urls')->nullable();`))
+	migrationGen.AddColumn(core.NewSimpleStatement(`$table->longText('img_urls')->nullable()`))
 
 	transactorGen := generator.NewTransactorGenerator(identifier, "image")
 

@@ -10,7 +10,9 @@ func TestQueryGenerator(t *testing.T) {
 	//transactorGenerator := generator.NewQueryGenerator("Order", true)
 	//fmt.Print(transactorGenerator)
 	var table = []*api.GeneralTest{
-		genQueryTest("Order", BasicQuery),
+		genQueryTest("Student", StudentBasicQuery),
+		genQueryTest("Admin", AdminBasicQuery),
+		genQueryTest("Teacher", TeacherBasicQuery),
 	}
 	api.IterateAndTest(table, t)
 }
