@@ -23,7 +23,6 @@ func TestBasicController(t *testing.T) {
 
 	api.IterateAndTest(table, t)
 
-
 }
 
 func genControllerGeneratorTest(array []string, expectedCodeString string) *api.GeneralTest {

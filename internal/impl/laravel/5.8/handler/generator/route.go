@@ -3,7 +3,6 @@ package generator
 import (
 	"asher/internal/api"
 	"asher/internal/api/codebuilder/php/core"
-	"asher/internal/models"
 	"fmt"
 	"strings"
 )
@@ -56,7 +55,7 @@ Sample Usage:
 	Route::post(/order/edit/{id}, OrderController@edit);
 	Route::post(/order/delete/{id}, OrderController@delete);
 */
-func (routeGenerator *RouteGenerator) AddDefaultRestRoutes(modelName string, controller models.Controller) *RouteGenerator {
+func (routeGenerator *RouteGenerator) AddDefaultRestRoutes(modelName string, supportedHttpMethods []string) *RouteGenerator {
 
 	type RouteConfig struct {
 		method         string
@@ -66,22 +65,21 @@ func (routeGenerator *RouteGenerator) AddDefaultRestRoutes(modelName string, con
 	}
 
 	var apiRouteConfig = []RouteConfig{
-		{actionFunction: "getById", method: "GET", subURI: "{id}"},
-		{actionFunction: "getAll", method: "GET", subURI: "all"},
 		{actionFunction: "create", method: "POST", subURI: ""},
 		{actionFunction: "edit", method: "PATCH", subURI: "{id}"},
 		{actionFunction: "delete", method: "DELETE", subURI: "{id}"},
+		{actionFunction: "getById", method: "GET", subURI: "{id}"},
+		{actionFunction: "getAll", method: "GET", subURI: "all"},
 	}
 
 	for _, routeConfig := range apiRouteConfig {
 
 		/*CHECK IF METHOD IS PRESENT IN SUPPORTEDMETHODS ARRAY OF CONTROLLER IN JSON FILE
 		IF PRESENT ADD THE METHOD ELSE DONT ADD*/
-		if contains(controller.HttpMethods, routeConfig.method) {
+		if contains(supportedHttpMethods, routeConfig.method) || len(supportedHttpMethods) == 0 {
 			uri := "/" + strings.ToLower(modelName)
-			if routeConfig.subURI != ""  {
+			if routeConfig.subURI != "" {
 				uri = uri + "/" + routeConfig.subURI
-
 			}
 			action := modelName + "Controller" + "@" + routeConfig.actionFunction
 			routeGenerator.AddRoute(strings.ToLower(routeConfig.method), uri, action)
@@ -105,6 +103,8 @@ Sample Usage:
 	Route::post(/order/create, OrderController@create);
 */
 func (routeGenerator *RouteGenerator) AddRoute(method string, uri string, action string) *RouteGenerator {
+	uri = `"`+uri+`"`
+	action = `"`+action+`"`
 	route := core.NewFunctionCall("Route::" + method)
 	route.AddArg(core.NewParameter(uri)).AddArg(core.NewParameter(action))
 	routeGenerator.routes = append(routeGenerator.Routes(), route)

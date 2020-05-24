@@ -78,7 +78,6 @@ func (transactorGenerator *TransactorGenerator) AddConstructorFunction() *Transa
 	constructorArguments := []string{
 		transactorGenerator.identifier + `Query $` + queryVariableName,
 		transactorGenerator.identifier + `Mutator $` + mutatorVariableName,
-		"$bulkDeleteColumn",
 	}
 
 	parentConstructorCall := core.NewFunctionCall("parent::__construct").
@@ -88,17 +87,30 @@ func (transactorGenerator *TransactorGenerator) AddConstructorFunction() *Transa
 
 	switch transactorGenerator.transactorType {
 	case "file":
-		transactorGenerator.imports = append(transactorGenerator.imports, `use App\Helpers\FileUploadHelper`)
+		transactorGenerator.imports = append(transactorGenerator.imports, `use App\Helpers\BaseFileUploadHelper`)
 		parentConstructorCall.AddArg(core.NewParameter(
-			`new FileUploadHelper(` + strings.ToLower(transactorGenerator.identifier) + `, self::IMAGE_VALIDATION_RULES,"png")`))
+			`new BaseFileUploadHelper(self::BASE_PATH, self::IMAGE_VALIDATION_RULES,"png")`))
 		/*TODO add something for const*/
-		transactorGenerator.classBuilder.AddMember(core.NewSimpleStatement("public const IMAGE_VALIDATION_RULES = array(\n        'file' => 'required|mimes:jpeg,jpg,png|max:3000'\n    )"))
+		transactorGenerator.classBuilder.AddMember(core.NewSimpleStatement(
+			"public const IMAGE_VALIDATION_RULES =" +
+				" array(\n        'file' => 'required|mimes:jpeg,jpg,png|max:3000'\n    )"))
+
+		transactorGenerator.classBuilder.AddMember(
+			core.NewSimpleStatement(`private const BASE_PATH = "`+
+				strings.ToLower(transactorGenerator.identifier)+`"`))
+
 	case "image":
-		constructorArguments = append(constructorArguments, `use App\Helpers\ImageUploadHelper`)
+		transactorGenerator.imports = append(transactorGenerator.imports, `use App\Helpers\ImageUploadHelper`)
 		parentConstructorCall.AddArg(core.NewParameter(
-			`new ImageUploadHelper(` + strings.ToLower(transactorGenerator.identifier) + `, self::IMAGE_VALIDATION_RULES)`))
+			`new ImageUploadHelper(self::BASE_PATH, self::IMAGE_VALIDATION_RULES)`))
 		/*TODO add something for const*/
-		transactorGenerator.classBuilder.AddMember(core.NewSimpleStatement("public const IMAGE_VALIDATION_RULES = array(\n        'file' => 'required|mimes:jpeg,jpg,png|max:3000'\n    )"))
+		transactorGenerator.classBuilder.AddMember(core.NewSimpleStatement(
+"public const IMAGE_VALIDATION_RULES = " +
+	"array(\n        'file' => 'required|mimes:jpeg,jpg,png|max:3000'\n    )"))
+
+		transactorGenerator.classBuilder.AddMember(
+			core.NewSimpleStatement(`private const BASE_PATH = "`+
+				strings.ToLower(transactorGenerator.identifier)+`"`))
 	}
 
 	constructorStatements := []api.TabbedUnit{

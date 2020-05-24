@@ -2,36 +2,25 @@ package generator
 
 import (
 	"asher/internal/impl/laravel/5.8/handler/generator"
-	"asher/internal/models"
-	"fmt"
+	"asher/test/api"
 	"testing"
 )
 
 //Route::get('/user', 'UserController@index');
 func TestRouteGenerator(t *testing.T) {
-	apiGenerator := generator.NewRouteGenerator()
 
-	apiGenerator.AddDefaultRestRoutes("Order", models.Controller{
-		Rest:        false,
-		Mvc:         false,
-		HttpMethods: []string{"POST"},
-		Type:        "",
-	})
-	///*ADDS SET OF DEFAULT API ROUTES*/
-	//apiGenerator.AddDefaultRestRoutes("Order")
-	//
-	///*ADDS A SPECIFIC ROUTE*/
-	//apiGenerator.AddRoute("get", `"/order-products"`, "OrderController@getAll")
-	//apiGenerator.AddRoute("get", "/order-products", "OrderController@getAll")
-	//apiGenerator.AddRoute("get", "/order-products", "OrderController@getAll")
-
-	fmt.Print(apiGenerator)
-}
-
-func testGenResourceRoute(t *testing.T) {
+	routeGenerator := generator.NewRouteGenerator()
+	var table = []*api.GeneralTest{
+		genRouteTest(routeGenerator, "Student", []string{}, ApiRouteFileAfterStudentWithAllRoutes),
+		genRouteTest(routeGenerator, "Teacher", []string{"GET"}, ApiRouteFileAfterTeacherWithGetRoutes),
+		genRouteTest(routeGenerator, "Admin",
+			[]string{"PATCH", "POST", "DELETE"}, ApiRouteFileAfterAdminWithPATCHPOSTDELTERoutes),
+	}
+	api.IterateAndTest(table, t)
 
 }
 
-func testGenCustomRoute(t *testing.T) {
-
+func genRouteTest(routeGen *generator.RouteGenerator, modelName string, methods []string,
+	expectedOut string) *api.GeneralTest {
+	return api.NewGeneralTest(routeGen.AddDefaultRestRoutes(modelName, methods).String(), expectedOut)
 }

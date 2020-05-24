@@ -66,8 +66,6 @@ class Order1Query extends BaseQuery {
 }
 `
 
-
-
 const CTOrder2Controller = `namespace App\Http\Controllers;
 
 use App\Order2;
@@ -228,5 +226,3 @@ class Order3Query extends BaseQuery {
 
 }
 `
-
-

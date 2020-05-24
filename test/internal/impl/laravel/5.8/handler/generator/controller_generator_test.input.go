@@ -1,6 +1,5 @@
 package generator
 
-
 const CreateRestController = `namespace App\Http\Controllers;
 
 use App\Order;

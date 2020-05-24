@@ -228,7 +228,7 @@ func (controllerHandler *ControllerHandler) handleRoutes(identifier string, cont
 		gen = context.GetFromRegistry("route").GetCtx("api").(*generator.RouteGenerator)
 	}
 
-	gen.AddDefaultRestRoutes(identifier, controllerConfig)
+	gen.AddDefaultRestRoutes(identifier, controllerConfig.HttpMethods)
 
 	if addRouteToEmmitFiles {
 		emitFile := core.NewPhpEmitterFile("asher_api.php", api.RouteFilePath, gen, api.RouterFile)
