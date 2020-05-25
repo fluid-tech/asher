@@ -5,6 +5,7 @@ import (
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/builder/interfaces"
 	"asher/internal/api/codebuilder/php/core"
+	"fmt"
 )
 
 type MutatorGenerator struct {
@@ -25,39 +26,14 @@ func NewMutatorGenerator() *MutatorGenerator {
 Sets the identifier of the current class
 Parameters:
 	- identifier: string
+Returns:
+	- Return instance of MutatorGenerator
 Sample Usage:
 	- SetIdentifier("ClassName")
 */
-func (mutatorGenerator *MutatorGenerator) SetIdentifier(identifier string) {
+func (mutatorGenerator *MutatorGenerator) SetIdentifier(identifier string) *MutatorGenerator {
 	mutatorGenerator.identifier = identifier
-}
-
-/**
-Adds a Simple Statement
-Parameters:
-	- identifier: string
-Returns:
-	- Return instance of TabbedUnit
-Sample Usage:
-	- addSimpleStatement("Just A Simple Statement String")
-*/
-func (mutatorGenerator *MutatorGenerator) addSimpleStatement(identifier string) *api.TabbedUnit {
-	statement := api.TabbedUnit(core.NewSimpleStatement(identifier))
-	return &statement
-}
-
-/**
-Adds a Parameter
-Parameters:
-	- identifier: string
-Returns:
-	- Return instance of TabbedUnit
-Sample Usage:
-	- addParameter("id")
-*/
-func (mutatorGenerator *MutatorGenerator) addParameter(identifier string) *api.TabbedUnit {
-	parameter := api.TabbedUnit(core.NewParameter(identifier))
-	return &parameter
+	return mutatorGenerator
 }
 
 /**
@@ -79,21 +55,17 @@ Adds Constructor in the mutator
 Returns:
 	- Return instance of MutatorGenerator
 Sample Usage:
-	- mutatorGeneratorObject.AddConstructorFunction()
+	- mutatorGeneratorObject.AddConstructor()
 */
-func (mutatorGenerator *MutatorGenerator) AddConstructorFunction() *MutatorGenerator {
+func (mutatorGenerator *MutatorGenerator) AddConstructor() *MutatorGenerator {
 
 	parentConstructorCall := api.TabbedUnit(
 		core.NewFunctionCall("parent::__construct").AddArg(core.NewParameter(
-			`'App\` + mutatorGenerator.identifier + `', 'id'`)))
-
-	constructorStatements := []api.TabbedUnit{
-		parentConstructorCall,
-	}
+			fmt.Sprintf(`'App\%s', 'id'`,mutatorGenerator.identifier))))
 
 	mutatorGenerator.classBuilder.AddFunction(
 		builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
-			AddStatements(constructorStatements).GetFunction())
+			AddStatement(parentConstructorCall).GetFunction())
 	return mutatorGenerator
 }
 
@@ -105,11 +77,11 @@ Sample Usage:
 	- mutatorGeneratorObject.BuildMutator()
 */
 func (mutatorGenerator *MutatorGenerator) BuildMutator() *core.Class {
-	var extends = `BaseMutator`
-	var namespace = `App\Transactors\Mutations`
-	className := mutatorGenerator.identifier + "Mutator"
+	const extends = `BaseMutator`
+	const namespace = `App\Transactors\Mutations`
+	var className = fmt.Sprintf("%sMutator", mutatorGenerator.identifier)
 
-	mutatorGenerator.AddConstructorFunction()
+	mutatorGenerator.AddConstructor()
 
 	mutatorGenerator.classBuilder.SetName(className).
 		SetExtends(extends).SetPackage(namespace).AddImports(mutatorGenerator.imports)

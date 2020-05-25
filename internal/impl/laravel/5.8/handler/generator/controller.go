@@ -5,6 +5,7 @@ import (
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/builder/interfaces"
 	"asher/internal/api/codebuilder/php/core"
+	"fmt"
 	"github.com/iancoleman/strcase"
 	"strings"
 )
@@ -38,39 +39,15 @@ func (conGen *ControllerGenerator) AppendImports(units []string) *ControllerGene
 }
 
 /**
-Adds a Simple Statement
-Parameters:
-	- identifier: string
-Returns:
-	- Return instance of TabbedUnit
-Sample Usage:
-	- addSimpleStatement("Just A Simple Statement String")
-*/
-
-/**
-Adds a FunctionCall String
-Parameters:
-	- identifier: string
-Returns:
-	- Return instance of TabbedUnit
-Sample Usage:
-	- addFunctionCall("create")
-	-  o/p: create();
-*/
-func (conGen *ControllerGenerator) addFunctionCall(identifier string) *api.TabbedUnit {
-	functionCallStatement := api.TabbedUnit(core.NewFunctionCall(identifier))
-	return &functionCallStatement
-}
-
-/**
 Sets the identifier of the current class
 Parameters:
 	- identifier: string
 Sample Usage:
 	- SetIdentifier("ClassName")
 */
-func (conGen *ControllerGenerator) SetIdentifier(identifier string) {
+func (conGen *ControllerGenerator) SetIdentifier(identifier string) *ControllerGenerator {
 	conGen.identifier = identifier
+	return conGen
 }
 
 /**
@@ -78,20 +55,20 @@ Add Create Function of REST in the controller
 Returns:
 	- Return instance of ControllerGenerator
 Sample Usage:
-	- controllerGeneratorObject.AddCreateFunction()
+	- controllerGeneratorObject.AddCreate()
 */
-func (conGen *ControllerGenerator) AddCreateFunction() *ControllerGenerator {
-	loweCamelCaseIdentifier := strcase.ToLowerCamel(conGen.identifier)
-	transactorVariableName := loweCamelCaseIdentifier + `Transactor`
+func (conGen *ControllerGenerator) AddCreate() *ControllerGenerator {
+	lowerCamelCaseIdentifier := strcase.ToLowerCamel(conGen.identifier)
+	transactorVariableName := lowerCamelCaseIdentifier + `Transactor`
 
 	functionCallStatement := core.NewFunctionCall(
-		`$` + loweCamelCaseIdentifier + ` = $this->` + transactorVariableName + `->create`)
+		fmt.Sprintf(`$%s = $this->%s->create`, lowerCamelCaseIdentifier, transactorVariableName))
 
 	functionCallStatement.AddArg(core.NewParameter("Auth::id()"))
 	functionCallStatement.AddArg(core.NewParameter("$request->all()"))
 	createCallStatement := functionCallStatement
 
-	returnStatement := core.NewReturnStatement(`ResponseHelper::create($`+loweCamelCaseIdentifier+`)`)
+	returnStatement := core.NewReturnStatement(fmt.Sprintf(`ResponseHelper::create($%s)`, lowerCamelCaseIdentifier))
 
 	createFunctionStatement := []api.TabbedUnit{
 		createCallStatement,
@@ -109,19 +86,19 @@ Add Update Function of REST in the controller
 Returns:
 	- Return instance of ControllerGenerator
 Sample Usage:
-	- controllerGeneratorObject.AddUpdateFunction()
+	- controllerGeneratorObject.AddUpdate()
 */
-func (conGen *ControllerGenerator) AddUpdateFunction() *ControllerGenerator {
-	loweCamelCaseIdentifier := strcase.ToLowerCamel(conGen.identifier)
-	transactorVariableName := loweCamelCaseIdentifier + `Transactor`
+func (conGen *ControllerGenerator) AddUpdate() *ControllerGenerator {
+	lowerCamelCaseIdentifier := strcase.ToLowerCamel(conGen.identifier)
+	transactorVariableName := lowerCamelCaseIdentifier + `Transactor`
 
 	functionCallStatement := core.NewFunctionCall(
-		`$` + loweCamelCaseIdentifier + ` = $this->` + transactorVariableName + `->update`)
+		fmt.Sprintf(`$%s = $this->%s->update`, lowerCamelCaseIdentifier, transactorVariableName))
 
 	functionCallStatement.AddArg(core.NewParameter("Auth::id()"))
 	functionCallStatement.AddArg(core.NewParameter("$request->all()"))
 
-	returnStatement := core.NewReturnStatement(`ResponseHelper::update($`+loweCamelCaseIdentifier+`)`)
+	returnStatement := core.NewReturnStatement(fmt.Sprintf(`ResponseHelper::update($%s)`, lowerCamelCaseIdentifier))
 
 	updateFunctionStatement := []api.TabbedUnit{
 		functionCallStatement,
@@ -138,30 +115,26 @@ Add Delete Function of REST in the controller
 Returns:
 	- Return instance of ControllerGenerator
 Sample Usage:
-	- controllerGeneratorObject.AddDeleteFunction()
+	- controllerGeneratorObject.AddDelete()
 */
-func (conGen *ControllerGenerator) AddDeleteFunction() *ControllerGenerator {
-	loweCamelCaseIdentifier := strcase.ToLowerCamel(conGen.identifier)
-	transactorVariableName := loweCamelCaseIdentifier + `Transactor`
+func (conGen *ControllerGenerator) AddDelete() *ControllerGenerator {
+	lowerCamelCaseIdentifier := strcase.ToLowerCamel(conGen.identifier)
+	transactorVariableName := lowerCamelCaseIdentifier + `Transactor`
 
 	functionCallStatement := core.NewFunctionCall(
-		`$` + loweCamelCaseIdentifier + ` = $this->` + transactorVariableName + `->delete`)
-	functionCallStatement.AddArg(core.NewParameter("$id"))
-	functionCallStatement.AddArg(core.NewParameter("$request->user->id"))
+		fmt.Sprintf(`$%s = $this->%s->delete`, lowerCamelCaseIdentifier, transactorVariableName))
+	functionCallStatement.AddArg(core.NewParameter("$id")).
+		AddArg(core.NewParameter("$request->user->id"))
 
-	returnStatement := core.NewReturnStatement(`ResponseHelper::delete($`+loweCamelCaseIdentifier+`)`)
+	returnStatement := core.NewReturnStatement(fmt.Sprintf(`ResponseHelper::delete($%s)`, lowerCamelCaseIdentifier))
 
-	deleteFunctionArgument := []string{
-		"Request $request",
-		"$id",
-	}
 	deleteFunctionStatement := []api.TabbedUnit{
 		functionCallStatement,
 		returnStatement,
 	}
 
 	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName("delete").
-		SetVisibility("public").AddArguments(deleteFunctionArgument).
+		SetVisibility("public").AddArgument(`Request $request`).AddArgument(`$id`).
 		AddStatements(deleteFunctionStatement).GetFunction())
 	return conGen
 }
@@ -171,9 +144,9 @@ Add FindById Function of REST in the controller
 Returns:
 	- Return instance of ControllerGenerator
 Sample Usage:
-	- controllerGeneratorObject.AddFindByIdFunction()
+	- controllerGeneratorObject.AddFindById()
 */
-func (conGen *ControllerGenerator) AddFindByIdFunction() *ControllerGenerator {
+func (conGen *ControllerGenerator) AddFindById() *ControllerGenerator {
 	queryVariableName := strcase.ToLowerCamel(conGen.identifier) + `Query`
 	returnTryStatement := []api.TabbedUnit{
 		core.NewReturnStatement(`response()->json(['data' => $this->` + queryVariableName + `->findById($id)], 200)`),
@@ -188,9 +161,9 @@ Add GetAll Function of REST in the controller
 Returns:
 	- Return instance of ControllerGenerator
 Sample Usage:
-	- controllerGeneratorObject.AddGetAllFunction()
+	- controllerGeneratorObject.AddGetAll()
 */
-func (conGen *ControllerGenerator) AddGetAllFunction() *ControllerGenerator {
+func (conGen *ControllerGenerator) AddGetAll() *ControllerGenerator {
 	queryVariableName := strcase.ToLowerCamel(conGen.identifier) + `Query`
 	returnStatement := core.NewReturnStatement(
 		`response()->json(['data' => $this->` + queryVariableName + `->paginate()], 200)`)
@@ -205,9 +178,9 @@ Adds Constructor in the controller with Query and Transactor Injected of the cur
 Returns:
 	- Return instance of ControllerGenerator
 Sample Usage:
-	- controllerGeneratorObject.AddConstructorFunction()
+	- controllerGeneratorObject.AddConstructor()
 */
-func (conGen *ControllerGenerator) AddConstructorFunction() *ControllerGenerator {
+func (conGen *ControllerGenerator) AddConstructor() *ControllerGenerator {
 	lowerCamelIdentifier := strcase.ToLowerCamel(conGen.identifier)
 	queryVariableName := lowerCamelIdentifier + `Query`
 	transactorVariableName := lowerCamelIdentifier + `Transactor`
@@ -230,32 +203,32 @@ func (conGen *ControllerGenerator) AddConstructorFunction() *ControllerGenerator
 	return conGen
 }
 
-func (conGen *ControllerGenerator) AddAllRESTFunctionsInController() {
-	conGen.AddConstructorFunction()
-	conGen.AddCreateFunction()
-	conGen.AddUpdateFunction()
-	conGen.AddDeleteFunction()
-	conGen.AddFindByIdFunction()
-	conGen.AddGetAllFunction()
+func (conGen *ControllerGenerator) AddAllRESTMethods() {
+	conGen.AddConstructor()
+	conGen.AddCreate()
+	conGen.AddUpdate()
+	conGen.AddDelete()
+	conGen.AddFindById()
+	conGen.AddGetAll()
 }
 
 func (conGen *ControllerGenerator) AddFunctionsInController(methods []string) {
 	if methods != nil && len(methods) > 0 {
-		conGen.AddConstructorFunction()
+		conGen.AddConstructor()
 		for _, element := range methods {
 			switch strings.ToUpper(element) {
 			case "POST":
-				conGen.AddCreateFunction()
+				conGen.AddCreate()
 			case "GET":
-				conGen.AddFindByIdFunction().AddGetAllFunction()
+				conGen.AddFindById().AddGetAll()
 			case "PUT":
-				conGen.AddUpdateFunction()
+				conGen.AddUpdate()
 			case "DELETE":
-				conGen.AddDeleteFunction()
+				conGen.AddDelete()
 			}
 		}
 	} else {
-		conGen.AddAllRESTFunctionsInController()
+		conGen.AddAllRESTMethods()
 	}
 }
 
@@ -269,14 +242,14 @@ Sample Usage:
 	- controllerGeneratorObject.BuildRestController()
 */
 func (conGen *ControllerGenerator) BuildRestController() *core.Class {
-	className := conGen.identifier + "RestController"
-	namespace := `App\Http\Controllers`
-	extends := "Controller"
+	className := fmt.Sprintf(  "%sRestController", conGen.identifier)
+	const namespace = `App\Http\Controllers\Api`
+	const extends = "Controller"
 
 	restControllerImports := []string{
 		`App\` + conGen.identifier,
-		`App\Transactors\` + conGen.identifier + `Transactor`,
-		`App\Query\` + conGen.identifier + `Query`,
+		fmt.Sprintf(  `App\Transactors\%sTransactor`, conGen.identifier),
+		fmt.Sprintf(  `App\Query\%sQuery`, conGen.identifier),
 		`Illuminate\Http\Request`,
 		`App\Helpers\ResponseHelper`,
 	}

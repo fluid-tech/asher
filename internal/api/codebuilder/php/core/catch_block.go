@@ -10,14 +10,14 @@ type CatchBlock struct {
 	api.TabbedUnit
 	tabs            int
 	CatchArg        string
-	CatchStatements []*api.TabbedUnit
+	CatchStatements []api.TabbedUnit
 }
 
 func NewCatchBlock() *CatchBlock {
 	return &CatchBlock{
 		tabs:            0,
 		CatchArg:        "",
-		CatchStatements: []*api.TabbedUnit{},
+		CatchStatements: []api.TabbedUnit{},
 	}
 }
 
@@ -26,12 +26,12 @@ func (catchBlock *CatchBlock) AddArgument(unit string) *CatchBlock {
 	return catchBlock
 }
 
-func (catchBlock *CatchBlock) AddStatement(statement *api.TabbedUnit) *CatchBlock {
+func (catchBlock *CatchBlock) AddStatement(statement api.TabbedUnit) *CatchBlock {
 	catchBlock.CatchStatements = append(catchBlock.CatchStatements, statement)
 	return catchBlock
 }
 
-func (catchBlock *CatchBlock) AddStatements(statements []*api.TabbedUnit) *CatchBlock {
+func (catchBlock *CatchBlock) AddStatements(statements []api.TabbedUnit) *CatchBlock {
 	catchBlock.CatchStatements = append(catchBlock.CatchStatements, statements...)
 	return catchBlock
 }
@@ -50,8 +50,8 @@ func (catchBlock *CatchBlock) String() string {
 	fmt.Fprint(&builder, tabbedString, "catch ( ")
 	fmt.Fprint(&builder, catchBlock.CatchArg+" "+") {\n")
 	for _, element := range catchBlock.CatchStatements {
-		(*element).SetNumTabs(catchBlock.tabs)
-		fmt.Fprint(&builder, tabbedString, (*element).String(), "\n")
+		element.SetNumTabs(catchBlock.tabs)
+		fmt.Fprint(&builder, tabbedString, element.String(), "\n")
 	}
 	fmt.Fprint(&builder, tabbedString, "}\n")
 	return builder.String()

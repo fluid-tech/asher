@@ -5,6 +5,7 @@ import (
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/builder/interfaces"
 	"asher/internal/api/codebuilder/php/core"
+	"fmt"
 	"github.com/iancoleman/strcase"
 	"strings"
 )
@@ -68,7 +69,7 @@ Adds Constructor in the Transactor with Query and Mutator Injected of the curren
 Returns:
 	- Return instance of TransactorGenerator
 Sample Usage:
-	- transactorGeneratorObject.AddConstructorFunction()
+	- transactorGeneratorObject.AddConstructor()
 */
 func (transactorGenerator *TransactorGenerator) AddConstructorFunction() *TransactorGenerator {
 	lowerCamelIdentifier := strcase.ToLowerCamel(transactorGenerator.identifier)
@@ -81,8 +82,8 @@ func (transactorGenerator *TransactorGenerator) AddConstructorFunction() *Transa
 	}
 
 	parentConstructorCall := core.NewFunctionCall("parent::__construct").
-		AddArg(core.NewParameter("$" + queryVariableName)).
-		AddArg(core.NewParameter("$" + mutatorVariableName)).
+		AddArg(core.NewParameter(fmt.Sprintf("$%s" , queryVariableName))).
+		AddArg(core.NewParameter(fmt.Sprintf("$%s" , mutatorVariableName))).
 		AddArg(core.NewParameter(`"id"`))
 
 	switch transactorGenerator.transactorType {
