@@ -99,7 +99,7 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 
 	/*Second and greater controllerHandlerCall should return only 3 files*/
 	if !isFirstCall && !(len(emitterFiles) == 4) {
-		t.Error("Not returend 3 files returned ", len(emitterFiles))
+		t.Error("Not returend 4 files returned ", len(emitterFiles))
 	}
 
 	retrivedControllerGen := fromControllerReg(className)

@@ -5,16 +5,24 @@ import (
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/builder/interfaces"
 	"asher/internal/api/codebuilder/php/core"
-	"fmt"
 	"github.com/iancoleman/strcase"
-	"strings"
 )
+
+const namespace = `App\Transactors`
+
+//TEMP VARIABLE
+var queryVariableName string
+var mutatorVariableName string
+var superConstructorCall *core.FunctionCall
 
 type TransactorGenerator struct {
 	classBuilder   interfaces.Class
 	identifier     string
 	imports        []string
 	transactorType string
+	parentConstructorCallArgs []api.TabbedUnit
+	constructorStatements []api.TabbedUnit
+	transactorMembers []api.TabbedUnit
 }
 
 func NewTransactorGenerator(identifier string, transactorType string) *TransactorGenerator {
@@ -23,6 +31,9 @@ func NewTransactorGenerator(identifier string, transactorType string) *Transacto
 		identifier:     identifier,
 		imports:        []string{},
 		transactorType: transactorType,
+		parentConstructorCallArgs: []api.TabbedUnit{},
+		constructorStatements: []api.TabbedUnit{},
+		transactorMembers: []api.TabbedUnit{},
 	}
 }
 
@@ -37,6 +48,25 @@ func (transactorGenerator *TransactorGenerator) SetIdentifier(identifier string)
 	transactorGenerator.identifier = identifier
 	return transactorGenerator
 }
+
+func (transactorGenerator *TransactorGenerator) AddParentConstructorCallArgs(
+	parameter *core.Parameter) *TransactorGenerator{
+
+	transactorGenerator.parentConstructorCallArgs =append(transactorGenerator.parentConstructorCallArgs, parameter)
+	return transactorGenerator
+}
+
+func (transactorGenerator *TransactorGenerator) AddTransactorMember(
+	member api.TabbedUnit) *TransactorGenerator{
+
+	transactorGenerator.transactorMembers =append(transactorGenerator.transactorMembers, member)
+	return transactorGenerator
+}
+
+
+
+
+
 
 /**
 Sets the type of the transactor
@@ -64,65 +94,45 @@ func (transactorGenerator *TransactorGenerator) AppendImports(units []string) *T
 	return transactorGenerator
 }
 
-/**
-Adds Constructor in the Transactor with Query and Mutator Injected of the currentModel
-Returns:
-	- Return instance of TransactorGenerator
-Sample Usage:
-	- transactorGeneratorObject.AddConstructor()
-*/
-func (transactorGenerator *TransactorGenerator) AddConstructorFunction() *TransactorGenerator {
+func (transactorGenerator *TransactorGenerator)addDefaults() *TransactorGenerator{
+	/*Default Imports*/
+	transactorImports := []string{
+		`App\Query\` + transactorGenerator.identifier + `Query`,
+		`App\Transactors\Mutations\` + transactorGenerator.identifier + `Mutator`,
+	}
+	transactorGenerator.imports = append(transactorImports, transactorGenerator.imports...)
+
+
+	/*Default CLASS MEMBERS*/
+	className := transactorGenerator.identifier + "Transactor"
+	transactorGenerator.transactorMembers = append([]api.TabbedUnit{core.NewSimpleStatement(
+		"private const CLASS_NAME = '" + className + "'")},
+		transactorGenerator.transactorMembers...)
+
+	/*Default parent Constructor CALL Arguments*/
 	lowerCamelIdentifier := strcase.ToLowerCamel(transactorGenerator.identifier)
-	queryVariableName := lowerCamelIdentifier + `Query`
-	mutatorVariableName := lowerCamelIdentifier + `Mutator`
+	queryVariableName = lowerCamelIdentifier + `Query`
+	mutatorVariableName = lowerCamelIdentifier + `Mutator`
 
-	constructorArguments := []string{
-		transactorGenerator.identifier + `Query $` + queryVariableName,
-		transactorGenerator.identifier + `Mutator $` + mutatorVariableName,
-	}
+	transactorGenerator.parentConstructorCallArgs = append([]api.TabbedUnit{
+		core.NewParameter("$"+queryVariableName),
+		core.NewParameter("$"+mutatorVariableName),
+		core.NewParameter(`"id"`)},
+		transactorGenerator.parentConstructorCallArgs...
+	)
 
-	parentConstructorCall := core.NewFunctionCall("parent::__construct").
-		AddArg(core.NewParameter(fmt.Sprintf("$%s" , queryVariableName))).
-		AddArg(core.NewParameter(fmt.Sprintf("$%s" , mutatorVariableName))).
-		AddArg(core.NewParameter(`"id"`))
 
-	switch transactorGenerator.transactorType {
-	case "file":
-		transactorGenerator.imports = append(transactorGenerator.imports, `use App\Helpers\BaseFileUploadHelper`)
-		parentConstructorCall.AddArg(core.NewParameter(
-			`new BaseFileUploadHelper(self::BASE_PATH, self::IMAGE_VALIDATION_RULES,"png")`))
-		/*TODO add something for const*/
-		transactorGenerator.classBuilder.AddMember(core.NewSimpleStatement(
-			"public const IMAGE_VALIDATION_RULES =" +
-				" array(\n        'file' => 'required|mimes:jpeg,jpg,png|max:3000'\n    )"))
+	/*DEFAULT CONSTRUCTOR STATEMENTS*/
+	superConstructorCall = core.NewFunctionCall("parent::__construct")
 
-		transactorGenerator.classBuilder.AddMember(
-			core.NewSimpleStatement(`private const BASE_PATH = "`+
-				strings.ToLower(transactorGenerator.identifier)+`"`))
-
-	case "image":
-		transactorGenerator.imports = append(transactorGenerator.imports, `use App\Helpers\ImageUploadHelper`)
-		parentConstructorCall.AddArg(core.NewParameter(
-			`new ImageUploadHelper(self::BASE_PATH, self::IMAGE_VALIDATION_RULES)`))
-		/*TODO add something for const*/
-		transactorGenerator.classBuilder.AddMember(core.NewSimpleStatement(
-"public const IMAGE_VALIDATION_RULES = " +
-	"array(\n        'file' => 'required|mimes:jpeg,jpg,png|max:3000'\n    )"))
-
-		transactorGenerator.classBuilder.AddMember(
-			core.NewSimpleStatement(`private const BASE_PATH = "`+
-				strings.ToLower(transactorGenerator.identifier)+`"`))
-	}
-
-	constructorStatements := []api.TabbedUnit{
-		parentConstructorCall,
+	transactorGenerator.constructorStatements = append(transactorGenerator.constructorStatements,
+		superConstructorCall,
 		core.NewSimpleStatement("$this->className = self::CLASS_NAME"),
-	}
+		)
 
-	transactorGenerator.classBuilder.AddFunction(builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
-		AddArguments(constructorArguments).AddStatements(constructorStatements).GetFunction())
 	return transactorGenerator
 }
+
 
 /**
 Main Function To be called when we want to build the transactor
@@ -132,33 +142,31 @@ Sample Usage:
 	- transactorGeneratorObject.BuildRestTransactor()
 */
 func (transactorGenerator *TransactorGenerator) BuildTransactor() *core.Class {
-	const namespace = `App\Transactors`
-	var extendsTransactor string
 
-	switch transactorGenerator.transactorType {
-	case "default":
-		extendsTransactor = "BaseTransactor"
-	case "file":
-		extendsTransactor = "FileTransactor"
-	case "image":
-		extendsTransactor = "ImageTransactor"
-	default:
-		extendsTransactor = "BaseTransactor"
-	}
-
-	transactorImports := []string{
-		`App\Query\` + transactorGenerator.identifier + `Query`,
-		`App\Transactors\Mutations\` + transactorGenerator.identifier + `Mutator`,
-	}
+	transactorGenerator.addDefaults()
 
 	className := transactorGenerator.identifier + "Transactor"
+	transactorGenerator.classBuilder.SetName(className).SetPackage(namespace).
+		SetExtends(strcase.ToCamel(transactorGenerator.transactorType)+"Transactor")
 
-	transactorGenerator.AppendImports(transactorImports)
-	transactorGenerator.AddConstructorFunction()
+	/*IMPORTS*/
+	transactorGenerator.classBuilder.AddImports(transactorGenerator.imports)
 
-	transactorGenerator.classBuilder.AddMember(core.NewSimpleStatement(
-		"private const CLASS_NAME = '" + className + "'")).SetName(className).
-		SetExtends(extendsTransactor).SetPackage(namespace).AddImports(transactorGenerator.imports)
+	/*MEMBERS*/
+	transactorGenerator.classBuilder.AddMembers(transactorGenerator.transactorMembers)
+
+	/*CALL TO SUPER CONSTRUCTOR*/
+	superConstructorCall.AddArgs(transactorGenerator.parentConstructorCallArgs)
+
+	/*CONSTRUCTOR*/
+
+	constructorFuncBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
+		AddArguments([]string{transactorGenerator.identifier + `Query $` + queryVariableName,
+		transactorGenerator.identifier + `Mutator $` + mutatorVariableName}).
+		AddStatements(transactorGenerator.constructorStatements)
+
+	transactorGenerator.classBuilder.AddFunction(constructorFuncBuilder.GetFunction())
+
 
 	return transactorGenerator.classBuilder.GetClass()
 }
