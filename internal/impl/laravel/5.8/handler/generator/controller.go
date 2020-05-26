@@ -14,6 +14,9 @@ type ControllerGenerator struct {
 	classBuilder interfaces.Class
 	identifier   string
 	imports      []string
+	queryVariableName string
+	transactorVariableName string
+	lowerCamelCaseIdentifier string
 }
 
 func NewControllerGenerator() *ControllerGenerator {
@@ -47,6 +50,9 @@ Sample Usage:
 */
 func (conGen *ControllerGenerator) SetIdentifier(identifier string) *ControllerGenerator {
 	conGen.identifier = identifier
+	conGen.lowerCamelCaseIdentifier = strcase.ToLowerCamel(conGen.identifier)
+	conGen.queryVariableName = conGen.lowerCamelCaseIdentifier + `Query`
+	conGen.transactorVariableName = conGen.lowerCamelCaseIdentifier + `Transactor`
 	return conGen
 }
 
@@ -58,17 +64,15 @@ Sample Usage:
 	- controllerGeneratorObject.AddCreate()
 */
 func (conGen *ControllerGenerator) AddCreate() *ControllerGenerator {
-	lowerCamelCaseIdentifier := strcase.ToLowerCamel(conGen.identifier)
-	transactorVariableName := lowerCamelCaseIdentifier + `Transactor`
 
 	functionCallStatement := core.NewFunctionCall(
-		fmt.Sprintf(`$%s = $this->%s->create`, lowerCamelCaseIdentifier, transactorVariableName))
+		fmt.Sprintf(`$%s = $this->%s->create`, conGen.lowerCamelCaseIdentifier, conGen.transactorVariableName))
 
 	functionCallStatement.AddArg(core.NewParameter("Auth::id()"))
 	functionCallStatement.AddArg(core.NewParameter("$request->all()"))
 	createCallStatement := functionCallStatement
 
-	returnStatement := core.NewReturnStatement(fmt.Sprintf(`ResponseHelper::create($%s)`, lowerCamelCaseIdentifier))
+	returnStatement := core.NewReturnStatement(fmt.Sprintf(`ResponseHelper::create($%s)`, conGen.lowerCamelCaseIdentifier))
 
 	createFunctionStatement := []api.TabbedUnit{
 		createCallStatement,
@@ -89,16 +93,14 @@ Sample Usage:
 	- controllerGeneratorObject.AddUpdate()
 */
 func (conGen *ControllerGenerator) AddUpdate() *ControllerGenerator {
-	lowerCamelCaseIdentifier := strcase.ToLowerCamel(conGen.identifier)
-	transactorVariableName := lowerCamelCaseIdentifier + `Transactor`
 
 	functionCallStatement := core.NewFunctionCall(
-		fmt.Sprintf(`$%s = $this->%s->update`, lowerCamelCaseIdentifier, transactorVariableName))
+		fmt.Sprintf(`$%s = $this->%s->update`, conGen.lowerCamelCaseIdentifier, conGen.transactorVariableName))
 
 	functionCallStatement.AddArg(core.NewParameter("Auth::id()"))
 	functionCallStatement.AddArg(core.NewParameter("$request->all()"))
 
-	returnStatement := core.NewReturnStatement(fmt.Sprintf(`ResponseHelper::update($%s)`, lowerCamelCaseIdentifier))
+	returnStatement := core.NewReturnStatement(fmt.Sprintf(`ResponseHelper::update($%s)`, conGen.lowerCamelCaseIdentifier))
 
 	updateFunctionStatement := []api.TabbedUnit{
 		functionCallStatement,
@@ -118,15 +120,13 @@ Sample Usage:
 	- controllerGeneratorObject.AddDelete()
 */
 func (conGen *ControllerGenerator) AddDelete() *ControllerGenerator {
-	lowerCamelCaseIdentifier := strcase.ToLowerCamel(conGen.identifier)
-	transactorVariableName := lowerCamelCaseIdentifier + `Transactor`
 
 	functionCallStatement := core.NewFunctionCall(
-		fmt.Sprintf(`$%s = $this->%s->delete`, lowerCamelCaseIdentifier, transactorVariableName))
+		fmt.Sprintf(`$%s = $this->%s->delete`, conGen.lowerCamelCaseIdentifier, conGen.transactorVariableName))
 	functionCallStatement.AddArg(core.NewParameter("$id")).
 		AddArg(core.NewParameter("$request->user->id"))
 
-	returnStatement := core.NewReturnStatement(fmt.Sprintf(`ResponseHelper::delete($%s)`, lowerCamelCaseIdentifier))
+	returnStatement := core.NewReturnStatement(fmt.Sprintf(`ResponseHelper::delete($%s)`, conGen.lowerCamelCaseIdentifier))
 
 	deleteFunctionStatement := []api.TabbedUnit{
 		functionCallStatement,
@@ -147,9 +147,9 @@ Sample Usage:
 	- controllerGeneratorObject.AddFindById()
 */
 func (conGen *ControllerGenerator) AddFindById() *ControllerGenerator {
-	queryVariableName := strcase.ToLowerCamel(conGen.identifier) + `Query`
 	returnTryStatement := []api.TabbedUnit{
-		core.NewReturnStatement(`response()->json(['data' => $this->` + queryVariableName + `->findById($id)], 200)`),
+		core.NewReturnStatement(fmt.Sprintf(
+			`ResponseHelper::success($this->%s->findById($id))`, conGen.queryVariableName)),
 	}
 	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName("findById").
 		AddArgument("$id").SetVisibility("public").AddStatements(returnTryStatement).GetFunction())
@@ -164,9 +164,8 @@ Sample Usage:
 	- controllerGeneratorObject.AddGetAll()
 */
 func (conGen *ControllerGenerator) AddGetAll() *ControllerGenerator {
-	queryVariableName := strcase.ToLowerCamel(conGen.identifier) + `Query`
 	returnStatement := core.NewReturnStatement(
-		`response()->json(['data' => $this->` + queryVariableName + `->paginate()], 200)`)
+		fmt.Sprintf(`ResponseHelper::success($this->%s->paginate())`, conGen.queryVariableName))
 	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().
 		SetName("getAll").SetVisibility("public").
 		AddStatement(returnStatement).GetFunction())
@@ -181,20 +180,17 @@ Sample Usage:
 	- controllerGeneratorObject.AddConstructor()
 */
 func (conGen *ControllerGenerator) AddConstructor() *ControllerGenerator {
-	lowerCamelIdentifier := strcase.ToLowerCamel(conGen.identifier)
-	queryVariableName := lowerCamelIdentifier + `Query`
-	transactorVariableName := lowerCamelIdentifier + `Transactor`
 	constructorArguments := []string{
-		conGen.identifier + `Query $` + queryVariableName,
-		conGen.identifier + `Transactor $` + transactorVariableName,
+		conGen.identifier + `Query $` + conGen.queryVariableName,
+		conGen.identifier + `Transactor $` + conGen.transactorVariableName,
 	}
 
-	conGen.classBuilder.AddMember(core.NewVarDeclaration("private", queryVariableName))
-	conGen.classBuilder.AddMember(core.NewVarDeclaration("private", transactorVariableName))
+	conGen.classBuilder.AddMember(core.NewVarDeclaration("private", conGen.queryVariableName))
+	conGen.classBuilder.AddMember(core.NewVarDeclaration("private", conGen.transactorVariableName))
 
 	constructorStatements := []api.TabbedUnit{
-		core.NewSimpleStatement("$this->" + queryVariableName + " = $" + queryVariableName),
-		core.NewSimpleStatement("$this->" + transactorVariableName + " = $" + transactorVariableName),
+		core.NewSimpleStatement("$this->" + conGen.queryVariableName + " = $" + conGen.queryVariableName),
+		core.NewSimpleStatement("$this->" + conGen.transactorVariableName + " = $" + conGen.transactorVariableName),
 	}
 
 	conGen.classBuilder.AddFunction(
@@ -203,6 +199,12 @@ func (conGen *ControllerGenerator) AddConstructor() *ControllerGenerator {
 	return conGen
 }
 
+/**
+Simply adds all the methods required inside the controller
+
+Sample Usage:
+	- controllerGeneratorObject.AddAllRESTMethods()
+*/
 func (conGen *ControllerGenerator) AddAllRESTMethods() {
 	conGen.AddConstructor()
 	conGen.AddCreate()
@@ -212,6 +214,15 @@ func (conGen *ControllerGenerator) AddAllRESTMethods() {
 	conGen.AddGetAll()
 }
 
+/**
+Checks which all methods to be added in the controller
+Parameters:
+	- methods: string array of the methods allowed in the rest controller
+Returns:
+	- Return instance of ControllerGenerator
+Sample Usage:
+	- controllerGeneratorObject.AddFunctionsInController([]string{"POST"})
+*/
 func (conGen *ControllerGenerator) AddFunctionsInController(methods []string) {
 	if methods != nil && len(methods) > 0 {
 		conGen.AddConstructor()

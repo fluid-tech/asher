@@ -1,6 +1,6 @@
 package generator
 
-const CreateRestController = `namespace App\Http\Controllers;
+const CreateRestController = `namespace App\Http\Controllers\Api;
 
 use App\Order;
 use App\Transactors\OrderTransactor;
@@ -26,7 +26,7 @@ class OrderRestController extends Controller {
 }
 `
 
-const UpdateRestController = `namespace App\Http\Controllers;
+const UpdateRestController = `namespace App\Http\Controllers\Api;
 
 use App\Order;
 use App\Transactors\OrderTransactor;
@@ -52,7 +52,7 @@ class OrderRestController extends Controller {
 }
 `
 
-const DeleteFunctionRestController = `namespace App\Http\Controllers;
+const DeleteFunctionRestController = `namespace App\Http\Controllers\Api;
 
 use App\Order;
 use App\Transactors\OrderTransactor;
@@ -78,7 +78,7 @@ class OrderRestController extends Controller {
 }
 `
 
-const GetFUnctionRestController = `namespace App\Http\Controllers;
+const GetFUnctionRestController = `namespace App\Http\Controllers\Api;
 
 use App\Order;
 use App\Transactors\OrderTransactor;
@@ -96,19 +96,19 @@ class OrderRestController extends Controller {
 
 
     public function findById($id) {
-        return response()->json(['data' => $this->orderQuery->findById($id)], 200);
+        return ResponseHelper::success($this->orderQuery->findById($id));
     }
 
 
     public function getAll() {
-        return response()->json(['data' => $this->orderQuery->paginate()], 200);
+        return ResponseHelper::success($this->orderQuery->paginate());
     }
 
 
 }
 `
 
-const AllFunctionsRestController = `namespace App\Http\Controllers;
+const AllFunctionsRestController = `namespace App\Http\Controllers\Api;
 
 use App\Order;
 use App\Transactors\OrderTransactor;
@@ -144,19 +144,19 @@ class OrderRestController extends Controller {
 
 
     public function findById($id) {
-        return response()->json(['data' => $this->orderQuery->findById($id)], 200);
+        return ResponseHelper::success($this->orderQuery->findById($id));
     }
 
 
     public function getAll() {
-        return response()->json(['data' => $this->orderQuery->paginate()], 200);
+        return ResponseHelper::success($this->orderQuery->paginate());
     }
 
 
 }
 `
 
-const StudentController = `namespace App\Http\Controllers;
+const StudentController = `namespace App\Http\Controllers\Api;
 
 use App\Student;
 use App\Transactors\StudentTransactor;
@@ -192,19 +192,19 @@ class StudentRestController extends Controller {
 
 
     public function findById($id) {
-        return response()->json(['data' => $this->studentQuery->findById($id)], 200);
+        return ResponseHelper::success($this->studentQuery->findById($id));
     }
 
 
     public function getAll() {
-        return response()->json(['data' => $this->studentQuery->paginate()], 200);
+        return ResponseHelper::success($this->studentQuery->paginate());
     }
 
 
 }
 `
 
-const TeacherController = `namespace App\Http\Controllers;
+const TeacherController = `namespace App\Http\Controllers\Api;
 
 use App\Teacher;
 use App\Transactors\TeacherTransactor;
@@ -222,19 +222,19 @@ class TeacherRestController extends Controller {
 
 
     public function findById($id) {
-        return response()->json(['data' => $this->teacherQuery->findById($id)], 200);
+        return ResponseHelper::success($this->teacherQuery->findById($id));
     }
 
 
     public function getAll() {
-        return response()->json(['data' => $this->teacherQuery->paginate()], 200);
+        return ResponseHelper::success($this->teacherQuery->paginate());
     }
 
 
 }
 `
 
-const AdminController = `namespace App\Http\Controllers;
+const AdminController = `namespace App\Http\Controllers\Api;
 
 use App\Admin;
 use App\Transactors\AdminTransactor;

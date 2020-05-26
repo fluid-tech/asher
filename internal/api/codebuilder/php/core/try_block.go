@@ -31,31 +31,6 @@ func (tryBlock *TryBlock) SetNumTabs(tabs int) {
 	tryBlock.tabs = tabs
 }
 
-func (tryBlock *TryBlock) AddStatement(statement api.TabbedUnit) *TryBlock {
-	tryBlock.Statements = append(tryBlock.Statements, statement)
-	return tryBlock
-}
-
-func (tryBlock *TryBlock) AddStatements(statements []api.TabbedUnit) *TryBlock {
-	tryBlock.Statements = append(tryBlock.Statements, statements...)
-	return tryBlock
-}
-
-func (tryBlock *TryBlock) AddFinallyStatement(statement api.TabbedUnit) *TryBlock {
-	tryBlock.FinallyStatements = append(tryBlock.FinallyStatements, statement)
-	return tryBlock
-}
-
-func (tryBlock *TryBlock) AddFinallyStatements(statements []api.TabbedUnit) *TryBlock {
-	tryBlock.FinallyStatements = append(tryBlock.FinallyStatements, statements...)
-	return tryBlock
-}
-
-func (tryBlock *TryBlock) AddCatchBlock(block *CatchBlock) *TryBlock {
-	tryBlock.CatchBlock = append(tryBlock.CatchBlock, *block)
-	return tryBlock
-}
-
 
 func (tryBlock *TryBlock) String() string {
 	var builder strings.Builder
