@@ -199,6 +199,12 @@ func (conGen *ControllerGenerator) AddConstructor() *ControllerGenerator {
 	return conGen
 }
 
+/**
+Simply adds all the methods required inside the controller
+
+Sample Usage:
+	- controllerGeneratorObject.AddAllRESTMethods()
+*/
 func (conGen *ControllerGenerator) AddAllRESTMethods() {
 	conGen.AddConstructor()
 	conGen.AddCreate()
@@ -208,6 +214,15 @@ func (conGen *ControllerGenerator) AddAllRESTMethods() {
 	conGen.AddGetAll()
 }
 
+/**
+Checks which all methods to be added in the controller
+Parameters:
+	- methods: string array of the methods allowed in the rest controller
+Returns:
+	- Return instance of ControllerGenerator
+Sample Usage:
+	- controllerGeneratorObject.AddFunctionsInController([]string{"POST"})
+*/
 func (conGen *ControllerGenerator) AddFunctionsInController(methods []string) {
 	if methods != nil && len(methods) > 0 {
 		conGen.AddConstructor()
