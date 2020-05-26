@@ -74,6 +74,8 @@ func (controllerHandler *ControllerHandler) handleRestController(
 	routeEmitterFile := controllerHandler.handleRoutes(identifier, controllerConfig)
 
 	fileToEmit = append(fileToEmit, controllerEmitterFile,transactorEmitterFile,mutatorEmitterFile,queryEmitterFile)
+
+	/*AS ROUTE FILE IS EMITTED ONLY ONCE IE FOR THE FIRST TIME AFTER THAT IT IS ONLY USED*/
 	if routeEmitterFile != nil {
 		fileToEmit = append(fileToEmit, routeEmitterFile)
 	}
@@ -121,7 +123,6 @@ func (controllerHandler *ControllerHandler) handleFileTransactor(identifier stri
 	/*MODEL AND MIGRATION UPDATES*/
 	modelGen.AddCreateValidationRule("file_urls", "sometimes|required", "").
 		AddCreateValidationRule("file_urls.urls", "array", "")
-
 	modelGen.AddUpdateValidationRule("file_urls", "sometimes|required", "").
 		AddUpdateValidationRule("file_urls.urls", "array", "")
 
@@ -130,6 +131,7 @@ func (controllerHandler *ControllerHandler) handleFileTransactor(identifier stri
 	/*TODO DATA type should be configurable in 2nd iteration*/
 	migrationGen.AddColumn(core.NewSimpleStatement(`$table->longText('file_urls')->nullable()`))
 
+	/*BUILDING OF TRANSACTOR*/
 	transactorGen := generator.NewTransactorGenerator(identifier,"file")
 
 	transactorGen.AppendImports([]string{`App\Helpers\BaseFileUploadHelper`}).
@@ -156,7 +158,7 @@ func (controllerHandler *ControllerHandler) handleImageTransactor(identifier str
 	modelGen *generator.ModelGenerator, migrationGen *generator.MigrationGenerator) api.EmitterFile {
 	//controller := value.(models.Controller)
 
-	/*controller argumtn something while merging with master*/
+	/*MODEL AND MIGRATION UPDATES*/
 	modelGen.AddCreateValidationRule("file_urls", "sometimes|required", "").
 		AddCreateValidationRule("file_urls.urls", "array", "")
 
@@ -167,7 +169,7 @@ func (controllerHandler *ControllerHandler) handleImageTransactor(identifier str
 
 	migrationGen.AddColumn(core.NewSimpleStatement(`$table->longText('file_urls')->nullable()`))
 
-	/**/
+	/*TRANSACTOR GENERATION*/
 	transactorGen := generator.NewTransactorGenerator(identifier, "image")
 	transactorGen.AppendImports([]string{`App\Helpers\ImageUploadHelper`}).
 		AddParentConstructorCallArgs(core.NewParameter(

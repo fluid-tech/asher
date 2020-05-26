@@ -10,7 +10,7 @@ import (
 
 const namespace = `App\Transactors`
 
-//TEMP VARIABLE
+/*Variables used between functions*/
 var queryVariableName string
 var mutatorVariableName string
 var superConstructorCall *core.FunctionCall
@@ -19,18 +19,19 @@ type TransactorGenerator struct {
 	classBuilder   interfaces.Class
 	identifier     string
 	imports        []string
-	transactorType string
-	parentConstructorCallArgs []api.TabbedUnit
-	constructorStatements []api.TabbedUnit
+	classToExtend string /*Base,File,Image*/
 	transactorMembers []api.TabbedUnit
+	constructorStatements []api.TabbedUnit
+	parentConstructorCallArgs []api.TabbedUnit
+
 }
 
-func NewTransactorGenerator(identifier string, transactorType string) *TransactorGenerator {
+func NewTransactorGenerator(identifier string, classToExtend string) *TransactorGenerator {
 	return &TransactorGenerator{
 		classBuilder:   builder.NewClassBuilder(),
 		identifier:     identifier,
 		imports:        []string{},
-		transactorType: transactorType,
+		classToExtend: classToExtend,
 		parentConstructorCallArgs: []api.TabbedUnit{},
 		constructorStatements: []api.TabbedUnit{},
 		transactorMembers: []api.TabbedUnit{},
@@ -49,13 +50,44 @@ func (transactorGenerator *TransactorGenerator) SetIdentifier(identifier string)
 	return transactorGenerator
 }
 
+/*FUNCTIONS TO BE USED BY HANDLERS*/
+
+
+/**
+Add statements inside the transactor constructor
+Parameters:
+	- statement: api.TabbedUnit
+Returns:
+	- instance of Transactor Generator object
+*/
+func (transactorGenerator *TransactorGenerator) AddConstructorStatement(
+	statement api.TabbedUnit) *TransactorGenerator{
+	transactorGenerator.constructorStatements =append(transactorGenerator.constructorStatements, statement)
+	return transactorGenerator
+}
+
+/**
+Add the parameters to the parent::constructor function call
+Every type of transactor requires different sets of parameters according to their extended class
+Parameters:
+	- parameter: *core.Parameter
+Returns:
+	- instance of Transactor Generator object
+*/
+
 func (transactorGenerator *TransactorGenerator) AddParentConstructorCallArgs(
 	parameter *core.Parameter) *TransactorGenerator{
-
 	transactorGenerator.parentConstructorCallArgs =append(transactorGenerator.parentConstructorCallArgs, parameter)
 	return transactorGenerator
 }
 
+/**
+Add Member To the Transactor class
+Parameters:
+	- member : api.TabbedUnit
+Returns:
+	- instance of Transactor Generator object
+*/
 func (transactorGenerator *TransactorGenerator) AddTransactorMember(
 	member api.TabbedUnit) *TransactorGenerator{
 
@@ -64,28 +96,12 @@ func (transactorGenerator *TransactorGenerator) AddTransactorMember(
 }
 
 
-
-
-
-
 /**
-Sets the type of the transactor
-Parameters:
-	- identifier: string
-Sample Usage:
-	- SetTransactorType("default") or SetTransactorType("file") or SetTransactorType("image")
-*/
-func (transactorGenerator *TransactorGenerator) SetTransactorType(identifier string) *TransactorGenerator {
-	transactorGenerator.transactorType = identifier
-	return transactorGenerator
-}
-
-/**
-Appends import to the controller file
+Appends import to the Transactor file
 Parameters:
 	- units: string array of the import
 Returns:
-	- instance of ControllerGenerator object
+	- instance of Transactor Generator object
 Sample Usage:
 	- AppendImport([]string{"App\User",})
 */
@@ -94,6 +110,15 @@ func (transactorGenerator *TransactorGenerator) AppendImports(units []string) *T
 	return transactorGenerator
 }
 
+
+
+/**
+There are some common imports, class members and parameters to the parent constructor call
+addDefaults Method inserts the common things in each of the array so that they will be already present during Build call
+NOTE:This will prepend the values to each array as they are the ones which will come first and then the values added from
+the handler
+Prepend is required because defaults are added after the handler inserts the values
+*/
 func (transactorGenerator *TransactorGenerator)addDefaults() *TransactorGenerator{
 	/*Default Imports*/
 	transactorImports := []string{
@@ -147,7 +172,7 @@ func (transactorGenerator *TransactorGenerator) BuildTransactor() *core.Class {
 
 	className := transactorGenerator.identifier + "Transactor"
 	transactorGenerator.classBuilder.SetName(className).SetPackage(namespace).
-		SetExtends(strcase.ToCamel(transactorGenerator.transactorType)+"Transactor")
+		SetExtends(strcase.ToCamel(transactorGenerator.classToExtend)+"Transactor")
 
 	/*IMPORTS*/
 	transactorGenerator.classBuilder.AddImports(transactorGenerator.imports)
