@@ -1,6 +1,7 @@
 package builder
 
 import (
+	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/core"
 	api2 "asher/test/api"
 	"testing"
@@ -17,17 +18,17 @@ func TestTryBlock(t *testing.T) {
 }
 
 func genTryCatchBlock(catch bool, finally bool, expectedCode string) *api2.GeneralTest {
-	tryBlock := core.NewTryBlock()
+	tryBlock := builder.NewTryBlockBuilder()
 
 	tryBlock.AddStatement(core.NewSimpleStatement(`$error = 5/0`))
 
 	if catch {
-		catchBlock := core.NewCatchBlock()
+		catchBlock := builder.NewCatchBlockBuilder()
 		catchBlock.AddArgument("DivideByZeroException $exception")
-		tryBlock.AddCatchBlock(catchBlock)
+		tryBlock.AddCatchBlock(catchBlock.GetCatchBlock())
 	}
 	if finally {
 		tryBlock.AddFinallyStatement(core.NewSimpleStatement(`echo "Hello I am in finally"`))
 	}
-	return api2.NewGeneralTest(tryBlock.String(), expectedCode)
+	return api2.NewGeneralTest(tryBlock.GetTryBlock().String(), expectedCode)
 }
