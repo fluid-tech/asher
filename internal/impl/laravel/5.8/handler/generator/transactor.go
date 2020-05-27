@@ -101,50 +101,6 @@ func (transactorGenerator *TransactorGenerator) AppendImports(units []string) *T
 }
 
 
-
-/**
-There are some common imports, class members and parameters to the parent constructor call
-addDefaults Method inserts the common things in each of the array so that they will be already present during Build call
-NOTE:This will prepend the values to each array as they are the ones which will come first and then the values added from
-the handler
-Prepend is required because defaults are added after the handler inserts the values
-*/
-func (transactorGenerator *TransactorGenerator) addDefaults() *TransactorGenerator{
-	/*Default Imports*/
-	transactorImports := []string{
-		fmt.Sprintf(`App\Query\%sQuery` , transactorGenerator.identifier),
-		fmt.Sprintf(`App\Transactors\Mutations\%sMutator` , transactorGenerator.identifier),
-	}
-	transactorGenerator.imports = append(transactorImports, transactorGenerator.imports...)
-
-
-	/*Default CLASS MEMBERS*/
-	className := transactorGenerator.identifier + "Transactor"
-	transactorGenerator.transactorMembers = append([]api.TabbedUnit{core.NewSimpleStatement(
-		fmt.Sprintf("private const CLASS_NAME = '%s'" , className))},
-		transactorGenerator.transactorMembers...)
-
-
-	transactorGenerator.parentConstructorCallArgs = append([]api.TabbedUnit{
-		core.NewParameter("$"+transactorGenerator.queryVariableName),
-		core.NewParameter("$"+transactorGenerator.mutatorVariableName),
-		core.NewParameter(`"id"`)},
-		transactorGenerator.parentConstructorCallArgs...
-	)
-
-
-	/*DEFAULT CONSTRUCTOR STATEMENTS*/
-	superConstructorCall = core.NewFunctionCall("parent::__construct")
-
-	transactorGenerator.constructorStatements = append(transactorGenerator.constructorStatements,
-		superConstructorCall,
-		core.NewSimpleStatement("$this->className = self::CLASS_NAME"),
-		)
-
-	return transactorGenerator
-}
-
-
 /**
 Main Function To be called when we want to build the transactor
 Returns:
@@ -191,4 +147,46 @@ Sample Usage:
 */
 func (transactorGenerator *TransactorGenerator) String() string {
 	return transactorGenerator.BuildTransactor().String()
+}
+
+/**
+There are some common imports, class members and parameters to the parent constructor call
+addDefaults Method inserts the common things in each of the array so that they will be already present during Build call
+NOTE:This will prepend the values to each array as they are the ones which will come first and then the values added from
+the handler
+Prepend is required because defaults are added after the handler inserts the values
+*/
+func (transactorGenerator *TransactorGenerator) addDefaults() *TransactorGenerator{
+	/*Default Imports*/
+	transactorImports := []string{
+		fmt.Sprintf(`App\Query\%sQuery` , transactorGenerator.identifier),
+		fmt.Sprintf(`App\Transactors\Mutations\%sMutator` , transactorGenerator.identifier),
+	}
+	transactorGenerator.imports = append(transactorImports, transactorGenerator.imports...)
+
+
+	/*Default CLASS MEMBERS*/
+	className := transactorGenerator.identifier + "Transactor"
+	transactorGenerator.transactorMembers = append([]api.TabbedUnit{core.NewSimpleStatement(
+		fmt.Sprintf("private const CLASS_NAME = '%s'" , className))},
+		transactorGenerator.transactorMembers...)
+
+
+	transactorGenerator.parentConstructorCallArgs = append([]api.TabbedUnit{
+		core.NewParameter("$"+transactorGenerator.queryVariableName),
+		core.NewParameter("$"+transactorGenerator.mutatorVariableName),
+		core.NewParameter(`"id"`)},
+		transactorGenerator.parentConstructorCallArgs...
+	)
+
+
+	/*DEFAULT CONSTRUCTOR STATEMENTS*/
+	superConstructorCall = core.NewFunctionCall("parent::__construct")
+
+	transactorGenerator.constructorStatements = append(transactorGenerator.constructorStatements,
+		superConstructorCall,
+		core.NewSimpleStatement("$this->className = self::CLASS_NAME"),
+	)
+
+	return transactorGenerator
 }
