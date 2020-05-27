@@ -5,17 +5,17 @@ import (
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/builder/interfaces"
 	"asher/internal/api/codebuilder/php/core"
+	"fmt"
 	"github.com/iancoleman/strcase"
 )
 
-const namespace = `App\Transactors`
+const TransactorNamespace = `App\Transactors`
 
 /*Variables used between functions*/
-var queryVariableName string
-var mutatorVariableName string
 var superConstructorCall *core.FunctionCall
 
 type TransactorGenerator struct {
+	api.Generator
 	classBuilder   interfaces.Class
 	identifier     string
 	imports        []string
@@ -23,13 +23,14 @@ type TransactorGenerator struct {
 	transactorMembers []api.TabbedUnit
 	constructorStatements []api.TabbedUnit
 	parentConstructorCallArgs []api.TabbedUnit
-
+	lowerCamelIdentifier string
+	queryVariableName string
+	mutatorVariableName string
 }
 
-func NewTransactorGenerator(identifier string, classToExtend string) *TransactorGenerator {
+func NewTransactorGenerator(classToExtend string) *TransactorGenerator {
 	return &TransactorGenerator{
 		classBuilder:   builder.NewClassBuilder(),
-		identifier:     identifier,
 		imports:        []string{},
 		classToExtend: classToExtend,
 		parentConstructorCallArgs: []api.TabbedUnit{},
@@ -47,24 +48,13 @@ Sample Usage:
 */
 func (transactorGenerator *TransactorGenerator) SetIdentifier(identifier string) *TransactorGenerator {
 	transactorGenerator.identifier = identifier
+	transactorGenerator.lowerCamelIdentifier = strcase.ToLowerCamel(transactorGenerator.identifier)
+	transactorGenerator.queryVariableName = transactorGenerator.lowerCamelIdentifier + `Query`
+	transactorGenerator.mutatorVariableName = transactorGenerator.lowerCamelIdentifier + `Mutator`
 	return transactorGenerator
 }
 
 /*FUNCTIONS TO BE USED BY HANDLERS*/
-
-
-/**
-Add statements inside the transactor constructor
-Parameters:
-	- statement: api.TabbedUnit
-Returns:
-	- instance of Transactor Generator object
-*/
-func (transactorGenerator *TransactorGenerator) AddConstructorStatement(
-	statement api.TabbedUnit) *TransactorGenerator{
-	transactorGenerator.constructorStatements =append(transactorGenerator.constructorStatements, statement)
-	return transactorGenerator
-}
 
 /**
 Add the parameters to the parent::constructor function call
@@ -119,11 +109,11 @@ NOTE:This will prepend the values to each array as they are the ones which will 
 the handler
 Prepend is required because defaults are added after the handler inserts the values
 */
-func (transactorGenerator *TransactorGenerator)addDefaults() *TransactorGenerator{
+func (transactorGenerator *TransactorGenerator) addDefaults() *TransactorGenerator{
 	/*Default Imports*/
 	transactorImports := []string{
-		`App\Query\` + transactorGenerator.identifier + `Query`,
-		`App\Transactors\Mutations\` + transactorGenerator.identifier + `Mutator`,
+		fmt.Sprintf(`App\Query\%sQuery` , transactorGenerator.identifier),
+		fmt.Sprintf(`App\Transactors\Mutations\%sMutator` , transactorGenerator.identifier),
 	}
 	transactorGenerator.imports = append(transactorImports, transactorGenerator.imports...)
 
@@ -131,17 +121,13 @@ func (transactorGenerator *TransactorGenerator)addDefaults() *TransactorGenerato
 	/*Default CLASS MEMBERS*/
 	className := transactorGenerator.identifier + "Transactor"
 	transactorGenerator.transactorMembers = append([]api.TabbedUnit{core.NewSimpleStatement(
-		"private const CLASS_NAME = '" + className + "'")},
+		fmt.Sprintf("private const CLASS_NAME = '%s'" , className))},
 		transactorGenerator.transactorMembers...)
 
-	/*Default parent Constructor CALL Arguments*/
-	lowerCamelIdentifier := strcase.ToLowerCamel(transactorGenerator.identifier)
-	queryVariableName = lowerCamelIdentifier + `Query`
-	mutatorVariableName = lowerCamelIdentifier + `Mutator`
 
 	transactorGenerator.parentConstructorCallArgs = append([]api.TabbedUnit{
-		core.NewParameter("$"+queryVariableName),
-		core.NewParameter("$"+mutatorVariableName),
+		core.NewParameter("$"+transactorGenerator.queryVariableName),
+		core.NewParameter("$"+transactorGenerator.mutatorVariableName),
 		core.NewParameter(`"id"`)},
 		transactorGenerator.parentConstructorCallArgs...
 	)
@@ -170,9 +156,7 @@ func (transactorGenerator *TransactorGenerator) BuildTransactor() *core.Class {
 
 	transactorGenerator.addDefaults()
 
-	className := transactorGenerator.identifier + "Transactor"
-	transactorGenerator.classBuilder.SetName(className).SetPackage(namespace).
-		SetExtends(strcase.ToCamel(transactorGenerator.classToExtend)+"Transactor")
+	className := fmt.Sprintf("%sTransactor", transactorGenerator.identifier)
 
 	/*IMPORTS*/
 	transactorGenerator.classBuilder.AddImports(transactorGenerator.imports)
@@ -186,11 +170,14 @@ func (transactorGenerator *TransactorGenerator) BuildTransactor() *core.Class {
 	/*CONSTRUCTOR*/
 
 	constructorFuncBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
-		AddArguments([]string{transactorGenerator.identifier + `Query $` + queryVariableName,
-		transactorGenerator.identifier + `Mutator $` + mutatorVariableName}).
+		AddArguments([]string{
+			fmt.Sprintf(`%sQuery $%s` ,transactorGenerator.identifier, transactorGenerator.queryVariableName),
+		fmt.Sprintf(`%sMutator $%s` ,transactorGenerator.identifier, transactorGenerator.mutatorVariableName)}).
 		AddStatements(transactorGenerator.constructorStatements)
 
-	transactorGenerator.classBuilder.AddFunction(constructorFuncBuilder.GetFunction())
+	transactorGenerator.classBuilder.AddFunction(constructorFuncBuilder.GetFunction()).
+		SetName(className).SetPackage(TransactorNamespace).
+		SetExtends(strcase.ToCamel(transactorGenerator.classToExtend)+"Transactor")
 
 
 	return transactorGenerator.classBuilder.GetClass()

@@ -18,7 +18,7 @@ func TestTransactorGenerator(t *testing.T) {
 }
 
 func genTransactorTest(modelName string, transactorType string, expectedOut string) *api.GeneralTest {
-	transactorGenerator := generator.NewTransactorGenerator(modelName, transactorType)
+	transactorGenerator := generator.NewTransactorGenerator(transactorType).SetIdentifier(modelName)
 	switch transactorType {
 	case "file":
 		transactorGenerator.AppendImports([]string{`App\Helpers\BaseFileUploadHelper`}).

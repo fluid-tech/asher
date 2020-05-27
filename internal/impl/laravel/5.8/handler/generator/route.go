@@ -20,15 +20,6 @@ func NewRouteGenerator() *RouteGenerator {
 	}
 }
 
-func contains(s []string, e string) bool {
-	for _, a := range s {
-		if strings.ToLower(a) == strings.ToLower(e) {
-			return true
-		}
-	}
-	return false
-}
-
 /**
 Returns the array of functional calls for every model to add their routes
 Returns:
@@ -41,16 +32,16 @@ func (routeGenerator *RouteGenerator) Routes() []*core.FunctionCall {
 /**
 Add the predefined sets of rest routes for the specific model in the generator routes array
 Parameters:
-	- modelName: name of the model for which routes are to be generated
+	- identifier: name of the model for which routes are to be generated
 	-controller : configuration for controller
 Returns:
 	- instance of the generator object
 Sample Usage:
-	Only that routes will be added thet are in the supported methods array of controller config
+	Only that routes will be added that are in the supported methods array of controller config
 	- AddDefaultRestRoutes('Order')
 	routes generated for the above call are
-	Route::get(/order/get-by-id/{id}, OrderController@get-by-id);
-	Route::get(/order/get-all, OrderController@get-all);
+	Route::get(/order/{id}, OrderController@findById);
+	Route::get(/order/all, OrderController@getAll);
 	Route::post(/order/create, OrderController@create);
 	Route::post(/order/edit/{id}, OrderController@edit);
 	Route::post(/order/delete/{id}, OrderController@delete);
@@ -68,7 +59,7 @@ func (routeGenerator *RouteGenerator) AddDefaultRestRoutes(modelName string, sup
 		{actionFunction: "create", method: "POST", subURI: ""},
 		{actionFunction: "edit", method: "PUT", subURI: "{id}"},
 		{actionFunction: "delete", method: "DELETE", subURI: "{id}"},
-		{actionFunction: "getById", method: "GET", subURI: "{id}"},
+		{actionFunction: "findById", method: "GET", subURI: "{id}"},
 		{actionFunction: "getAll", method: "GET", subURI: "all"},
 	}
 
@@ -117,17 +108,14 @@ Returns:
 	- array of tabbed units
 */
 func (routeGenerator *RouteGenerator) Build() []api.TabbedUnit {
-	var builtRouteFile []api.TabbedUnit
-
-	importStmt := core.NewSimpleStatement(`use Illuminate\Support\Facades\Route`)
-	builtRouteFile = append(builtRouteFile, importStmt)
+	buildRoutFile := []api.TabbedUnit{core.NewSimpleStatement(`use Illuminate\Support\Facades\Route`)}
 
 	/*ADD ALL FUNCTION CALLS*/
 	for _, functionCall := range routeGenerator.routes {
-		builtRouteFile = append(builtRouteFile, functionCall)
+		buildRoutFile = append(buildRoutFile, functionCall)
 	}
 
-	return builtRouteFile
+	return buildRoutFile
 }
 
 /**
@@ -136,8 +124,8 @@ Returns:
 Sample Usage:
 	-eg.output:
 	use Illuminate\Support\Facades\Route;
-	Route::get(/order/get-by-id/{id}, OrderController@get-by-id);
-	Route::get(/order/get-all, OrderController@get-all);
+	Route::get(/order/{id}, OrderController@fetchById);
+	Route::get(/order/all, OrderController@getAll);
 	Route::post(/order/create, OrderController@create);
 	Route::post(/order/edit/{id}, OrderController@edit);
 	Route::post(/order/delete/{id}, OrderController@delete);
@@ -152,4 +140,13 @@ func (routeGenerator *RouteGenerator) String() string {
 	}
 
 	return builder.String()
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if strings.ToLower(a) == strings.ToLower(e) {
+			return true
+		}
+	}
+	return false
 }
