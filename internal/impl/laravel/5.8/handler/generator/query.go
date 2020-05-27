@@ -4,42 +4,49 @@ import (
 	"asher/internal/api"
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/core"
+	"fmt"
 )
+
+
+const QueryExtends = "BaseQuery"
+const QueryNamespace  = `App\Queries`
 
 type QueryGenerator struct {
 	api.Generator
-	Class     *builder.Class
-	imports   []api.TabbedUnit
-	modelName string
-	relation  bool
+	Class      *builder.Class
+	imports    []api.TabbedUnit
+	identifier string
+	relation   bool
 }
 
 /**
 Get the new instance of query Generator ,Query is a part of transactor pattern which handles the read operations
 like getById , paginate for various frameworks like datatables.net
 Parameters:
-	- modelName: name of the model for which queries is to be generated
+	- identifier: name of the model for which queries is to be generated
 	-relation : for future use to handle nested queries
 Returns:
 	- instance of the generator object
 Sample Usage:
-	- AddDefaultRestRoutes('Order',{{Relation parameter is yet to defined }})
+	- AddDefaultRestRoutes({{Relation parameter is yet to defined }})
 */
-func NewQueryGenerator(modelName string, relation bool) *QueryGenerator {
+func NewQueryGenerator(relation bool) *QueryGenerator {
 	classBuilder := builder.NewClassBuilder()
-	classBuilder.SetName(modelName + "Query")
-	classBuilder.SetPackage(`App\Queries`)
-	return &QueryGenerator{Class: classBuilder, imports: nil, modelName: modelName, relation: relation}
+	return &QueryGenerator{Class: classBuilder, imports: nil, relation: relation}
 }
 
 /**
-Returns the class builder object of the models query class
-Returns:
-	- *builder.Class
+Sets the identifier of the current class
+Parameters:
+	- identifier: string
+Sample Usage:
+	- SetIdentifier("ClassName")
 */
-func (queryGenerator *QueryGenerator) GetClass() *builder.Class {
-	return queryGenerator.Class
+func (queryGenerator *QueryGenerator) SetIdentifier(identifier string) *QueryGenerator {
+	queryGenerator.identifier = identifier
+	return queryGenerator
 }
+
 
 /**
 Builds the query class by adding imports and call to the constructor of base class (BaseQuery)
@@ -48,19 +55,21 @@ Returns:
 	- *core.Class (class object of the the query class)
 */
 func (queryGenerator *QueryGenerator) Build() *core.Class {
-	/*IMPORTS*/
-	queryGenerator.Class.AddImport(`App\` + queryGenerator.modelName)
+	var className = fmt.Sprintf("%sQuery",queryGenerator.identifier)
 
-	/*EXTENDS*/
-	queryGenerator.Class.SetExtends("BaseQuery")
+	/*IMPORTS*/
+	queryGenerator.Class.AddImport(fmt.Sprintf(`App\%s` , queryGenerator.identifier))
+
 
 	/*CONSTRUCTOR*/
 	constructor := builder.NewFunctionBuilder()
 	constructor.SetName("__construct").SetVisibility("public")
-	fullyQualifiedModelArg := core.NewParameter(`"App\` + queryGenerator.modelName + `"`)
+	fullyQualifiedModelArg := core.NewParameter(fmt.Sprintf(`"App\%s"` , queryGenerator.identifier))
 	callToSuperConstructor := core.NewFunctionCall("parent::__construct").AddArg(fullyQualifiedModelArg)
 	constructor.AddStatement(callToSuperConstructor)
-	queryGenerator.GetClass().AddFunction(constructor.GetFunction())
+
+	queryGenerator.Class.AddFunction(constructor.GetFunction()).
+		SetName(className).SetPackage(QueryNamespace).SetExtends(QueryExtends)
 
 	return queryGenerator.Class.GetClass()
 }
@@ -88,6 +97,5 @@ Sample Usage:
 
 */
 func (queryGenerator QueryGenerator) String() string {
-	queryClass := queryGenerator.Build()
-	return queryClass.String()
+	return queryGenerator.Build().String()
 }

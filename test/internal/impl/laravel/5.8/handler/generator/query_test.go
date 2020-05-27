@@ -19,6 +19,6 @@ func TestQueryGenerator(t *testing.T) {
 
 func genQueryTest(modelName string, expectedOut string) *api.GeneralTest {
 	/*TODO relation is not used for iteration1*/
-	transactorGenerator := generator.NewQueryGenerator(modelName, true)
+	transactorGenerator := generator.NewQueryGenerator(true).SetIdentifier(modelName)
 	return api.NewGeneralTest(transactorGenerator.String(), expectedOut)
 }
