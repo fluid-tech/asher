@@ -26,7 +26,6 @@ class TeacherQuery extends BaseQuery {
 }
 `
 
-
 const StudentBasicQuery = `namespace App\Queries;
 
 use App\Student;

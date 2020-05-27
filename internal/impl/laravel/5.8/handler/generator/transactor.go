@@ -16,26 +16,26 @@ var superConstructorCall *core.FunctionCall
 
 type TransactorGenerator struct {
 	api.Generator
-	classBuilder   interfaces.Class
-	identifier     string
-	imports        []string
-	classToExtend string /*Base,File,Image*/
-	transactorMembers []api.TabbedUnit
-	constructorStatements []api.TabbedUnit
+	classBuilder              interfaces.Class
+	identifier                string
+	imports                   []string
+	classToExtend             string /*Base,File,Image*/
+	transactorMembers         []api.TabbedUnit
+	constructorStatements     []api.TabbedUnit
 	parentConstructorCallArgs []api.TabbedUnit
-	lowerCamelIdentifier string
-	queryVariableName string
-	mutatorVariableName string
+	lowerCamelIdentifier      string
+	queryVariableName         string
+	mutatorVariableName       string
 }
 
 func NewTransactorGenerator(classToExtend string) *TransactorGenerator {
 	return &TransactorGenerator{
-		classBuilder:   builder.NewClassBuilder(),
-		imports:        []string{},
-		classToExtend: classToExtend,
+		classBuilder:              builder.NewClassBuilder(),
+		imports:                   []string{},
+		classToExtend:             classToExtend,
 		parentConstructorCallArgs: []api.TabbedUnit{},
-		constructorStatements: []api.TabbedUnit{},
-		transactorMembers: []api.TabbedUnit{},
+		constructorStatements:     []api.TabbedUnit{},
+		transactorMembers:         []api.TabbedUnit{},
 	}
 }
 
@@ -66,8 +66,8 @@ Returns:
 */
 
 func (transactorGenerator *TransactorGenerator) AddParentConstructorCallArgs(
-	parameter *core.Parameter) *TransactorGenerator{
-	transactorGenerator.parentConstructorCallArgs =append(transactorGenerator.parentConstructorCallArgs, parameter)
+	parameter *core.Parameter) *TransactorGenerator {
+	transactorGenerator.parentConstructorCallArgs = append(transactorGenerator.parentConstructorCallArgs, parameter)
 	return transactorGenerator
 }
 
@@ -79,12 +79,11 @@ Returns:
 	- instance of Transactor Generator object
 */
 func (transactorGenerator *TransactorGenerator) AddTransactorMember(
-	member api.TabbedUnit) *TransactorGenerator{
+	member api.TabbedUnit) *TransactorGenerator {
 
-	transactorGenerator.transactorMembers =append(transactorGenerator.transactorMembers, member)
+	transactorGenerator.transactorMembers = append(transactorGenerator.transactorMembers, member)
 	return transactorGenerator
 }
-
 
 /**
 Appends import to the Transactor file
@@ -99,7 +98,6 @@ func (transactorGenerator *TransactorGenerator) AppendImports(units []string) *T
 	transactorGenerator.imports = append(transactorGenerator.imports, units...)
 	return transactorGenerator
 }
-
 
 /**
 Main Function To be called when we want to build the transactor
@@ -127,14 +125,13 @@ func (transactorGenerator *TransactorGenerator) BuildTransactor() *core.Class {
 
 	constructorFuncBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
 		AddArguments([]string{
-			fmt.Sprintf(`%sQuery $%s` ,transactorGenerator.identifier, transactorGenerator.queryVariableName),
-		fmt.Sprintf(`%sMutator $%s` ,transactorGenerator.identifier, transactorGenerator.mutatorVariableName)}).
+			fmt.Sprintf(`%sQuery $%s`, transactorGenerator.identifier, transactorGenerator.queryVariableName),
+			fmt.Sprintf(`%sMutator $%s`, transactorGenerator.identifier, transactorGenerator.mutatorVariableName)}).
 		AddStatements(transactorGenerator.constructorStatements)
 
 	transactorGenerator.classBuilder.AddFunction(constructorFuncBuilder.GetFunction()).
 		SetName(className).SetPackage(TransactorNamespace).
-		SetExtends(strcase.ToCamel(transactorGenerator.classToExtend)+"Transactor")
-
+		SetExtends(strcase.ToCamel(transactorGenerator.classToExtend) + "Transactor")
 
 	return transactorGenerator.classBuilder.GetClass()
 }
@@ -156,29 +153,26 @@ NOTE:This will prepend the values to each array as they are the ones which will 
 the handler
 Prepend is required because defaults are added after the handler inserts the values
 */
-func (transactorGenerator *TransactorGenerator) addDefaults() *TransactorGenerator{
+func (transactorGenerator *TransactorGenerator) addDefaults() *TransactorGenerator {
 	/*Default Imports*/
 	transactorImports := []string{
-		fmt.Sprintf(`App\Query\%sQuery` , transactorGenerator.identifier),
-		fmt.Sprintf(`App\Transactors\Mutations\%sMutator` , transactorGenerator.identifier),
+		fmt.Sprintf(`App\Query\%sQuery`, transactorGenerator.identifier),
+		fmt.Sprintf(`App\Transactors\Mutations\%sMutator`, transactorGenerator.identifier),
 	}
 	transactorGenerator.imports = append(transactorImports, transactorGenerator.imports...)
-
 
 	/*Default CLASS MEMBERS*/
 	className := transactorGenerator.identifier + "Transactor"
 	transactorGenerator.transactorMembers = append([]api.TabbedUnit{core.NewSimpleStatement(
-		fmt.Sprintf("private const CLASS_NAME = '%s'" , className))},
+		fmt.Sprintf("private const CLASS_NAME = '%s'", className))},
 		transactorGenerator.transactorMembers...)
 
-
 	transactorGenerator.parentConstructorCallArgs = append([]api.TabbedUnit{
-		core.NewParameter("$"+transactorGenerator.queryVariableName),
-		core.NewParameter("$"+transactorGenerator.mutatorVariableName),
+		core.NewParameter("$" + transactorGenerator.queryVariableName),
+		core.NewParameter("$" + transactorGenerator.mutatorVariableName),
 		core.NewParameter(`"id"`)},
-		transactorGenerator.parentConstructorCallArgs...
+		transactorGenerator.parentConstructorCallArgs...,
 	)
-
 
 	/*DEFAULT CONSTRUCTOR STATEMENTS*/
 	superConstructorCall = core.NewFunctionCall("parent::__construct")

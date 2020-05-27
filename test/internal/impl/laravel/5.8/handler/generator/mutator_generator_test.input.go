@@ -22,7 +22,6 @@ class AdminMutator extends BaseMutator {
 }
 `
 
-
 const TeacherBasicMutator = `namespace App\Transactors\Mutations;
 
 class TeacherMutator extends BaseMutator {
@@ -33,4 +32,3 @@ class TeacherMutator extends BaseMutator {
 
 }
 `
-

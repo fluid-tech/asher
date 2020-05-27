@@ -1,9 +1,9 @@
 package generator
 
 import (
-"asher/internal/impl/laravel/5.8/handler/generator"
-"asher/test/api"
-"testing"
+	"asher/internal/impl/laravel/5.8/handler/generator"
+	"asher/test/api"
+	"testing"
 )
 
 func TestMutatorGenerator(t *testing.T) {

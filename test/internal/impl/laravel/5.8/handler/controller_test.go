@@ -30,10 +30,9 @@ func TestController(t *testing.T) {
 	RESTControllerConfigWithPOSTPUTDELETEHttpMethods := models.Controller{
 		Rest:        true,
 		Mvc:         false,
-		HttpMethods: []string{"POST","DELETE","PUT"},
+		HttpMethods: []string{"POST", "DELETE", "PUT"},
 		Type:        "file",
 	}
-
 
 	var table = []*struct {
 		in  []string
@@ -52,9 +51,6 @@ func TestController(t *testing.T) {
 				generator2.ApiRouteFileAfterAdminWithPATCHPOSTDELTERoutes}},
 	}
 
-	//if table[0].in[0] == ""  {
-	//	t.Error("controller handler returned Nothing")
-	//}
 
 	for _, element := range table {
 		for j := 0; j < 5; j++ {
@@ -81,9 +77,6 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 
 	emitterFiles, error := handler.NewControllerHandler().Handle(className, controllerConfig)
 
-	//fmt.Print(modelGen)
-	//fmt.Print(migGen)
-
 	if error != nil {
 		t.Error(error)
 	}
@@ -108,13 +101,7 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 	retrivedRouteGen := fromRouteReg("api")
 	retrivedQueryGen := fromQueryReg(className)
 
-	//fmt.Print(retrivedControllerGen)
-	//fmt.Print(retrivedTransactorGen)
-	//fmt.Print(retrivedMutatorGen)
-	//fmt.Print(retrivedRouteGen)
-	//fmt.Print(retrivedQueryGen)
-	//
-	//fmt.Print("--------------------------------------------------------------")
+
 
 	if retrivedControllerGen == nil {
 		t.Errorf("controller for %s doesnt exist ", className)

@@ -32,6 +32,6 @@ func (c *CatchBlock) AddStatements(statements []api.TabbedUnit) interfaces.Catch
 	return c
 }
 
-func (c *CatchBlock) GetCatchBlock() *core.CatchBlock  {
+func (c *CatchBlock) GetCatchBlock() *core.CatchBlock {
 	return c.catchBlock
 }

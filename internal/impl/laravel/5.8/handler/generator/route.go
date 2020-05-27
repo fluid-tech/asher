@@ -94,8 +94,8 @@ Sample Usage:
 	Route::post(/order/create, OrderController@create);
 */
 func (routeGenerator *RouteGenerator) AddRoute(method string, uri string, action string) *RouteGenerator {
-	uri = `"`+uri+`"`
-	action = `"`+action+`"`
+	uri = `"` + uri + `"`
+	action = `"` + action + `"`
 	route := core.NewFunctionCall("Route::" + method)
 	route.AddArg(core.NewParameter(uri)).AddArg(core.NewParameter(action))
 	routeGenerator.routes = append(routeGenerator.Routes(), route)

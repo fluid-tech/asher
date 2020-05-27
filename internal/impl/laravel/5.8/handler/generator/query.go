@@ -7,9 +7,8 @@ import (
 	"fmt"
 )
 
-
 const QueryExtends = "BaseQuery"
-const QueryNamespace  = `App\Queries`
+const QueryNamespace = `App\Queries`
 
 type QueryGenerator struct {
 	api.Generator
@@ -47,7 +46,6 @@ func (queryGenerator *QueryGenerator) SetIdentifier(identifier string) *QueryGen
 	return queryGenerator
 }
 
-
 /**
 Builds the query class by adding imports and call to the constructor of base class (BaseQuery)
 passing the fullyQualified Name as the parameter to the super call
@@ -55,16 +53,15 @@ Returns:
 	- *core.Class (class object of the the query class)
 */
 func (queryGenerator *QueryGenerator) Build() *core.Class {
-	var className = fmt.Sprintf("%sQuery",queryGenerator.identifier)
+	var className = fmt.Sprintf("%sQuery", queryGenerator.identifier)
 
 	/*IMPORTS*/
-	queryGenerator.Class.AddImport(fmt.Sprintf(`App\%s` , queryGenerator.identifier))
-
+	queryGenerator.Class.AddImport(fmt.Sprintf(`App\%s`, queryGenerator.identifier))
 
 	/*CONSTRUCTOR*/
 	constructor := builder.NewFunctionBuilder()
 	constructor.SetName("__construct").SetVisibility("public")
-	fullyQualifiedModelArg := core.NewParameter(fmt.Sprintf(`"App\%s"` , queryGenerator.identifier))
+	fullyQualifiedModelArg := core.NewParameter(fmt.Sprintf(`"App\%s"`, queryGenerator.identifier))
 	callToSuperConstructor := core.NewFunctionCall("parent::__construct").AddArg(fullyQualifiedModelArg)
 	constructor.AddStatement(callToSuperConstructor)
 

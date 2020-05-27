@@ -7,11 +7,11 @@ import (
 )
 
 type TryBlock struct {
-	 interfaces.TryBlock
-	 tryBlock *core.TryBlock
+	interfaces.TryBlock
+	tryBlock *core.TryBlock
 }
 
-func NewTryBlockBuilder() *TryBlock  {
+func NewTryBlockBuilder() *TryBlock {
 	return &TryBlock{
 		tryBlock: core.NewTryBlock(),
 	}
@@ -42,6 +42,6 @@ func (t *TryBlock) AddCatchBlock(block *core.CatchBlock) interfaces.TryBlock {
 	return t
 }
 
-func (t *TryBlock) GetTryBlock() *core.TryBlock  {
+func (t *TryBlock) GetTryBlock() *core.TryBlock {
 	return t.tryBlock
 }

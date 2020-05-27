@@ -15,11 +15,11 @@ const ControllerExtends = "Controller"
 
 type ControllerGenerator struct {
 	api.Generator
-	classBuilder interfaces.Class
-	identifier   string
-	imports      []string
-	queryVariableName string
-	transactorVariableName string
+	classBuilder             interfaces.Class
+	identifier               string
+	imports                  []string
+	queryVariableName        string
+	transactorVariableName   string
 	lowerCamelCaseIdentifier string
 }
 
@@ -254,12 +254,12 @@ Sample Usage:
 	- controllerGeneratorObject.BuildRestController()
 */
 func (conGen *ControllerGenerator) BuildRestController() *core.Class {
-	className := fmt.Sprintf(  "%sRestController", conGen.identifier)
+	className := fmt.Sprintf("%sRestController", conGen.identifier)
 
 	restControllerImports := []string{
 		`App\` + conGen.identifier,
-		fmt.Sprintf(  `App\Transactors\%sTransactor`, conGen.identifier),
-		fmt.Sprintf(  `App\Query\%sQuery`, conGen.identifier),
+		fmt.Sprintf(`App\Transactors\%sTransactor`, conGen.identifier),
+		fmt.Sprintf(`App\Query\%sQuery`, conGen.identifier),
 		`Illuminate\Http\Request`,
 		`App\Helpers\ResponseHelper`,
 	}

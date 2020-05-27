@@ -1,0 +1,23 @@
+package generator
+
+import (
+	"asher/internal/api/codebuilder/php/core"
+	"strings"
+)
+
+type ImageTransactor struct {
+	transactorGen *TransactorGenerator
+}
+
+func NewImageTransactor(transactorGen *TransactorGenerator) *ImageTransactor {
+	return &ImageTransactor{transactorGen: transactorGen}
+}
+
+func (imageTransactor *ImageTransactor) AddDefaults() *ImageTransactor {
+	imageTransactor.transactorGen.AppendImports([]string{ImageUploadHelperPath}).
+		AddParentConstructorCallArgs(core.NewParameter(NewImageUploadHelper)).
+		AddTransactorMember(core.NewSimpleStatement(`private const BASE_PATH = "` +
+			strings.ToLower(imageTransactor.transactorGen.identifier) + `"`)).
+		AddTransactorMember(core.NewSimpleStatement(ImageValidationRules))
+	return imageTransactor
+}

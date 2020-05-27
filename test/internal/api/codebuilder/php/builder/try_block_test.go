@@ -38,9 +38,9 @@ func genTryCatchBlockWithSingleStatement(catch bool, finally bool, expectedCode 
 func genTryCatchBlockWithMultipleStatements(catch bool, finally bool, expectedCode string) *api2.GeneralTest {
 	tryBlock := builder.NewTryBlockBuilder().
 		AddStatements([]api.TabbedUnit{
-		core.NewSimpleStatement(`$error = 5/0`),
-		core.NewSimpleStatement(`echo "Hello in try block"`),
-	})
+			core.NewSimpleStatement(`$error = 5/0`),
+			core.NewSimpleStatement(`echo "Hello in try block"`),
+		})
 
 	if catch {
 		tryBlock.AddCatchBlock(builder.NewCatchBlockBuilder().

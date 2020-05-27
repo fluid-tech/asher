@@ -35,7 +35,7 @@ func (catchBlock *CatchBlock) String() string {
 	fmt.Fprint(&builder, tabbedString, "catch ( ")
 	fmt.Fprint(&builder, catchBlock.CatchArg+" "+") {\n")
 	for _, element := range catchBlock.CatchStatements {
-		element.SetNumTabs(catchBlock.tabs+1)
+		element.SetNumTabs(catchBlock.tabs + 1)
 		fmt.Fprint(&builder, tabbedString, element.String(), "\n")
 	}
 	fmt.Fprint(&builder, tabbedString, "}\n")

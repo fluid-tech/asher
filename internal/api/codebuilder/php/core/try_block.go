@@ -31,7 +31,6 @@ func (tryBlock *TryBlock) SetNumTabs(tabs int) {
 	tryBlock.tabs = tabs
 }
 
-
 func (tryBlock *TryBlock) String() string {
 	var builder strings.Builder
 	tabbedString := api.TabbedString(uint(tryBlock.tabs))

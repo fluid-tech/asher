@@ -73,7 +73,7 @@ func (controllerHandler *ControllerHandler) handleRestController(
 	queryEmitterFile := controllerHandler.handleQuery(identifier)
 	routeEmitterFile := controllerHandler.handleRoutes(identifier, controllerConfig)
 
-	fileToEmit = append(fileToEmit, controllerEmitterFile,transactorEmitterFile,mutatorEmitterFile,queryEmitterFile)
+	fileToEmit = append(fileToEmit, controllerEmitterFile, transactorEmitterFile, mutatorEmitterFile, queryEmitterFile)
 
 	/*AS ROUTE FILE IS EMITTED ONLY ONCE IE FOR THE FIRST TIME AFTER THAT IT IS ONLY USED*/
 	if routeEmitterFile != nil {
@@ -121,28 +121,12 @@ func (controllerHandler *ControllerHandler) handleFileTransactor(identifier stri
 	modelGen *generator.ModelGenerator, migrationGen *generator.MigrationGenerator) api.EmitterFile {
 
 	/*MODEL AND MIGRATION UPDATES*/
-	modelGen.AddCreateValidationRule("file_urls", "sometimes|required", "").
-		AddCreateValidationRule("file_urls.urls", "array", "")
-	modelGen.AddUpdateValidationRule("file_urls", "sometimes|required", "").
-		AddUpdateValidationRule("file_urls.urls", "array", "")
-
-	modelGen.AddFillable("file_urls")
-
-	/*TODO DATA type should be configurable in 2nd iteration*/
-	migrationGen.AddColumn(core.NewSimpleStatement(`$table->longText('file_urls')->nullable()`))
+	generator.NewTransactorModel(modelGen).AddFileUrlsToFillAbles().AddFileUrlsValidationRules()
+	generator.NewTransactorMigration(migrationGen).AddMigrationForFileUrls()
 
 	/*BUILDING OF TRANSACTOR*/
 	transactorGen := generator.NewTransactorGenerator("file").SetIdentifier(identifier)
-
-	transactorGen.AppendImports([]string{`App\Helpers\BaseFileUploadHelper`}).
-		AddParentConstructorCallArgs(core.NewParameter(
-			`new BaseFileUploadHelper(self::BASE_PATH, self::IMAGE_VALIDATION_RULES,"png")`)).
-		AddTransactorMember(core.NewSimpleStatement(`private const BASE_PATH = "`+
-			strings.ToLower(identifier)+`"`)).
-		AddTransactorMember(core.NewSimpleStatement(
-			"public const IMAGE_VALIDATION_RULES =" +
-				" array(\n        'file' => 'required|mimes:jpeg,jpg,png|max:3000'\n    )"))
-
+	generator.NewFileTransactor(transactorGen).AddDefaults()
 
 	context.GetFromRegistry("transactor").AddToCtx(identifier, transactorGen)
 
@@ -159,31 +143,14 @@ func (controllerHandler *ControllerHandler) handleImageTransactor(identifier str
 	//controller := value.(models.Controller)
 
 	/*MODEL AND MIGRATION UPDATES*/
-	modelGen.AddCreateValidationRule("file_urls", "sometimes|required", "").
-		AddCreateValidationRule("file_urls.urls", "array", "")
-
-	modelGen.AddUpdateValidationRule("file_urls", "sometimes|required", "").
-		AddUpdateValidationRule("file_urls.urls", "array", "")
-
-	modelGen.AddFillable("file_urls")
-
-	migrationGen.AddColumn(core.NewSimpleStatement(`$table->longText('file_urls')->nullable()`))
+	generator.NewTransactorModel(modelGen).AddFileUrlsToFillAbles().AddFileUrlsValidationRules()
+	generator.NewTransactorMigration(migrationGen).AddMigrationForFileUrls()
 
 	/*TRANSACTOR GENERATION*/
 	transactorGen := generator.NewTransactorGenerator("image").SetIdentifier(identifier)
-	transactorGen.AppendImports([]string{`App\Helpers\ImageUploadHelper`}).
-		AddParentConstructorCallArgs(core.NewParameter(
-			`new ImageUploadHelper(self::BASE_PATH, self::IMAGE_VALIDATION_RULES)`)).
-		AddTransactorMember(core.NewSimpleStatement(`private const BASE_PATH = "`+
-			strings.ToLower(identifier)+`"`)).
-		AddTransactorMember(core.NewSimpleStatement(
-			"public const IMAGE_VALIDATION_RULES =" +
-				" array(\n        'file' => 'required|mimes:jpeg,jpg,png|max:3000'\n    )"))
-
+	generator.NewImageTransactor(transactorGen).AddDefaults()
 	context.GetFromRegistry("transactor").AddToCtx(identifier, transactorGen)
-
 	transactorEmitter := core.NewPhpEmitterFile(identifier+"Transactor.php", api.TransactorPath, transactorGen, api.Transactor)
-
 	return transactorEmitter
 }
 
@@ -202,13 +169,11 @@ func (controllerHandler *ControllerHandler) handleMutator(identifier string) api
 func (controllerHandler *ControllerHandler) handleQuery(
 	identifier string) api.EmitterFile {
 
-
 	queryGenerator := generator.NewQueryGenerator(true).SetIdentifier(identifier)
 
 	context.GetFromRegistry("query").AddToCtx(identifier, queryGenerator)
 
 	emitFile := core.NewPhpEmitterFile(identifier+"Query.php", api.QueryPath, queryGenerator, api.Query)
-
 
 	return emitFile
 }
@@ -225,15 +190,14 @@ Returns:
 */
 func (controllerHandler *ControllerHandler) handleRoutes(identifier string, controllerConfig models.Controller) api.EmitterFile {
 
-
 	addRouteToEmmitFiles := false
 
 	gen := context.GetFromRegistry("route").GetCtx("api").(*generator.RouteGenerator)
 
 	if gen == nil {
 		addRouteToEmmitFiles = true
-		context.GetFromRegistry("route").AddToCtx("api", generator.NewRouteGenerator())
-		gen = context.GetFromRegistry("route").GetCtx("api").(*generator.RouteGenerator)
+		gen = generator.NewRouteGenerator()
+		context.GetFromRegistry("route").AddToCtx("api", gen)
 	}
 
 	gen.AddDefaultRestRoutes(identifier, controllerConfig.HttpMethods)

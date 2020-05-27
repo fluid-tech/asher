@@ -64,7 +64,7 @@ Sample Usage:
 func (mutatorGenerator *MutatorGenerator) AddConstructor() *MutatorGenerator {
 
 	parentConstructorCall := core.NewFunctionCall("parent::__construct").AddArg(core.NewParameter(
-			fmt.Sprintf(`'App\%s', 'id'`,mutatorGenerator.identifier)))
+		fmt.Sprintf(`'App\%s', 'id'`, mutatorGenerator.identifier)))
 
 	mutatorGenerator.classBuilder.AddFunction(
 		builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
