@@ -10,7 +10,11 @@ import (
 	"strings"
 )
 
+const ControllerNamespace = `App\Http\Controllers\Api`
+const ControllerExtends = "Controller"
+
 type ControllerGenerator struct {
+	api.Generator
 	classBuilder interfaces.Class
 	identifier   string
 	imports      []string
@@ -66,16 +70,13 @@ Sample Usage:
 func (conGen *ControllerGenerator) AddCreate() *ControllerGenerator {
 
 	functionCallStatement := core.NewFunctionCall(
-		fmt.Sprintf(`$%s = $this->%s->create`, conGen.lowerCamelCaseIdentifier, conGen.transactorVariableName))
-
-	functionCallStatement.AddArg(core.NewParameter("Auth::id()"))
-	functionCallStatement.AddArg(core.NewParameter("$request->all()"))
-	createCallStatement := functionCallStatement
+		fmt.Sprintf(`$%s = $this->%s->create`, conGen.lowerCamelCaseIdentifier, conGen.transactorVariableName)).
+		AddArg(core.NewParameter("Auth::id()")).AddArg(core.NewParameter("$request->all()"))
 
 	returnStatement := core.NewReturnStatement(fmt.Sprintf(`ResponseHelper::create($%s)`, conGen.lowerCamelCaseIdentifier))
 
 	createFunctionStatement := []api.TabbedUnit{
-		createCallStatement,
+		functionCallStatement,
 		returnStatement,
 	}
 
@@ -254,8 +255,6 @@ Sample Usage:
 */
 func (conGen *ControllerGenerator) BuildRestController() *core.Class {
 	className := fmt.Sprintf(  "%sRestController", conGen.identifier)
-	const namespace = `App\Http\Controllers\Api`
-	const extends = "Controller"
 
 	restControllerImports := []string{
 		`App\` + conGen.identifier,
@@ -270,8 +269,8 @@ func (conGen *ControllerGenerator) BuildRestController() *core.Class {
 	//Adding functions in the controller
 
 	conGen.classBuilder.SetName(className).
-		SetPackage(namespace).
-		SetExtends(extends).
+		SetPackage(ControllerNamespace).
+		SetExtends(ControllerExtends).
 		AddImports(conGen.imports)
 	return conGen.classBuilder.GetClass()
 }
