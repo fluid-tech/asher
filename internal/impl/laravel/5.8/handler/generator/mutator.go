@@ -8,7 +8,11 @@ import (
 	"fmt"
 )
 
+const MutatorExtends = `BaseMutator`
+const MutatorNamespace = `App\Transactors\Mutations`
+
 type MutatorGenerator struct {
+	api.Generator
 	classBuilder interfaces.Class
 	identifier   string
 	imports      []string
@@ -59,9 +63,8 @@ Sample Usage:
 */
 func (mutatorGenerator *MutatorGenerator) AddConstructor() *MutatorGenerator {
 
-	parentConstructorCall := api.TabbedUnit(
-		core.NewFunctionCall("parent::__construct").AddArg(core.NewParameter(
-			fmt.Sprintf(`'App\%s', 'id'`,mutatorGenerator.identifier))))
+	parentConstructorCall := core.NewFunctionCall("parent::__construct").AddArg(core.NewParameter(
+			fmt.Sprintf(`'App\%s', 'id'`,mutatorGenerator.identifier)))
 
 	mutatorGenerator.classBuilder.AddFunction(
 		builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
@@ -77,14 +80,13 @@ Sample Usage:
 	- mutatorGeneratorObject.BuildMutator()
 */
 func (mutatorGenerator *MutatorGenerator) BuildMutator() *core.Class {
-	const extends = `BaseMutator`
-	const namespace = `App\Transactors\Mutations`
+
 	var className = fmt.Sprintf("%sMutator", mutatorGenerator.identifier)
 
 	mutatorGenerator.AddConstructor()
 
 	mutatorGenerator.classBuilder.SetName(className).
-		SetExtends(extends).SetPackage(namespace).AddImports(mutatorGenerator.imports)
+		SetExtends(MutatorExtends).SetPackage(MutatorNamespace).AddImports(mutatorGenerator.imports)
 	return mutatorGenerator.classBuilder.GetClass()
 }
 
