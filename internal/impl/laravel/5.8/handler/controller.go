@@ -108,7 +108,7 @@ func (controllerHandler *ControllerHandler) handleDefaultTransactor(identifier s
 	controllerConfig models.Controller) api.EmitterFile {
 	//controller := value.(models.Controller)
 
-	transactorGen := generator.NewTransactorGenerator(identifier, "Base")
+	transactorGen := generator.NewTransactorGenerator("Base").SetIdentifier(identifier)
 
 	context.GetFromRegistry("transactor").AddToCtx(identifier, transactorGen)
 
@@ -132,7 +132,7 @@ func (controllerHandler *ControllerHandler) handleFileTransactor(identifier stri
 	migrationGen.AddColumn(core.NewSimpleStatement(`$table->longText('file_urls')->nullable()`))
 
 	/*BUILDING OF TRANSACTOR*/
-	transactorGen := generator.NewTransactorGenerator(identifier,"file")
+	transactorGen := generator.NewTransactorGenerator("file").SetIdentifier(identifier)
 
 	transactorGen.AppendImports([]string{`App\Helpers\BaseFileUploadHelper`}).
 		AddParentConstructorCallArgs(core.NewParameter(
@@ -170,7 +170,7 @@ func (controllerHandler *ControllerHandler) handleImageTransactor(identifier str
 	migrationGen.AddColumn(core.NewSimpleStatement(`$table->longText('file_urls')->nullable()`))
 
 	/*TRANSACTOR GENERATION*/
-	transactorGen := generator.NewTransactorGenerator(identifier, "image")
+	transactorGen := generator.NewTransactorGenerator("image").SetIdentifier(identifier)
 	transactorGen.AppendImports([]string{`App\Helpers\ImageUploadHelper`}).
 		AddParentConstructorCallArgs(core.NewParameter(
 			`new ImageUploadHelper(self::BASE_PATH, self::IMAGE_VALIDATION_RULES)`)).
@@ -203,7 +203,7 @@ func (controllerHandler *ControllerHandler) handleQuery(
 	identifier string) api.EmitterFile {
 
 
-	queryGenerator := generator.NewQueryGenerator(identifier, true)
+	queryGenerator := generator.NewQueryGenerator(true).SetIdentifier(identifier)
 
 	context.GetFromRegistry("query").AddToCtx(identifier, queryGenerator)
 
