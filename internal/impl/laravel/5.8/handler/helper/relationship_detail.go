@@ -25,7 +25,3 @@ func NewRelationshipDetail(relationShipType int, function *core.Function, foreig
 		ReferencingModel: referencingModel,
 	}
 }
-
-func (relationshipDetail *RelationshipDetail) GetRelationshipType() int {
-	return relationshipDetail.RelationshipType
-}
