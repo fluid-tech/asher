@@ -40,19 +40,19 @@ func TestController(t *testing.T) {
 	}{
 		{genControllerTest("Student", RESTControllerConfigWithALLHttpMethods, t, true),
 			[]string{generator2.StudentController, generator2.StudentBasicTransactor, generator2.StudentBasicMutator, generator2.StudentBasicQuery,
-				generator2.ApiRouteFileAfterStudentWithAllRoutes}},
+				generator2.ApiRouteFileAfterStudentWithAllRoutes,generator2.StudentEmptyMigrationWithName, generator2.StudentEmptyModel}},
 
 		{genControllerTest("Teacher", RESTControllerConfigWithGETHttpMethods, t, false),
 			[]string{generator2.TeacherController, generator2.TeacherImageTransactor, generator2.TeacherBasicMutator, generator2.TeacherBasicQuery,
-				generator2.ApiRouteFileAfterTeacherWithGetRoutes}},
+				generator2.ApiRouteFileAfterTeacherWithGetRoutes,generator2.TeacherMigrationForFileURLS,generator2.TeacherModelWithFileURLS}},
 
 		{genControllerTest("Admin", RESTControllerConfigWithPOSTPUTDELETEHttpMethods, t, false),
 			[]string{generator2.AdminController, generator2.AdminFileTransactor, generator2.AdminBasicMutator, generator2.AdminBasicQuery,
-				generator2.ApiRouteFileAfterAdminWithPATCHPOSTDELTERoutes}},
+				generator2.ApiRouteFileAfterAdminWithPATCHPOSTDELTERoutes,generator2.AdminMigrationForFileURLS,generator2.AdminModelWithFileURLS}},
 	}
 
 	for _, element := range table {
-		for j := 0; j < 5; j++ {
+		for j := 0; j < 7; j++ {
 			if element.in[j] != element.out[j] {
 				t.Errorf("in test case %d expected '%s' found '%s'", j, element.out[j], element.in[j])
 			}
@@ -121,7 +121,7 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 	}
 
 	return []string{retrievedControllerGen.String(), retrievedTransactorGen.String(), retrievedMutatorGen.String(),
-		retrievedQueryGen.String(), retrievedRouteGen.String()}
+		retrievedQueryGen.String(), retrievedRouteGen.String(), migGen.String(), modelGen.String()}
 }
 
 func fromControllerReg(className string) *generator.ControllerGenerator {
