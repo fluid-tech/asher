@@ -30,7 +30,7 @@ func TestModelContext(t *testing.T) {
 
 func genModel(className string) *generator.ModelGenerator {
 	modelGen := generator.NewModelGenerator().SetName(className)
-	context.GetFromRegistry("model").AddToCtx(className, modelGen)
+	context.GetFromRegistry(context.ContextModel).AddToCtx(className, modelGen)
 	return modelGen
 }
 

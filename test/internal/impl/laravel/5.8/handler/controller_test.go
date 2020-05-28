@@ -72,8 +72,8 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 	modelGen := generator.NewModelGenerator().SetName(className)
 	migGen := generator.NewMigrationGenerator().SetName(className)
 
-	context.GetFromRegistry("migration").AddToCtx(className, migGen)
-	context.GetFromRegistry("model").AddToCtx(className, modelGen)
+	context.GetFromRegistry(context.ContextMigration).AddToCtx(className, migGen)
+	context.GetFromRegistry(context.ContextModel).AddToCtx(className, modelGen)
 
 	emitterFiles, error := handler.NewControllerHandler().Handle(className, controllerConfig)
 
