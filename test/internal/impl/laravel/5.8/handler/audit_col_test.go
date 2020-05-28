@@ -30,10 +30,10 @@ func TestModel(t *testing.T) {
 
 	for i, element := range table {
 		if element.in[0] != element.out[0] {
-			t.Errorf("in test case %d expected '%s' found '%s'", i, element.in[0], element.out[0])
+			t.Errorf("in test case %d expected '%s' found '%s'", i, element.out[0], element.in[0])
 		}
 		if element.in[1] != element.out[1] {
-			t.Errorf("in test case %d expected '%s' found '%s'", i, element.in[1], element.out[1])
+			t.Errorf("in test case %d expected '%s' found '%s'", i, element.out[1], element.in[1])
 		}
 	}
 

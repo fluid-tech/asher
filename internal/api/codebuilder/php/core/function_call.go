@@ -38,6 +38,11 @@ func (c *FunctionCall) AddArg(unit api.TabbedUnit) *FunctionCall {
 	return c
 }
 
+func (c *FunctionCall) AddArgs(unit []api.TabbedUnit) *FunctionCall {
+	c.Args = append(c.Args, unit...)
+	return c
+}
+
 func (c *FunctionCall) FindById(id string) (api.TabbedUnit, error) {
 	for _, element := range c.Args {
 		if element.Id() == id {

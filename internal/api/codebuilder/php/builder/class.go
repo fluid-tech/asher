@@ -64,7 +64,15 @@ func (klass *Class) SetExtends(extendsClass string) interfaces.Class {
 Adds a method to the class. ENSURE the first method in this list is the constructor
 */
 func (klass *Class) AddFunction(function *core.Function) interfaces.Class {
-	klass.class.Functions = append(klass.class.Functions, function)
+	klass.AddFunctions([]*core.Function{function})
+	return klass
+}
+
+/**
+Adds methods to the class. ENSURE the first method in this list is the constructor
+*/
+func (klass *Class) AddFunctions(functions []*core.Function) interfaces.Class {
+	klass.class.Functions = append(klass.class.Functions, functions...)
 	return klass
 }
 
