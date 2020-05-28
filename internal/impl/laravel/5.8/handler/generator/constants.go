@@ -18,4 +18,9 @@ const (
 	NewBaseFileUploadHelper  = `new BaseFileUploadHelper(self::BASE_PATH, self::IMAGE_VALIDATION_RULES,"png")`
 	ImageUploadHelperPath    = `App\Helpers\ImageUploadHelper`
 	BaseFileUploadHelperPath = `App\Helpers\BaseFileUploadHelper`
+
+	/*COMMON CONSTANTS*/
+	VisibilityPublic 		  = "public"
+	VisibilityPrivate         = "private"
+	VisibilityProtected       = "protected"
 )
