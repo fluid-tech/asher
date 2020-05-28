@@ -11,10 +11,10 @@ type GenericContext struct {
 	- A pointer to A GenericContext
  Usage:
 	- ctx := NewGenericContext()
- */
+*/
 func NewGenericContext() *GenericContext {
 	return &GenericContext{
-		genericMap:  make(map[string]interface{}),
+		genericMap: make(map[string]interface{}),
 	}
 }
 

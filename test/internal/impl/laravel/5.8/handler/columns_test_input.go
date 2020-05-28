@@ -250,7 +250,7 @@ class CreateStudentEnrollmentTable extends Migration {
 
 }
 `
-const ColumnTestModel =`namespace App;
+const ColumnTestModel = `namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 

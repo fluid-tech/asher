@@ -164,7 +164,7 @@ func (transactorGenerator *TransactorGenerator) addDefaults() *TransactorGenerat
 	/*Default CLASS MEMBERS*/
 	className := transactorGenerator.identifier + "Transactor"
 	transactorGenerator.transactorMembers = append([]api.TabbedUnit{core.NewSimpleStatement(
-		fmt.Sprintf("%s const CLASS_NAME = '%s'",VisibilityPrivate, className))},
+		fmt.Sprintf("%s const CLASS_NAME = '%s'", VisibilityPrivate, className))},
 		transactorGenerator.transactorMembers...)
 
 	transactorGenerator.parentConstructorCallArgs = append([]api.TabbedUnit{

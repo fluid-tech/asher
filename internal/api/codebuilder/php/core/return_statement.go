@@ -22,7 +22,6 @@ func (r *ReturnStatement) SetNumTabs(tabs int) {
 	r.tabs = tabs
 }
 
-
 func (r *ReturnStatement) String() string {
 	var builder strings.Builder
 	fmt.Fprint(&builder, api.TabbedString(uint(r.tabs)), "return ", r.statement, ";")

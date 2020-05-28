@@ -9,7 +9,7 @@ const (
 	ContextAuditCols  = "auditCols"
 	ContextController = "controller"
 	ContextColumns    = "columns"
-	ContextRelation	  = "relation"
+	ContextRelation   = "relation"
 )
 
 var handlerRegistry = map[string]api.Handler{

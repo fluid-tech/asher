@@ -11,6 +11,7 @@ import (
 const (
 	MigrationExtends = "Migration"
 )
+
 type MigrationGenerator struct {
 	api.Generator
 	classBuilder interfaces.Class

@@ -21,10 +21,9 @@ type ModelGenerator struct {
 
 const RowIdsArr = "array $rowIds"
 const RowIdVar = "$rowIds"
-const Unique   = "unique"
+const Unique = "unique"
 const ModelPackage = "App"
-const ModelExtends = "Model" 
-
+const ModelExtends = "Model"
 
 /**
 Creates a new instance of this generator with a new interfaces.Class
@@ -56,7 +55,7 @@ func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, co
 	returnString := "[ "
 	var ruleArray = strings.Split(colRule, "|")
 	for i := 0; i < len(ruleArray); i++ {
-		if strings.HasPrefix(ruleArray[i], Unique + ":") {
+		if strings.HasPrefix(ruleArray[i], Unique+":") {
 			tableDataSplitter := strings.Split(ruleArray[i], ",")
 			//tableName := strings.TrimPrefix(tableDataSplitter[0], "unique:")
 			if len(tableDataSplitter) == 1 {
@@ -93,9 +92,9 @@ func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, co
 	returnString := "[ "
 	var ruleArray = strings.Split(colRule, "|")
 	for i := 0; i < len(ruleArray); i++ {
-		if strings.HasPrefix(ruleArray[i], Unique + ":") {
+		if strings.HasPrefix(ruleArray[i], Unique+":") {
 			tableDataSplitter := strings.Split(ruleArray[i], ",")
-			tableName := strings.TrimPrefix(tableDataSplitter[0], Unique + ":")
+			tableName := strings.TrimPrefix(tableDataSplitter[0], Unique+":")
 			if len(tableDataSplitter) == 1 {
 				ruleArray[i] = fmt.Sprintf(`'%s,%s,' . %s['%s']`, ruleArray[i], colName, RowIdVar, tableName)
 				//ruleArray[i] = `'` + ruleArray[i] + `,` + colName + `,' . RowId'` + tableName + `']`

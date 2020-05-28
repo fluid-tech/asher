@@ -20,23 +20,22 @@ const (
 	BaseFileUploadHelperPath = `App\Helpers\BaseFileUploadHelper`
 
 	/*COMMON CONSTANTS*/
-	VisibilityPublic 		  = "public"
-	VisibilityPrivate         = "private"
-	VisibilityProtected       = "protected"
-	Constructor				  = "__construct"
-	ParentConstructor  		  = "parent::__construct"
+	VisibilityPublic    = "public"
+	VisibilityPrivate   = "private"
+	VisibilityProtected = "protected"
+	Constructor         = "__construct"
+	ParentConstructor   = "parent::__construct"
 
 	/*Http METHODS*/
-	POST = "POST"
-	GET  = "GET"
-	PUT  = "PUT"
+	POST   = "POST"
+	GET    = "GET"
+	PUT    = "PUT"
 	DELETE = "DELETE"
 
 	/*Http Methods Name*/
-	CreateMethod = "create"
-	UpdateMethod = "update"
-	DeleteMethod = "delete"
-	GetAllMethod = "getAll"
+	CreateMethod   = "create"
+	UpdateMethod   = "update"
+	DeleteMethod   = "delete"
+	GetAllMethod   = "getAll"
 	FindByIdMethod = "findById"
-
 )

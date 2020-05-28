@@ -17,11 +17,9 @@ func NewFileTransactor(transactorGen *TransactorGenerator) *FileTransactor {
 func (fileTransactor *FileTransactor) AddDefaults() *FileTransactor {
 	fileTransactor.transactorGen.AppendImports([]string{BaseFileUploadHelperPath}).
 		AddParentConstructorCallArgs(core.NewParameter(NewBaseFileUploadHelper)).
-
 		AddTransactorMember(core.NewSimpleStatement(fmt.Sprintf(
-			`%s const BASE_PATH = "%s"` , VisibilityPrivate ,
+			`%s const BASE_PATH = "%s"`, VisibilityPrivate,
 			strings.ToLower(fileTransactor.transactorGen.identifier)))).
-
 		AddTransactorMember(core.NewSimpleStatement(ImageValidationRules))
 	return fileTransactor
 }
