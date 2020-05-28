@@ -5,6 +5,7 @@ import (
 	"asher/internal/impl/laravel/5.8/handler/context"
 	"asher/internal/impl/laravel/5.8/handler/generator"
 	"asher/internal/models"
+	"asher/test/api"
 	generator2 "asher/test/internal/impl/laravel/5.8/handler/generator"
 	"testing"
 )
@@ -94,11 +95,11 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 		t.Error("Not returned 4 files", len(emitterFiles))
 	}
 
-	retrievedControllerGen := fromControllerReg(className)
-	retrievedTransactorGen := fromTransactorReg(className)
-	retrievedMutatorGen := fromMutattorReg(className)
-	retrievedRouteGen := fromRouteReg("api")
-	retrievedQueryGen := fromQueryReg(className)
+	retrievedControllerGen := api.FromContext(context.ContextController, className)
+	retrievedTransactorGen := api.FromContext(context.ContextTransactor, className)
+	retrievedMutatorGen := api.FromContext(context.ContextMutator, className)
+	retrievedRouteGen := api.FromContext(context.ContextRoute, "api")
+	retrievedQueryGen := api.FromContext(context.ContextQuery, className)
 
 	if retrievedControllerGen == nil {
 		t.Errorf("controller for %s doesnt exist ", className)
@@ -119,9 +120,14 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 	if retrievedQueryGen == nil {
 		t.Errorf("query for %s doesnt exist ", className)
 	}
+	actualControllerGen := retrievedControllerGen.(*generator.ControllerGenerator)
+	actualTransactorGen := retrievedTransactorGen.(*generator.TransactorGenerator)
+	actualMutatorGen := retrievedMutatorGen.(*generator.MutatorGenerator)
+	actualRouteGen := retrievedRouteGen.(*generator.RouteGenerator)
+	actualQueryGen := retrievedQueryGen.(*generator.QueryGenerator)
 
-	return []string{retrievedControllerGen.String(), retrievedTransactorGen.String(), retrievedMutatorGen.String(),
-		retrievedQueryGen.String(), retrievedRouteGen.String()}
+	return []string{actualControllerGen.String(), actualTransactorGen.String(), actualMutatorGen.String(),
+		actualQueryGen.String(), actualRouteGen.String()}
 }
 
 func fromControllerReg(className string) *generator.ControllerGenerator {
