@@ -31,7 +31,7 @@ func TestController(t *testing.T) {
 	RESTControllerConfigWithPOSTPUTDELETEHttpMethods := models.Controller{
 		Rest:        true,
 		Mvc:         false,
-		HttpMethods: []string{"POST", "DELETE", "PUT"},
+		HttpMethods: []string{generator.POST, generator.DELETE, generator.PUT},
 		Type:        "file",
 	}
 
