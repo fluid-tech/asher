@@ -23,4 +23,20 @@ const (
 	VisibilityPublic 		  = "public"
 	VisibilityPrivate         = "private"
 	VisibilityProtected       = "protected"
+	Constructor				  = "__construct"
+	ParentConstructor  		  = "parent::__construct"
+
+	/*Http METHODS*/
+	POST = "POST"
+	GET  = "GET"
+	PUT  = "PUT"
+	DELETE = "DELETE"
+
+	/*Http Methods Name*/
+	CreateMethod = "create"
+	UpdateMethod = "update"
+	DeleteMethod = "delete"
+	GetAllMethod = "getAll"
+	FindByIdMethod = "findById"
+
 )

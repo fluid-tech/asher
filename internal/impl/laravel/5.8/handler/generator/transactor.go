@@ -123,7 +123,7 @@ func (transactorGenerator *TransactorGenerator) BuildTransactor() *core.Class {
 
 	/*CONSTRUCTOR*/
 
-	constructorFuncBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
+	constructorFuncBuilder := builder.NewFunctionBuilder().SetVisibility(VisibilityPublic).SetName(Constructor).
 		AddArguments([]string{
 			fmt.Sprintf(`%sQuery $%s`, transactorGenerator.identifier, transactorGenerator.queryVariableName),
 			fmt.Sprintf(`%sMutator $%s`, transactorGenerator.identifier, transactorGenerator.mutatorVariableName)}).
@@ -164,7 +164,7 @@ func (transactorGenerator *TransactorGenerator) addDefaults() *TransactorGenerat
 	/*Default CLASS MEMBERS*/
 	className := transactorGenerator.identifier + "Transactor"
 	transactorGenerator.transactorMembers = append([]api.TabbedUnit{core.NewSimpleStatement(
-		fmt.Sprintf("private const CLASS_NAME = '%s'", className))},
+		fmt.Sprintf("%s const CLASS_NAME = '%s'",VisibilityPrivate, className))},
 		transactorGenerator.transactorMembers...)
 
 	transactorGenerator.parentConstructorCallArgs = append([]api.TabbedUnit{
@@ -175,7 +175,7 @@ func (transactorGenerator *TransactorGenerator) addDefaults() *TransactorGenerat
 	)
 
 	/*DEFAULT CONSTRUCTOR STATEMENTS*/
-	superConstructorCall = core.NewFunctionCall("parent::__construct")
+	superConstructorCall = core.NewFunctionCall(ParentConstructor)
 
 	transactorGenerator.constructorStatements = append(transactorGenerator.constructorStatements,
 		superConstructorCall,

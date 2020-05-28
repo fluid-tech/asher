@@ -12,6 +12,10 @@ import (
 
 const ControllerNamespace = `App\Http\Controllers\Api`
 const ControllerExtends = "Controller"
+const Request = "Request $request"
+const AuthID = "Auth::id()"
+const RequestAll = "$request->all()"
+const Id = "$id"
 
 type ControllerGenerator struct {
 	api.Generator
@@ -71,7 +75,7 @@ func (conGen *ControllerGenerator) AddCreate() *ControllerGenerator {
 
 	functionCallStatement := core.NewFunctionCall(
 		fmt.Sprintf(`$%s = $this->%s->create`, conGen.lowerCamelCaseIdentifier, conGen.transactorVariableName)).
-		AddArg(core.NewParameter("Auth::id()")).AddArg(core.NewParameter("$request->all()"))
+		AddArg(core.NewParameter(AuthID)).AddArg(core.NewParameter(RequestAll))
 
 	returnStatement := core.NewReturnStatement(fmt.Sprintf(`ResponseHelper::create($%s)`, conGen.lowerCamelCaseIdentifier))
 
@@ -80,8 +84,8 @@ func (conGen *ControllerGenerator) AddCreate() *ControllerGenerator {
 		returnStatement,
 	}
 
-	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName("create").
-		SetVisibility("public").AddArgument("Request $request").
+	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName(CreateMethod).
+		SetVisibility(VisibilityPublic).AddArgument(Request).
 		AddStatements(createFunctionStatement).GetFunction())
 	return conGen
 }
@@ -98,8 +102,8 @@ func (conGen *ControllerGenerator) AddUpdate() *ControllerGenerator {
 	functionCallStatement := core.NewFunctionCall(
 		fmt.Sprintf(`$%s = $this->%s->update`, conGen.lowerCamelCaseIdentifier, conGen.transactorVariableName))
 
-	functionCallStatement.AddArg(core.NewParameter("Auth::id()"))
-	functionCallStatement.AddArg(core.NewParameter("$request->all()"))
+	functionCallStatement.AddArg(core.NewParameter(AuthID))
+	functionCallStatement.AddArg(core.NewParameter(RequestAll))
 
 	returnStatement := core.NewReturnStatement(fmt.Sprintf(`ResponseHelper::update($%s)`, conGen.lowerCamelCaseIdentifier))
 
@@ -107,8 +111,8 @@ func (conGen *ControllerGenerator) AddUpdate() *ControllerGenerator {
 		functionCallStatement,
 		returnStatement,
 	}
-	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName("update").
-		SetVisibility("public").AddArgument("Request $request").
+	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName(UpdateMethod).
+		SetVisibility(VisibilityPublic).AddArgument(Request).
 		AddStatements(updateFunctionStatement).GetFunction())
 	return conGen
 }
@@ -124,7 +128,7 @@ func (conGen *ControllerGenerator) AddDelete() *ControllerGenerator {
 
 	functionCallStatement := core.NewFunctionCall(
 		fmt.Sprintf(`$%s = $this->%s->delete`, conGen.lowerCamelCaseIdentifier, conGen.transactorVariableName))
-	functionCallStatement.AddArg(core.NewParameter("$id")).
+	functionCallStatement.AddArg(core.NewParameter(Id)).
 		AddArg(core.NewParameter("$request->user->id"))
 
 	returnStatement := core.NewReturnStatement(fmt.Sprintf(`ResponseHelper::delete($%s)`, conGen.lowerCamelCaseIdentifier))
@@ -134,8 +138,8 @@ func (conGen *ControllerGenerator) AddDelete() *ControllerGenerator {
 		returnStatement,
 	}
 
-	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName("delete").
-		SetVisibility("public").AddArgument(`Request $request`).AddArgument(`$id`).
+	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName(DeleteMethod).
+		SetVisibility(VisibilityPublic).AddArgument(Request).AddArgument(Id).
 		AddStatements(deleteFunctionStatement).GetFunction())
 	return conGen
 }
@@ -150,10 +154,10 @@ Sample Usage:
 func (conGen *ControllerGenerator) AddFindById() *ControllerGenerator {
 	returnTryStatement := []api.TabbedUnit{
 		core.NewReturnStatement(fmt.Sprintf(
-			`ResponseHelper::success($this->%s->findById($id))`, conGen.queryVariableName)),
+			`ResponseHelper::success($this->%s->findById(%s))`, conGen.queryVariableName, Id)),
 	}
-	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName("findById").
-		AddArgument("$id").SetVisibility("public").AddStatements(returnTryStatement).GetFunction())
+	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName(FindByIdMethod).
+		AddArgument(Id).SetVisibility(VisibilityPublic).AddStatements(returnTryStatement).GetFunction())
 	return conGen
 }
 
@@ -168,7 +172,7 @@ func (conGen *ControllerGenerator) AddGetAll() *ControllerGenerator {
 	returnStatement := core.NewReturnStatement(
 		fmt.Sprintf(`ResponseHelper::success($this->%s->paginate())`, conGen.queryVariableName))
 	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().
-		SetName("getAll").SetVisibility("public").
+		SetName(GetAllMethod).SetVisibility(VisibilityPublic).
 		AddStatement(returnStatement).GetFunction())
 	return conGen
 }
@@ -195,7 +199,7 @@ func (conGen *ControllerGenerator) AddConstructor() *ControllerGenerator {
 	}
 
 	conGen.classBuilder.AddFunction(
-		builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
+		builder.NewFunctionBuilder().SetVisibility(VisibilityPublic).SetName(Constructor).
 			AddArguments(constructorArguments).AddStatements(constructorStatements).GetFunction())
 	return conGen
 }
@@ -229,13 +233,13 @@ func (conGen *ControllerGenerator) AddFunctionsInController(methods []string) {
 		conGen.AddConstructor()
 		for _, element := range methods {
 			switch strings.ToUpper(element) {
-			case "POST":
+			case POST:
 				conGen.AddCreate()
-			case "GET":
+			case GET:
 				conGen.AddFindById().AddGetAll()
-			case "PUT":
+			case PUT:
 				conGen.AddUpdate()
-			case "DELETE":
+			case DELETE:
 				conGen.AddDelete()
 			}
 		}

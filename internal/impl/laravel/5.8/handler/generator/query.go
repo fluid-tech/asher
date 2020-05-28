@@ -60,9 +60,9 @@ func (queryGenerator *QueryGenerator) Build() *core.Class {
 
 	/*CONSTRUCTOR*/
 	constructor := builder.NewFunctionBuilder()
-	constructor.SetName("__construct").SetVisibility("public")
+	constructor.SetName(Constructor).SetVisibility(VisibilityPublic)
 	fullyQualifiedModelArg := core.NewParameter(fmt.Sprintf(`"App\%s"`, queryGenerator.identifier))
-	callToSuperConstructor := core.NewFunctionCall("parent::__construct").AddArg(fullyQualifiedModelArg)
+	callToSuperConstructor := core.NewFunctionCall(ParentConstructor).AddArg(fullyQualifiedModelArg)
 	constructor.AddStatement(callToSuperConstructor)
 
 	queryGenerator.Class.AddFunction(constructor.GetFunction()).
