@@ -32,7 +32,7 @@ Returns:
 func (relationshipHandler *RelationshipHandler) Handle(currentTableName string, relations interface{}) ([]api.EmitterFile,
 	error) {
 
-	currentModelGenerator := context.GetFromRegistry("model").GetCtx(currentTableName).(*generator.ModelGenerator)
+	currentModelGenerator := context.GetFromRegistry(context.ContextModel).GetCtx(currentTableName).(*generator.ModelGenerator)
 	relationshipModelGenerator := generator.NewRelationshipModel(currentModelGenerator)
 	myRelations := relations.(models.Relation)
 
@@ -40,14 +40,14 @@ func (relationshipHandler *RelationshipHandler) Handle(currentTableName string, 
 		var referenceTableName, foreignKey, primaryKey = getRelationshipKeys(rel, currentTableName)
 		relationshipDetailObj := relationshipModelGenerator.AddRelationshipToModel(helper.HasMany, currentTableName,
 			referenceTableName, foreignKey, primaryKey)
-		context.GetFromRegistry("relation").AddToCtx(currentTableName, relationshipDetailObj)
+		context.GetFromRegistry(context.ContextRelation).AddToCtx(currentTableName, relationshipDetailObj)
 	}
 
 	for _, rel := range myRelations.HasOne {
 		var referenceTableName, foreignKey, primaryKey = getRelationshipKeys(rel, currentTableName)
 		relationshipDetailObj := relationshipModelGenerator.AddRelationshipToModel(helper.HasOne, currentTableName,
 			referenceTableName, foreignKey, primaryKey)
-		context.GetFromRegistry("relation").AddToCtx(currentTableName, relationshipDetailObj)
+		context.GetFromRegistry(context.ContextRelation).AddToCtx(currentTableName, relationshipDetailObj)
 	}
 
 	return nil, nil
