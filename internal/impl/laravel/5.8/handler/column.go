@@ -38,7 +38,7 @@ func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []model
 		columnHandler.handleValidation(modelGenerator, singleColumn.Validations, singleColumn.Name, modelName)
 	}
 	//fmt.Print(modelGenerator.Build().String())
-	context.GetFromRegistry("model").AddToCtx(modelName, modelGenerator)
+	context.GetFromRegistry(context.ContextModel).AddToCtx(modelName, modelGenerator)
 
 	phpEmitter := core.NewPhpEmitterFile(modelName, api.ModelPath, modelGenerator, api.Model)
 
@@ -56,7 +56,7 @@ func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr
 	}
 
 	migrationGenerator := generator.NewMigrationGenerator().SetName(identifier).AddColumns(statementsArr)
-	context.GetFromRegistry("migration").AddToCtx(identifier, migrationGenerator)
+	context.GetFromRegistry(context.ContextMigration).AddToCtx(identifier, migrationGenerator)
 
 	phpEmitter := core.NewPhpEmitterFile(identifier, api.ModelPath, migrationGenerator, api.Model)
 

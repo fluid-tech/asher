@@ -2,7 +2,10 @@ package handler
 
 import (
 	"asher/internal/impl/laravel/5.8/handler"
+	"asher/internal/impl/laravel/5.8/handler/context"
+	"asher/internal/impl/laravel/5.8/handler/generator"
 	"asher/internal/models"
+	"asher/test/api"
 	"testing"
 )
 
@@ -35,8 +38,8 @@ func genColTest(modelName string, cols []models.Column, t *testing.T, ) []string
 		t.Error("ColHandler didnt return an emitter file")
 	}
 
-	mig := fromMigReg(modelName)
-	model := fromModelReg(modelName)
+	mig := api.FromContext(context.ContextMigration, modelName).(*generator.MigrationGenerator)
+	model := api.FromContext(context.ContextModel, modelName).(*generator.ModelGenerator)
 
 	if mig == nil {
 		t.Errorf("migration file for %s not added to context", modelName)
