@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestModel(t *testing.T) {
+func TestAuditCol(t *testing.T) {
 
 	var table = []*struct {
 		in  []string

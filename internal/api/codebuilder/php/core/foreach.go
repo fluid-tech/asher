@@ -20,10 +20,6 @@ func NewForEach() *ForEach {
 	}
 }
 
-func (forEach *ForEach) Id() string {
-	return "for"
-}
-
 func (forEach *ForEach) SetNumTabs(tabs int) {
 	forEach.tabs = tabs
 }
