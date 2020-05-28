@@ -2,9 +2,7 @@ package core
 
 import (
 	"asher/internal/api"
-	"errors"
 	"fmt"
-	"regexp"
 	"strings"
 )
 
@@ -34,17 +32,10 @@ func (f *Function) SetNumTabs(tabs int) {
 	f.tabs = tabs
 }
 
-func (f *Function) Id() string {
-	if f.Name == "" {
-		return "anon"
-	}
-	return f.Name
-}
-
 func (f *Function) String() string {
 	var builder strings.Builder
 	tabbedString := api.TabbedString(uint(f.tabs))
-	fmt.Fprint(&builder, tabbedString, f.Visibility, getStaticValue(f.Static), " function ", f.Name, "(")
+	fmt.Fprint(&builder, tabbedString, f.Visibility, staticStr(f.Static), " function ", f.Name, "(")
 	fmt.Fprint(&builder, strings.Join(f.Arguments, ", "), ") {\n")
 	for _, element := range f.Statements {
 		element.SetNumTabs(f.tabs + 1)
@@ -54,24 +45,11 @@ func (f *Function) String() string {
 	return builder.String()
 }
 
-func getStaticValue(isStatic bool) string {
+func staticStr(isStatic bool) string {
 	if isStatic {
 		return " static"
 	}
 	return ""
-}
-
-/**
-Finds a statement with a regex
-*/
-func (f *Function) FindStatement(pattern string) (api.TabbedUnit, error) {
-	for _, element := range f.Statements {
-		found, err := regexp.Match(pattern, []byte(element.Id()))
-		if err == nil && found {
-			return element, nil
-		}
-	}
-	return nil, errors.New("couldnt find pattern")
 }
 
 /**
