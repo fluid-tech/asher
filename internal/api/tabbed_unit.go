@@ -4,7 +4,6 @@ import "strings"
 
 type TabbedUnit interface {
 	SetNumTabs(tabs int)
-	Id() string // something that uniquely identifies this tabbed unit, in cases of vars it could be the var name
 	String() string
 }
 

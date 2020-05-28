@@ -1,101 +1,51 @@
 package handler
 
 import (
-	"asher/internal/api/codebuilder/php/core"
 	"asher/internal/impl/laravel/5.8/handler"
-	"asher/internal/impl/laravel/5.8/handler/context"
-	"asher/internal/impl/laravel/5.8/handler/generator"
 	"asher/internal/models"
-	"asher/test/api"
 	"testing"
 )
 
-type IN struct {
-	tableName        string
-	columnInputArray []models.Column
-}
-
-type OUT struct {
-	expectedOutputFillable []string
-	expectedOutputHidden   []string
-}
-
-func getInput(tableName string, columnInputArray []models.Column) IN {
-	return IN{tableName, columnInputArray}
-}
-
-func expectedOutput(fillableExpected []string, hiddenExpected []string) OUT {
-	return OUT{fillableExpected, hiddenExpected}
-}
-
-func Test_Columns(t *testing.T) {
+func TestColumns(t *testing.T) {
 
 	var columnTestObject = []*struct {
-		in  IN
-		out OUT
-	}{
-		{getInput(test_1_tableName, test_1_columnInputArray), expectedOutput(test_1_fillableExpectedOutput, test_1_hiddenExpectedOutput)},
-	}
-	for _, obj := range columnTestObject {
-		handler.NewColumnHandler().Handle(obj.in.tableName, obj.in.columnInputArray)
-		ModelTester(t, obj.in.tableName, obj.in.columnInputArray, obj.out.expectedOutputFillable, obj.out.expectedOutputHidden)
-		MigrationTester(t, obj.in.tableName, obj.in.columnInputArray, obj.out.expectedOutputFillable, obj.out.expectedOutputHidden)
-	}
-
-}
-
-func MigrationTester(t *testing.T, tableName string, array []models.Column, fillable []string, hidden []string) {
-
-	migrationInfo := context.GetFromRegistry("migration").GetCtx(tableName).(*generator.MigrationGenerator).Build()
-	inputDownBody, _ := migrationInfo.FindFunction("down")
-	inputUpBody, _ := migrationInfo.FindFunction("up")
-
-	downTester := api.NewGeneralTest(inputDownBody.String(), migration_output_down)
-	upTester := api.NewGeneralTest(inputUpBody.String(), migration_output_up)
-	testArray := []*api.GeneralTest{downTester, upTester}
-	api.IterateAndTest(testArray, t)
-}
-
-func ModelTester(t *testing.T, tableName string, columnArray []models.Column, fillableExpectedOutput []string, hiddenExpectedOutput []string) {
-
-	modelClass := context.GetFromRegistry("model").GetCtx(tableName).(*generator.ModelGenerator).Build()
-
-	var fillableData = getFillableRhs(modelClass, t)
-	var hiddenData = getHiddenRhs(modelClass, t)
-	arrayEquilizer(t, fillableData, fillableExpectedOutput)
-	arrayEquilizer(t, hiddenData, hiddenExpectedOutput)
-
-}
-
-func getFillableRhs(klass *core.Class, t *testing.T) []string {
-	element, err := klass.FindMember("fillable")
-	if err != nil {
-		t.Error("fillable not found in klass")
-	}
-	return element.(*core.ArrayAssignment).Rhs
-}
-
-func getHiddenRhs(klass *core.Class, t *testing.T) []string {
-	element, err := klass.FindMember("visible")
-	if err != nil {
-		t.Error("hidden not found in klass")
-	}
-	return element.(*core.ArrayAssignment).Rhs
-}
-
-func arrayEquilizer(t *testing.T, in []string, out []string) {
-	var table = []*struct {
 		in  []string
 		out []string
 	}{
-		{in, out},
+		{genColTest("StudentEnrollment", StudentEnrollmentInputArr, t), []string{ColumnTestModel, ColumnTestMigration}},
 	}
-
-	for i, element := range table {
-		for j, inner := range element.in {
-			if inner != element.out[j] {
-				t.Errorf("in test case %d , %d expected '%s' found '%s'", i, j, inner, element.out[j])
-			}
+	for i, element := range columnTestObject {
+		if element.in[0] != element.out[0] {
+			t.Errorf("in test case %d expected '%s' found '%s'", i, element.out[0], element.in[0])
+		}
+		if element.in[1] != element.out[1] {
+			t.Errorf("in test case %d expected '%s' found '%s'", i, element.out[1], element.in[1])
 		}
 	}
+
+}
+
+func genColTest(modelName string, cols []models.Column, t *testing.T, ) []string {
+	emitterFile, err := handler.NewColumnHandler().Handle(modelName, cols)
+
+	if err != nil {
+		t.Error("some errors were encountered in Handle")
+	}
+	if len(emitterFile) == 0 {
+		t.Error("ColHandler didnt return an emitter file")
+	}
+
+	mig := fromMigReg(modelName)
+	model := fromModelReg(modelName)
+
+	if mig == nil {
+		t.Errorf("migration file for %s not added to context", modelName)
+	}
+
+	if model == nil {
+		t.Errorf("model file for %s not added to context", modelName)
+	}
+
+	return []string{model.String(), mig.String()}
+
 }

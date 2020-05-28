@@ -22,9 +22,6 @@ func (r *ReturnStatement) SetNumTabs(tabs int) {
 	r.tabs = tabs
 }
 
-func (r *ReturnStatement) Id() string {
-	return "return"
-}
 
 func (r *ReturnStatement) String() string {
 	var builder strings.Builder
