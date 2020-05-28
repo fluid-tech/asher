@@ -12,6 +12,7 @@ func TestModelGenerator(t *testing.T) {
 	fillableArr := []string{"name", "phone_number"}
 	hiddenFields := []string{"password", "gender"}
 	createRules := map[string]string{
+
 		"name":         "string|max:255|unique",
 		"phone_number": "string|max:12|unique:users,id",
 	}

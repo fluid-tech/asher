@@ -39,9 +39,11 @@ func (f *PhpEmitterFile) FileType() int {
 	return f.fileType
 }
 
-func (p *PhpEmitterFile) String() string {
+func (f *PhpEmitterFile) String() string {
 	var builder strings.Builder
 	fmt.Fprintf(&builder, "<?php\n")
-	fmt.Fprint(&builder, p.content.String(), "\n")
+
+	fmt.Fprint(&builder, f.content.String(), "\n")
+
 	return builder.String()
 }

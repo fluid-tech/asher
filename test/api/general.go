@@ -17,7 +17,7 @@ func NewGeneralTest(in string, out string) *GeneralTest {
 func IterateAndTest(table []*GeneralTest, t *testing.T) {
 	for i, element := range table {
 		if element.in != element.out {
-			t.Errorf("in test case %d expected '%s' found '%s'", i, element.in, element.out)
+			t.Errorf("in test case %d expected '%s' found '%s'", i, element.out, element.in)
 		}
 	}
 }

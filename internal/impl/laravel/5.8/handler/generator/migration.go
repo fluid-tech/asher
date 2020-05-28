@@ -88,7 +88,9 @@ func (migrationGenerator *MigrationGenerator) Build() *core.Class {
 	arg2 := closure.GetFunction()
 
 	// Preparing the statements for up function
+
 	schemaBlock := core.NewFunctionCall("Schema::create").AddArg(arg1).AddArg(arg2)
+
 	upFunction := builder.NewFunctionBuilder().SetName("up").SetVisibility("public").
 		AddStatement(schemaBlock).GetFunction()
 

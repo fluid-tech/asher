@@ -45,7 +45,6 @@ func (f *Function) String() string {
 	var builder strings.Builder
 	tabbedString := api.TabbedString(uint(f.tabs))
 	fmt.Fprint(&builder, tabbedString, f.Visibility, getStaticValue(f.Static), " function ", f.Name, "(")
-
 	fmt.Fprint(&builder, strings.Join(f.Arguments, ", "), ") {\n")
 	for _, element := range f.Statements {
 		element.SetNumTabs(f.tabs + 1)
@@ -80,4 +79,11 @@ Append Statement
 */
 func (f *Function) AppendStatement(unit api.TabbedUnit) {
 	f.Statements = append(f.Statements, unit)
+}
+
+/**
+Appends Argument
+*/
+func (f *Function) AppendArgument(unit string) {
+	f.Arguments = append(f.Arguments, unit)
 }
