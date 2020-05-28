@@ -23,6 +23,5 @@ func genTransactorTest(modelName string, transactorType string, expectedOut stri
 	case "image":
 		generator.NewImageTransactor(transactorGenerator).AddDefaults()
 	}
-	//fmt.Print(transactorGenerator.String())
 	return api.NewGeneralTest(transactorGenerator.String(), expectedOut)
 }
