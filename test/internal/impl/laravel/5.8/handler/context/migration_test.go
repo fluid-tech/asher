@@ -24,6 +24,9 @@ func TestMigrationContext(t *testing.T) {
 			t.Error("Unexpected data")
 		}
 	}
+	if nil != api.FromContext(context.ContextMigration, "nonexistentRecords") {
+		t.Error("Unexpected data")
+	}
 }
 
 func genMigration(className string) *generator.MigrationGenerator {
