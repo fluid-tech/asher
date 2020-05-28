@@ -129,23 +129,3 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 	return []string{actualControllerGen.String(), actualTransactorGen.String(), actualMutatorGen.String(),
 		actualQueryGen.String(), actualRouteGen.String()}
 }
-
-func fromControllerReg(className string) *generator.ControllerGenerator {
-	return context.GetFromRegistry("controller").GetCtx(className).(*generator.ControllerGenerator)
-}
-
-func fromTransactorReg(className string) *generator.TransactorGenerator {
-	return context.GetFromRegistry("transactor").GetCtx(className).(*generator.TransactorGenerator)
-}
-
-func fromMutattorReg(className string) *generator.MutatorGenerator {
-	return context.GetFromRegistry("mutator").GetCtx(className).(*generator.MutatorGenerator)
-}
-
-func fromQueryReg(className string) *generator.QueryGenerator {
-	return context.GetFromRegistry("query").GetCtx(className).(*generator.QueryGenerator)
-}
-
-func fromRouteReg(className string) *generator.RouteGenerator {
-	return context.GetFromRegistry("route").GetCtx(className).(*generator.RouteGenerator)
-}
