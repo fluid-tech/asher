@@ -16,13 +16,16 @@ type Function interface {
 	AddArguments(args []string) Function
 
 	// adds a statement to the statement list
-	AddStatement(unit *api.TabbedUnit) Function
+	AddStatement(unit api.TabbedUnit) Function
 
 	// appends statements to the statements arr
-	AddStatements(units []*api.TabbedUnit) Function
+	AddStatements(units []api.TabbedUnit) Function
 
 	// Sets the visibility of the method
 	SetVisibility(vis string) Function
+
+	// Sets the visibility of the method
+	SetStatic(isStatic bool) Function
 
 	// returns the function
 	GetFunction() *core.Function

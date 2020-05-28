@@ -8,13 +8,13 @@ import (
 	"testing"
 )
 
-const Ctor = `public function __construct(BaseMutator $mutator, BaseQuery $query) {
+const Ctor = `public static function __construct(BaseMutator $mutator, BaseQuery $query) {
     $this->query = $query;
     $this->mutator = $mutator;
 }
 
 `
-const Ctor2 = `public function __construct(BaseMutator $mutator, BaseQuery $query, ImageHandler $imageHandler) {
+const Ctor2 = `public static function __construct(BaseMutator $mutator, BaseQuery $query, ImageHandler $imageHandler) {
     $this->query = $query;
     $this->mutator = $mutator;
 }
@@ -24,9 +24,9 @@ const Ctor2 = `public function __construct(BaseMutator $mutator, BaseQuery $quer
 func TestFunctionBuilder(t *testing.T) {
 	assigmentSS := api2.TabbedUnit(core.NewSimpleStatement("$this->mutator = $mutator"))
 	assigmentSS2 := api2.TabbedUnit(core.NewSimpleStatement("$this->query = $query"))
-	builder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
-		AddArgument("BaseMutator $mutator").AddArgument("BaseQuery $query").AddStatement(&assigmentSS2).
-		AddStatement(&assigmentSS)
+	builder := builder.NewFunctionBuilder().SetVisibility("public").SetStatic(true).SetName("__construct").
+		AddArgument("BaseMutator $mutator").AddArgument("BaseQuery $query").AddStatement(assigmentSS2).
+		AddStatement(assigmentSS)
 
 	var table = []*api.GeneralTest{
 		api.NewGeneralTest(builder.GetFunction().String(), Ctor),
@@ -42,8 +42,8 @@ func buildFunctionBuilderWithExistingFunction() *api.GeneralTest {
 	function.Name = "up"
 	function.Visibility = "protected"
 	function.Arguments = []string{"$hello", "$world"}
-	s := api2.TabbedUnit(core.NewSimpleStatement("return $world+$hello"))
-	b := builder.NewFunctionBuilderFromFunction(function).AddStatement(&s)
+	s := core.NewSimpleStatement("return $world+$hello")
+	b := builder.NewFunctionBuilderFromFunction(function).AddStatement(s)
 	return api.NewGeneralTest(b.GetFunction().String(), TestFunction)
 }
 

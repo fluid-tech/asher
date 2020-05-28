@@ -57,7 +57,7 @@
             "patternType": "transactor",
             "protected": true,
             "nestedWith": ["OrderProduct"],
-            "type": "default"
+            "type": "default,file,image"/*model fillable fileurls, migration, create validation rule , update validation dependenign on type chnage helper*/
           }
         }
       }

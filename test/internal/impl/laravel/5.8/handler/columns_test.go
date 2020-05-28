@@ -1,4 +1,4 @@
-package context
+package handler
 
 import (
 	"asher/internal/api/codebuilder/php/core"
@@ -6,8 +6,7 @@ import (
 	"asher/internal/impl/laravel/5.8/handler/context"
 	"asher/internal/impl/laravel/5.8/handler/generator"
 	"asher/internal/models"
-	"fmt"
-	"reflect"
+	"asher/test/api"
 	"testing"
 )
 
@@ -40,7 +39,7 @@ func Test_Columns(t *testing.T) {
 	for _, obj := range columnTestObject {
 		handler.NewColumnHandler().Handle(obj.in.tableName, obj.in.columnInputArray)
 		ModelTester(t, obj.in.tableName, obj.in.columnInputArray, obj.out.expectedOutputFillable, obj.out.expectedOutputHidden)
-		//MigrationTester(t, obj.in.tableName, obj.in.columnInputArray, obj.out.expectedOutputFillable, obj.out.expectedOutputHidden)
+		MigrationTester(t, obj.in.tableName, obj.in.columnInputArray, obj.out.expectedOutputFillable, obj.out.expectedOutputHidden)
 	}
 
 }
@@ -48,12 +47,13 @@ func Test_Columns(t *testing.T) {
 func MigrationTester(t *testing.T, tableName string, array []models.Column, fillable []string, hidden []string) {
 
 	migrationInfo := context.GetFromRegistry("migration").GetCtx(tableName).(*generator.MigrationGenerator).Build()
-	upFunc, _ := migrationInfo.FindFunction("up")
+	inputDownBody, _ := migrationInfo.FindFunction("down")
+	inputUpBody, _ := migrationInfo.FindFunction("up")
 
-	for _, j := range upFunc.Statements {
-		fmt.Println(j)
-	}
-
+	downTester := api.NewGeneralTest(inputDownBody.String(), migration_output_down)
+	upTester := api.NewGeneralTest(inputUpBody.String(), migration_output_up)
+	testArray := []*api.GeneralTest{downTester, upTester}
+	api.IterateAndTest(testArray, t)
 }
 
 func ModelTester(t *testing.T, tableName string, columnArray []models.Column, fillableExpectedOutput []string, hiddenExpectedOutput []string) {
@@ -72,7 +72,7 @@ func getFillableRhs(klass *core.Class, t *testing.T) []string {
 	if err != nil {
 		t.Error("fillable not found in klass")
 	}
-	return (*element).(*core.ArrayAssignment).Rhs
+	return element.(*core.ArrayAssignment).Rhs
 }
 
 func getHiddenRhs(klass *core.Class, t *testing.T) []string {
@@ -80,7 +80,7 @@ func getHiddenRhs(klass *core.Class, t *testing.T) []string {
 	if err != nil {
 		t.Error("hidden not found in klass")
 	}
-	return (*element).(*core.ArrayAssignment).Rhs
+	return element.(*core.ArrayAssignment).Rhs
 }
 
 func arrayEquilizer(t *testing.T, in []string, out []string) {
@@ -93,7 +93,7 @@ func arrayEquilizer(t *testing.T, in []string, out []string) {
 
 	for i, element := range table {
 		for j, inner := range element.in {
-			if !reflect.DeepEqual(inner, element.out[j]) {
+			if inner != element.out[j] {
 				t.Errorf("in test case %d , %d expected '%s' found '%s'", i, j, inner, element.out[j])
 			}
 		}

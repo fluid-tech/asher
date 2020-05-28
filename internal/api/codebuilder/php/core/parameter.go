@@ -2,15 +2,15 @@ package core
 
 import "asher/internal/api"
 
-type Parameter struct{
+type Parameter struct {
 	api.TabbedUnit
-	tabs int
+	tabs  int
 	value string
 }
 
 func NewParameter(arg string) *Parameter {
 	return &Parameter{
-		value:  arg,
+		value: arg,
 	}
 }
 

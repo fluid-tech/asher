@@ -4,6 +4,10 @@ const Sidebar = [
         link: '/introduction'
     },
     {
+        title: "Workflow",
+        link: "/guide/workflow"
+    },
+    {
         title: 'Getting Started',
         children: [
             {

@@ -40,17 +40,22 @@ func (f *Function) AddArguments(args []string) interfaces.Function {
 	return f
 }
 
-func (f *Function) AddStatement(statement *api.TabbedUnit) interfaces.Function {
-	return f.AddStatements([]*api.TabbedUnit{statement})
+func (f *Function) AddStatement(statement api.TabbedUnit) interfaces.Function {
+	return f.AddStatements([]api.TabbedUnit{statement})
 }
 
-func (f *Function) AddStatements(statements []*api.TabbedUnit) interfaces.Function {
+func (f *Function) AddStatements(statements []api.TabbedUnit) interfaces.Function {
 	f.function.Statements = append(f.function.Statements, statements...)
 	return f
 }
 
 func (f *Function) SetVisibility(vis string) interfaces.Function {
 	f.function.Visibility = vis
+	return f
+}
+
+func (f *Function) SetStatic(isStatic bool) interfaces.Function {
+	f.function.Static = isStatic
 	return f
 }
 
