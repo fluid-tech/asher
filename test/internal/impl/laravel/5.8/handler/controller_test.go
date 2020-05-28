@@ -51,7 +51,6 @@ func TestController(t *testing.T) {
 				generator2.ApiRouteFileAfterAdminWithPATCHPOSTDELTERoutes}},
 	}
 
-
 	for _, element := range table {
 		for j := 0; j < 5; j++ {
 			if element.in[j] != element.out[j] {
@@ -87,44 +86,42 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 
 	/*only first call to handleController will return asher_api.php hence it will return 4 files*/
 	if isFirstCall && !(len(emitterFiles) == 5) {
-		t.Error(" first call controller handler didi not returned route file")
+		t.Error(" first call controller handler did not returned route file")
 	}
 
 	/*Second and greater controllerHandlerCall should return only 3 files*/
 	if !isFirstCall && !(len(emitterFiles) == 4) {
-		t.Error("Not returend 4 files returned ", len(emitterFiles))
+		t.Error("Not returned 4 files", len(emitterFiles))
 	}
 
-	retrivedControllerGen := fromControllerReg(className)
-	retrivedTransactorGen := fromTransactorReg(className)
-	retrivedMutatorGen := fromMutattorReg(className)
-	retrivedRouteGen := fromRouteReg("api")
-	retrivedQueryGen := fromQueryReg(className)
+	retrievedControllerGen := fromControllerReg(className)
+	retrievedTransactorGen := fromTransactorReg(className)
+	retrievedMutatorGen := fromMutattorReg(className)
+	retrievedRouteGen := fromRouteReg("api")
+	retrievedQueryGen := fromQueryReg(className)
 
-
-
-	if retrivedControllerGen == nil {
+	if retrievedControllerGen == nil {
 		t.Errorf("controller for %s doesnt exist ", className)
 	}
 
-	if retrivedTransactorGen == nil {
+	if retrievedTransactorGen == nil {
 		t.Errorf("transactor for %s doesnt exist ", className)
 	}
 
-	if retrivedMutatorGen == nil {
+	if retrievedMutatorGen == nil {
 		t.Errorf("mutator for %s doesnt exist ", className)
 	}
 
-	if retrivedRouteGen == nil {
+	if retrievedRouteGen == nil {
 		t.Errorf("route for %s doesnt exist ", className)
 	}
 
-	if retrivedQueryGen == nil {
+	if retrievedQueryGen == nil {
 		t.Errorf("query for %s doesnt exist ", className)
 	}
 
-	return []string{retrivedControllerGen.String(), retrivedTransactorGen.String(), retrivedMutatorGen.String(),
-		retrivedQueryGen.String(), retrivedRouteGen.String()}
+	return []string{retrievedControllerGen.String(), retrievedTransactorGen.String(), retrievedMutatorGen.String(),
+		retrievedQueryGen.String(), retrievedRouteGen.String()}
 }
 
 func fromControllerReg(className string) *generator.ControllerGenerator {
