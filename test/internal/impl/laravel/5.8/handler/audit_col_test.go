@@ -49,8 +49,8 @@ func genAuditColTest(className string, softDeletes bool, timestamp bool, auditCo
 	modelGen := generator.NewModelGenerator().SetName(className)
 	migGen := generator.NewMigrationGenerator().SetName(className)
 
-	context.GetFromRegistry(context.ContextMigration).AddToCtx(className, migGen)
-	context.GetFromRegistry(context.ContextModel).AddToCtx(className, modelGen)
+	context.GetFromRegistry(context.Migration).AddToCtx(className, migGen)
+	context.GetFromRegistry(context.Model).AddToCtx(className, modelGen)
 
 	emitterFiles, error := handler.NewAuditColHandler().Handle(className, helper.NewAuditCol(auditCol, softDeletes, timestamp, pkCol))
 	if error != nil {
@@ -59,11 +59,11 @@ func genAuditColTest(className string, softDeletes bool, timestamp bool, auditCo
 	if emitterFiles != nil && len(emitterFiles) > 0 {
 		t.Error("audit col handler returned a file")
 	}
-	retrievedMigGen := api.FromContext(context.ContextMigration, className)
+	retrievedMigGen := api.FromContext(context.Migration, className)
 	if retrievedMigGen == nil {
 		t.Errorf("migration for %s doesnt exist ", className)
 	}
-	retrievedModGen := api.FromContext(context.ContextModel, className)
+	retrievedModGen := api.FromContext(context.Model, className)
 	if retrievedModGen == nil {
 		t.Errorf("model for %s doesnt exist ", className)
 	}

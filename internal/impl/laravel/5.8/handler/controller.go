@@ -103,6 +103,7 @@ func (controllerHandler *ControllerHandler) handleTransactor(identifier string,
 		return nil,errors.New(fmt.Sprintf("migration class %s not found", identifier))
 	}
 	migrationGen := retrievedMigGen.(*generator.MigrationGenerator)
+
 	/*SWITCH CASE FOR TYPE OF TRANSACTOR*/
 	switch strings.ToLower(controllerType) {
 	case "file":
@@ -122,9 +123,10 @@ func (controllerHandler *ControllerHandler) handleDefaultTransactor(identifier s
 
 	transactorGen := generator.NewTransactorGenerator("Base").SetIdentifier(identifier)
 
+
 	context.GetFromRegistry(context.ContextTransactor).AddToCtx(identifier, transactorGen)
 	transactorEmitter := core.NewPhpEmitterFile(fmt.Sprintf(transactorFileName,identifier), api.TransactorPath, transactorGen,
-		api.Transactor)
+                                              api.Transactor)
 
 	return transactorEmitter
 }
@@ -140,7 +142,7 @@ func (controllerHandler *ControllerHandler) handleFileTransactor(identifier stri
 	transactorGen := generator.NewTransactorGenerator("file").SetIdentifier(identifier)
 	generator.NewFileTransactor(transactorGen).AddDefaults()
 
-	context.GetFromRegistry(context.ContextTransactor).AddToCtx(identifier, transactorGen)
+	context.GetFromRegistry(context.Transactor).AddToCtx(identifier, transactorGen)
 
 	transactorEmitter := core.NewPhpEmitterFile(fmt.Sprintf(transactorFileName,identifier), api.TransactorPath, transactorGen,
 		api.Transactor)
@@ -172,17 +174,17 @@ func (controllerHandler *ControllerHandler) handleMutator(identifier string) api
 	mutatorGen := generator.NewMutatorGenerator()
 	mutatorGen.SetIdentifier(identifier)
 
-	context.GetFromRegistry(context.ContextMutator).AddToCtx(identifier, mutatorGen)
+	context.GetFromRegistry(context.Mutator).AddToCtx(identifier, mutatorGen)
 	mutatorEmitter :=
 		core.NewPhpEmitterFile(fmt.Sprintf(mutatorFileName,identifier), api.MutatorPath, mutatorGen, api.Mutator)
 
 	return mutatorEmitter
 }
 
-func (controllerHandler *ControllerHandler) handleQuery(
-	identifier string) api.EmitterFile {
+func (controllerHandler *ControllerHandler) handleQuery(identifier string) api.EmitterFile {
 
 	queryGenerator := generator.NewQueryGenerator(true).SetIdentifier(identifier)
+
 
 	context.GetFromRegistry(context.ContextQuery).AddToCtx(identifier, queryGenerator)
 	emitFile := core.NewPhpEmitterFile(identifier+"Query.php", api.QueryPath, queryGenerator, api.Query)
@@ -207,10 +209,12 @@ func (controllerHandler *ControllerHandler) handleRoutes(identifier string, http
 	addRouteToEmmitFiles := false
 	gen := context.GetFromRegistry(context.ContextRoute).GetCtx(apiContext)
 
+
 	if gen == nil {
 		addRouteToEmmitFiles = true
 		actualGenerator = generator.NewRouteGenerator()
 		context.GetFromRegistry(context.ContextRoute).AddToCtx(apiContext, actualGenerator)
+
 	} else {
 		actualGenerator = gen.(*generator.RouteGenerator)
 	}

@@ -41,7 +41,7 @@ func (auditColModel *AuditColModel) SetSoftDeletes(softDeletes bool) *AuditColMo
 	if softDeletes {
 		auditColModel.modelGen.classBuilder.AddMember(core.NewSimpleStatement(UseSoftDeletesStr))
 		// todo make date format configurable
-		// Passing auditColModel.modelName as argument below just to show the intent although it will bot be used in this case
+		// Passing auditColModel.modelName as argument below just to show the intent although it will not be used in
 		auditColModel.modelGen.AddUpdateValidationRule(DeletedAtStr, DeletedAtValidationRule, "auditColModel.modelName")
 		auditColModel.modelGen.AddFillable(DeletedAtStr)
 	}
@@ -49,7 +49,7 @@ func (auditColModel *AuditColModel) SetSoftDeletes(softDeletes bool) *AuditColMo
 }
 
 /**
- Adds the AuditCols field of to the fillable array of this model and adds them to create and update
+ Adds the AuditCols field to the fillable array of this model and adds them to create and update
  validation rules array.
  Parameters
 	- auditCols:		bool 		If set this generator adds created by and updated by cols to the migration file
