@@ -128,5 +128,5 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 	actualQueryGen := retrievedQueryGen.(*generator.QueryGenerator)
 
 	return []string{actualControllerGen.String(), actualTransactorGen.String(), actualMutatorGen.String(),
-		actualQueryGen.String(), actualRouteGen.String()}
+		actualQueryGen.String(), actualRouteGen.String(), migGen.String(), modelGen.String()}
 }
