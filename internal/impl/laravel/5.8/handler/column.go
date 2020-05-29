@@ -14,8 +14,10 @@ import (
 type ColumnHandler struct {
 	api.Handler
 }
+
 const FkFmt = "$table->foreign('%s')->references('%s')->on('%s')->onDelete('%s')%s"
 const UuidFmt = "$table->uuid('%s')->primary()"
+
 func NewColumnHandler() *ColumnHandler {
 	return &ColumnHandler{}
 }
@@ -38,7 +40,7 @@ func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []model
 		columnHandler.handleGuarded(modelGenerator, singleColumn.Guarded, singleColumn.Name)
 		columnHandler.handleValidation(modelGenerator, singleColumn.Validations, singleColumn.Name, modelName)
 	}
-	context.GetFromRegistry(context.ContextModel).AddToCtx(modelName, modelGenerator)
+	context.GetFromRegistry(context.Model).AddToCtx(modelName, modelGenerator)
 
 	phpEmitter := core.NewPhpEmitterFile(modelName, api.ModelPath, modelGenerator, api.Model)
 
@@ -56,7 +58,7 @@ func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr
 	}
 
 	migrationGenerator := generator.NewMigrationGenerator().SetName(identifier).AddColumns(statementsArr)
-	context.GetFromRegistry(context.ContextMigration).AddToCtx(identifier, migrationGenerator)
+	context.GetFromRegistry(context.Migration).AddToCtx(identifier, migrationGenerator)
 
 	phpEmitter := core.NewPhpEmitterFile(identifier, api.ModelPath, migrationGenerator, api.Model)
 
