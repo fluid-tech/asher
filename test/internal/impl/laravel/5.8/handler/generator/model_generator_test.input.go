@@ -44,6 +44,26 @@ class StudentAllotments extends Model {
 }
 `
 
+const StudentEmptyModel = `namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Student extends Model {
+    public static function createValidationRules() {
+        return [
+];
+    }
+
+
+    public static function updateValidationRules(array $rowIds) {
+        return [
+];
+    }
+
+
+}
+`
+
 const ModelWithHidden = `namespace App;
 
 use Illuminate\Database\Eloquent\Model;
