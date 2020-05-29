@@ -10,9 +10,9 @@ import (
 func TestRouteGenerator(t *testing.T) {
 
 	var table = []*api.GeneralTest{
-		genRouteTest(routeGenerator, "Student", []string{}, ApiRouteFileAfterStudentWithAllRoutes),
-		genRouteTest(routeGenerator, "Teacher", []string{generator.HttpGet}, ApiRouteFileAfterTeacherWithGetRoutes),
-		genRouteTest(routeGenerator, "Admin",
+		genRouteTest(generator.NewRouteGenerator(), "Student", []string{}, ApiRouteFileAfterStudentWithAllRoutes),
+		genRouteTest(generator.NewRouteGenerator(), "Teacher", []string{generator.HttpGet}, ApiRouteFileAfterTeacherWithGetRoutes),
+		genRouteTest(generator.NewRouteGenerator(), "Admin",
 			[]string{generator.HttpPut, generator.HttpPost, generator.HttpDelete}, ApiRouteFileAfterAdminWithPATCHPOSTDELTERoutes),
 	}
 	api.IterateAndTest(table, t)
