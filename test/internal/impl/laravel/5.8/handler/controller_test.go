@@ -5,6 +5,7 @@ import (
 	"asher/internal/impl/laravel/5.8/handler/context"
 	"asher/internal/impl/laravel/5.8/handler/generator"
 	"asher/internal/models"
+	"asher/test/api"
 	generator2 "asher/test/internal/impl/laravel/5.8/handler/generator"
 	"testing"
 )
@@ -40,19 +41,19 @@ func TestController(t *testing.T) {
 	}{
 		{genControllerTest("Student", RESTControllerConfigWithALLHttpMethods, t, true),
 			[]string{generator2.StudentController, generator2.StudentBasicTransactor, generator2.StudentBasicMutator, generator2.StudentBasicQuery,
-				generator2.ApiRouteFileAfterStudentWithAllRoutes}},
+				generator2.ApiRouteFileAfterStudentWithAllRoutes,generator2.StudentEmptyMigrationWithName, generator2.StudentEmptyModel}},
 
 		{genControllerTest("Teacher", RESTControllerConfigWithGETHttpMethods, t, false),
 			[]string{generator2.TeacherController, generator2.TeacherImageTransactor, generator2.TeacherBasicMutator, generator2.TeacherBasicQuery,
-				generator2.ApiRouteFileAfterTeacherWithGetRoutes}},
+				generator2.ApiRouteFileAfterTeacherWithGetRoutes,generator2.TeacherMigrationForFileURLS,generator2.TeacherModelWithFileURLS}},
 
 		{genControllerTest("Admin", RESTControllerConfigWithPOSTPUTDELETEHttpMethods, t, false),
 			[]string{generator2.AdminController, generator2.AdminFileTransactor, generator2.AdminBasicMutator, generator2.AdminBasicQuery,
-				generator2.ApiRouteFileAfterAdminWithPATCHPOSTDELTERoutes}},
+				generator2.ApiRouteFileAfterAdminWithPATCHPOSTDELTERoutes,generator2.AdminMigrationForFileURLS,generator2.AdminModelWithFileURLS}},
 	}
 
 	for _, element := range table {
-		for j := 0; j < 5; j++ {
+		for j := 0; j < 7; j++ {
 			if element.in[j] != element.out[j] {
 				t.Errorf("in test case %d expected '%s' found '%s'", j, element.out[j], element.in[j])
 			}
@@ -71,8 +72,8 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 	modelGen := generator.NewModelGenerator().SetName(className)
 	migGen := generator.NewMigrationGenerator().SetName(className)
 
-	context.GetFromRegistry("migration").AddToCtx(className, migGen)
-	context.GetFromRegistry("model").AddToCtx(className, modelGen)
+	context.GetFromRegistry(context.ContextMigration).AddToCtx(className, migGen)
+	context.GetFromRegistry(context.ContextModel).AddToCtx(className, modelGen)
 
 	emitterFiles, error := handler.NewControllerHandler().Handle(className, controllerConfig)
 
@@ -94,11 +95,11 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 		t.Error("Not returned 4 files", len(emitterFiles))
 	}
 
-	retrievedControllerGen := fromControllerReg(className)
-	retrievedTransactorGen := fromTransactorReg(className)
-	retrievedMutatorGen := fromMutattorReg(className)
-	retrievedRouteGen := fromRouteReg("api")
-	retrievedQueryGen := fromQueryReg(className)
+	retrievedControllerGen := api.FromContext(context.ContextController, className)
+	retrievedTransactorGen := api.FromContext(context.ContextTransactor, className)
+	retrievedMutatorGen := api.FromContext(context.ContextMutator, className)
+	retrievedRouteGen := api.FromContext(context.ContextRoute, "api")
+	retrievedQueryGen := api.FromContext(context.ContextQuery, className)
 
 	if retrievedControllerGen == nil {
 		t.Errorf("controller for %s doesnt exist ", className)
@@ -120,26 +121,12 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 		t.Errorf("query for %s doesnt exist ", className)
 	}
 
-	return []string{retrievedControllerGen.String(), retrievedTransactorGen.String(), retrievedMutatorGen.String(),
-		retrievedQueryGen.String(), retrievedRouteGen.String()}
-}
+	actualControllerGen := retrievedControllerGen.(*generator.ControllerGenerator)
+	actualTransactorGen := retrievedTransactorGen.(*generator.TransactorGenerator)
+	actualMutatorGen := retrievedMutatorGen.(*generator.MutatorGenerator)
+	actualRouteGen := retrievedRouteGen.(*generator.RouteGenerator)
+	actualQueryGen := retrievedQueryGen.(*generator.QueryGenerator)
 
-func fromControllerReg(className string) *generator.ControllerGenerator {
-	return context.GetFromRegistry("controller").GetCtx(className).(*generator.ControllerGenerator)
-}
-
-func fromTransactorReg(className string) *generator.TransactorGenerator {
-	return context.GetFromRegistry("transactor").GetCtx(className).(*generator.TransactorGenerator)
-}
-
-func fromMutattorReg(className string) *generator.MutatorGenerator {
-	return context.GetFromRegistry("mutator").GetCtx(className).(*generator.MutatorGenerator)
-}
-
-func fromQueryReg(className string) *generator.QueryGenerator {
-	return context.GetFromRegistry("query").GetCtx(className).(*generator.QueryGenerator)
-}
-
-func fromRouteReg(className string) *generator.RouteGenerator {
-	return context.GetFromRegistry("route").GetCtx(className).(*generator.RouteGenerator)
+	return []string{actualControllerGen.String(), actualTransactorGen.String(), actualMutatorGen.String(),
+		actualQueryGen.String(), actualRouteGen.String(), migGen.String(), modelGen.String()}
 }
