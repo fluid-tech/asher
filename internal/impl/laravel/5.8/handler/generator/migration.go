@@ -10,8 +10,8 @@ import (
 
 const (
 	MigrationExtends = "Migration"
-	IdentifierDown = "down"
-	IdentifierUp = "up"
+	IdentifierDown   = "down"
+	IdentifierUp     = "up"
 )
 
 type MigrationGenerator struct {

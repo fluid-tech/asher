@@ -184,7 +184,6 @@ func (transactorGenerator *TransactorGenerator) addDefaults() *TransactorGenerat
 
 	superConstructorCall = core.NewFunctionCall(CallParentConstructor)
 
-
 	transactorGenerator.constructorStatements = append(transactorGenerator.constructorStatements,
 		superConstructorCall,
 		core.NewSimpleStatement(InitiateSelfClassName),

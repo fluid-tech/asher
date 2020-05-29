@@ -18,8 +18,8 @@ const (
 	NewBaseFileUploadHelper  = `new BaseFileUploadHelper(self::BASE_PATH, self::IMAGE_VALIDATION_RULES,"png")`
 	ImageUploadHelperPath    = `App\Helpers\ImageUploadHelper`
 	BaseFileUploadHelperPath = `App\Helpers\BaseFileUploadHelper`
-	BasePathFmt            = `%s const BASE_PATH = "%s"`
-	TransactorClassNameFmt = `%s const CLASS_NAME = '%sTransactor'`
+	BasePathFmt              = `%s const BASE_PATH = "%s"`
+	TransactorClassNameFmt   = `%s const CLASS_NAME = '%sTransactor'`
 
 	/*COMMON CONSTANTS*/
 	VisibilityPublic      = "public"
@@ -27,9 +27,9 @@ const (
 	VisibilityProtected   = "protected"
 	CallConstructor       = "__construct"
 	CallParentConstructor = "parent::__construct"
-	QueryObjectFmt = "%sQuery $%s"
-	MutatorObjectFmt = `%sMutator $%s`
-	TransactorObjectFmt = "%sTransactor $%s"
+	QueryObjectFmt        = "%sQuery $%s"
+	MutatorObjectFmt      = `%sMutator $%s`
+	TransactorObjectFmt   = "%sTransactor $%s"
 
 	/*Http METHODS*/
 	HttpPost   = "POST"
@@ -38,12 +38,9 @@ const (
 	HttpDelete = "DELETE"
 
 	/*Http Methods Name*/
-	CreateMethod           = "create"
-	UpdateMethod           = "update"
-	DeleteMethod           = "delete"
-	GetAllMethod           = "getAll"
-	FindByIdMethod         = "findById"
-
-
-
+	CreateMethod   = "create"
+	UpdateMethod   = "update"
+	DeleteMethod   = "delete"
+	GetAllMethod   = "getAll"
+	FindByIdMethod = "findById"
 )

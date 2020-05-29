@@ -40,9 +40,8 @@ type ControllerGenerator struct {
 	queryVariableName        string
 	transactorVariableName   string
 	lowerCamelCaseIdentifier string
-	queryClassName string
-	transactorClassName string
-
+	queryClassName           string
+	transactorClassName      string
 }
 
 func NewControllerGenerator() *ControllerGenerator {
@@ -172,7 +171,7 @@ Sample Usage:
 func (conGen *ControllerGenerator) AddFindById() *ControllerGenerator {
 	ResponseHelperSuccess := []api.TabbedUnit{
 		core.NewReturnStatement(fmt.Sprintf(
-			FindByIdCallFmt, ResponseHelperSuccess,conGen.queryVariableName, Id)),
+			FindByIdCallFmt, ResponseHelperSuccess, conGen.queryVariableName, Id)),
 	}
 	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName(FindByIdMethod).
 		AddArgument(Id).SetVisibility(VisibilityPublic).AddStatements(ResponseHelperSuccess).GetFunction())
@@ -204,7 +203,7 @@ Sample Usage:
 */
 func (conGen *ControllerGenerator) AddConstructor() *ControllerGenerator {
 	constructorArguments := []string{
-	fmt.Sprintf(QueryObjectFmt, conGen.identifier, conGen.queryVariableName),
+		fmt.Sprintf(QueryObjectFmt, conGen.identifier, conGen.queryVariableName),
 		fmt.Sprintf(TransactorObjectFmt, conGen.identifier, conGen.transactorVariableName),
 	}
 
@@ -212,8 +211,8 @@ func (conGen *ControllerGenerator) AddConstructor() *ControllerGenerator {
 	conGen.classBuilder.AddMember(core.NewVarDeclaration(VisibilityPrivate, conGen.transactorVariableName))
 
 	constructorStatements := []api.TabbedUnit{
-		core.NewSimpleStatement(fmt.Sprintf(ThisAssignFmt , conGen.queryVariableName , conGen.queryVariableName)),
-		core.NewSimpleStatement(fmt.Sprintf(ThisAssignFmt, conGen.transactorVariableName , conGen.transactorVariableName)),
+		core.NewSimpleStatement(fmt.Sprintf(ThisAssignFmt, conGen.queryVariableName, conGen.queryVariableName)),
+		core.NewSimpleStatement(fmt.Sprintf(ThisAssignFmt, conGen.transactorVariableName, conGen.transactorVariableName)),
 	}
 
 	conGen.classBuilder.AddFunction(

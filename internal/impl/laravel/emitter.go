@@ -31,7 +31,6 @@ func (e Emitter) Emit(value interface{}) {
 		model.SoftDeletes, model.Timestamps, pkColName(model.Cols)))
 	GetFromRegistry(ContextRelation).Handle(model.Name, model.Relations)
 
-
 }
 
 func (e Emitter) GetFileMap() map[string]api.EmitterFile {
