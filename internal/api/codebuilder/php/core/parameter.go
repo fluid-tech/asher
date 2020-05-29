@@ -18,10 +18,6 @@ func (a *Parameter) SetNumTabs(tabs int) {
 	a.tabs = tabs
 }
 
-func (a *Parameter) Id() string {
-	return a.value
-}
-
 func (a *Parameter) String() string {
 	return a.value
 }

@@ -22,10 +22,6 @@ func (stmt *SimpleStatement) SetNumTabs(tabs int) {
 	stmt.numTabs = tabs
 }
 
-func (stmt *SimpleStatement) Id() string {
-	return stmt.SimpleStatement
-}
-
 func (stmt *SimpleStatement) String() string {
 	var builder strings.Builder
 	fmt.Fprint(&builder, api.TabbedString(uint(stmt.numTabs)), stmt.SimpleStatement, ";")

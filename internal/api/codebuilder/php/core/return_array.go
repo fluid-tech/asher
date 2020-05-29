@@ -35,10 +35,6 @@ func (r *ReturnArray) SetNumTabs(tabs int) {
 	r.tabs = tabs
 }
 
-func (r *ReturnArray) Id() string {
-	return "return"
-}
-
 func (r *ReturnArray) String() string {
 	var builder strings.Builder
 	fmt.Fprint(&builder, api.TabbedString(uint(r.tabs)), "return [\n", strings.Join(r.Statements, ",\n"), "];")

@@ -10,6 +10,10 @@ import (
 )
 
 const TransactorNamespace = `App\Transactors`
+const InitiateSelfClassName = `$this->className = self::CLASS_NAME`
+const QueryImporterFmt = `App\Query\%sQuery`
+const MutatorImporterFmt = `App\Transactors\Mutations\%sMutator`
+const DollarVarFmt = `$%s`
 
 /*Variables used between functions*/
 var superConstructorCall *core.FunctionCall
@@ -49,8 +53,8 @@ Sample Usage:
 func (transactorGenerator *TransactorGenerator) SetIdentifier(identifier string) *TransactorGenerator {
 	transactorGenerator.identifier = identifier
 	transactorGenerator.lowerCamelIdentifier = strcase.ToLowerCamel(transactorGenerator.identifier)
-	transactorGenerator.queryVariableName = transactorGenerator.lowerCamelIdentifier + `Query`
-	transactorGenerator.mutatorVariableName = transactorGenerator.lowerCamelIdentifier + `Mutator`
+	transactorGenerator.queryVariableName = fmt.Sprintf(`%sQuery`, transactorGenerator.lowerCamelIdentifier)
+	transactorGenerator.mutatorVariableName = fmt.Sprintf(`%sMutator`, transactorGenerator.lowerCamelIdentifier)
 	return transactorGenerator
 }
 
@@ -123,15 +127,15 @@ func (transactorGenerator *TransactorGenerator) BuildTransactor() *core.Class {
 
 	/*CONSTRUCTOR*/
 
-	constructorFuncBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
+	constructorFuncBuilder := builder.NewFunctionBuilder().SetVisibility(VisibilityPublic).SetName(FunctionNameCtor).
 		AddArguments([]string{
-			fmt.Sprintf(`%sQuery $%s`, transactorGenerator.identifier, transactorGenerator.queryVariableName),
-			fmt.Sprintf(`%sMutator $%s`, transactorGenerator.identifier, transactorGenerator.mutatorVariableName)}).
+			fmt.Sprintf(QueryObjectFmt, transactorGenerator.identifier, transactorGenerator.queryVariableName),
+			fmt.Sprintf(MutatorObjectFmt, transactorGenerator.identifier, transactorGenerator.mutatorVariableName)}).
 		AddStatements(transactorGenerator.constructorStatements)
 
 	transactorGenerator.classBuilder.AddFunction(constructorFuncBuilder.GetFunction()).
 		SetName(className).SetPackage(TransactorNamespace).
-		SetExtends(strcase.ToCamel(transactorGenerator.classToExtend) + "Transactor")
+		SetExtends(fmt.Sprintf(`%sTransactor`, strcase.ToCamel(transactorGenerator.classToExtend)))
 
 	return transactorGenerator.classBuilder.GetClass()
 }
@@ -156,30 +160,33 @@ Prepend is required because defaults are added after the handler inserts the val
 func (transactorGenerator *TransactorGenerator) addDefaults() *TransactorGenerator {
 	/*Default Imports*/
 	transactorImports := []string{
-		fmt.Sprintf(`App\Query\%sQuery`, transactorGenerator.identifier),
-		fmt.Sprintf(`App\Transactors\Mutations\%sMutator`, transactorGenerator.identifier),
+		fmt.Sprintf(QueryImporterFmt, transactorGenerator.identifier),
+		fmt.Sprintf(MutatorImporterFmt, transactorGenerator.identifier),
 	}
 	transactorGenerator.imports = append(transactorImports, transactorGenerator.imports...)
 
 	/*Default CLASS MEMBERS*/
-	className := transactorGenerator.identifier + "Transactor"
 	transactorGenerator.transactorMembers = append([]api.TabbedUnit{core.NewSimpleStatement(
-		fmt.Sprintf("private const CLASS_NAME = '%s'", className))},
+		fmt.Sprintf(TransactorClassNameFmt, VisibilityPrivate, transactorGenerator.identifier))},
+
 		transactorGenerator.transactorMembers...)
 
 	transactorGenerator.parentConstructorCallArgs = append([]api.TabbedUnit{
-		core.NewParameter("$" + transactorGenerator.queryVariableName),
-		core.NewParameter("$" + transactorGenerator.mutatorVariableName),
+		core.NewParameter(fmt.Sprintf(DollarVarFmt, transactorGenerator.queryVariableName)),
+		core.NewParameter(fmt.Sprintf(DollarVarFmt, transactorGenerator.mutatorVariableName)),
 		core.NewParameter(`"id"`)},
 		transactorGenerator.parentConstructorCallArgs...,
 	)
 
 	/*DEFAULT CONSTRUCTOR STATEMENTS*/
-	superConstructorCall = core.NewFunctionCall("parent::__construct")
+
+	superConstructorCall = core.NewFunctionCall(FunctionNameBaseCtor)
+
+	superConstructorCall = core.NewFunctionCall(FunctionNameBaseCtor)
 
 	transactorGenerator.constructorStatements = append(transactorGenerator.constructorStatements,
 		superConstructorCall,
-		core.NewSimpleStatement("$this->className = self::CLASS_NAME"),
+		core.NewSimpleStatement(InitiateSelfClassName),
 	)
 
 	return transactorGenerator

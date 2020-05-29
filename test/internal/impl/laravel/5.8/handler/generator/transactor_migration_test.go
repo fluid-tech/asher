@@ -16,7 +16,7 @@ func TestTransactorMigration(t *testing.T) {
 
 }
 
-func genTransactorMigration(className string,expectedOut string) *api.GeneralTest {
+func genTransactorMigration(className string, expectedOut string) *api.GeneralTest {
 	migGen := generator.NewMigrationGenerator().SetName(className)
 	generator.NewTransactorMigration(migGen).AddMigrationForFileUrls()
 	return api.NewGeneralTest(migGen.String(), expectedOut)

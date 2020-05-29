@@ -18,4 +18,32 @@ const (
 	NewBaseFileUploadHelper  = `new BaseFileUploadHelper(self::BASE_PATH, self::IMAGE_VALIDATION_RULES,"png")`
 	ImageUploadHelperPath    = `App\Helpers\ImageUploadHelper`
 	BaseFileUploadHelperPath = `App\Helpers\BaseFileUploadHelper`
+	BasePathFmt              = `%s const BASE_PATH = "%s"`
+	TransactorClassNameFmt   = `%s const CLASS_NAME = '%sTransactor'`
+
+	VisibilityPublic     = "public"
+	VisibilityPrivate    = "private"
+	VisibilityProtected  = "protected"
+	FunctionNameCtor     = "__construct"
+	FunctionNameBaseCtor = "parent::__construct"
+	QueryObjectFmt       = "%sQuery $%s"
+	MutatorObjectFmt     = `%sMutator $%s`
+	TransactorObjectFmt  = "%sTransactor $%s"
+
+	/*Http METHODS*/
+	HttpPost   = "POST"
+	HttpGet    = "GET"
+	HttpPut    = "PUT"
+	HttpDelete = "DELETE"
+
+	/*Rest Controller Methods Name*/
+	MethodNameCreate   = "create"
+	MethodNameUpdate   = "update"
+	MethodNameDelete   = "delete"
+	MethodNameGetAll   = "getAll"
+	MethodNameFindById = "findById"
+
+	ImportPathModelFmt      = `App\%s`
+	ImportPathTransactorFmt = `App\Transactors\%s`
+	ImportPathQueryFmt      = `App\Query\%s`
 )

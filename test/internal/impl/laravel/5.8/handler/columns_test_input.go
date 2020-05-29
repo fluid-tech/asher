@@ -4,10 +4,9 @@ import (
 	"asher/internal/models"
 )
 
-const test_1_tableName = "student_enrollments"
+const TableStudentEnrollments = "student_enrollments"
 
-var test_1_columnInputArray = []models.Column{
-
+var StudentEnrollmentInputArr = []models.Column{
 	{
 		Name:               "id_int",
 		ColType:            "integer",
@@ -35,7 +34,7 @@ var test_1_columnInputArray = []models.Column{
 		Allowed:            nil,
 		Hidden:             true,
 		Guarded:            true,
-		Primary:            true,
+		Primary:            false,
 		Unique:             false,
 		Nullable:           false,
 		OnDelete:           "",
@@ -51,7 +50,7 @@ var test_1_columnInputArray = []models.Column{
 		Allowed:            nil,
 		Hidden:             true,
 		Guarded:            true,
-		Primary:            true,
+		Primary:            false,
 		Unique:             false,
 		Nullable:           false,
 		OnDelete:           "",
@@ -67,8 +66,8 @@ var test_1_columnInputArray = []models.Column{
 		Allowed:            nil,
 		Hidden:             true,
 		Guarded:            true,
-		Primary:            true,
-		Unique:             false,
+		Primary:            false,
+		Unique:             true,
 		Nullable:           false,
 		OnDelete:           "",
 	},
@@ -99,7 +98,7 @@ var test_1_columnInputArray = []models.Column{
 		Allowed:            nil,
 		Hidden:             true,
 		Guarded:            true,
-		Primary:            true,
+		Primary:            false,
 		Unique:             false,
 		Nullable:           false,
 		OnDelete:           "",
@@ -218,17 +217,19 @@ var test_1_columnInputArray = []models.Column{
 	},
 }
 
-var test_1_fillableExpectedOutput = []string{`"id_int"`, `"id_medium"`, `"id_small"`, `"id_tiny"`, `"id_big"`, `"id_uuid"`, `"order_id"`, `"order_id"`, `"order_id"`}
-var test_1_hiddenExpectedOutput = []string{`"id_int"`, `"id_medium"`, `"id_small"`, `"id_tiny"`, `"id_big"`, `"id_uuid"`, `"order_id"`, `"order_id"`, `"order_id"`, `"name"`, `"dummy_column"`}
+const ColumnTestMigration = `use Illuminate\Database\Migrations\Migration;
+use Illuminate\DatabaseSchema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-const migration_output_up = `public function up() {
-    Schema::create('student_enrollments',  function (Blueprint $table) {
+class CreateStudentEnrollmentTable extends Migration {
+    public function up() {
+        Schema::create('student_enrollment',  function (Blueprint $table) {
     $table->increments('id_int');
-    $table->mediumIncrements('id_medium');
-    $table->smallIncrements('id_small');
-    $table->tinyIncrements('id_tiny');
+    $table->mediumInteger('id_medium');
+    $table->unsupported datatype;
+    $table->tinyInteger('id_tiny')->unique();
     $table->bigIncrements('id_big');
-    $table->uuid('id_uuid')->primary();
+    $table->unsupported datatype;
     $table->foreign('order_id')->references('id')->on('Orders')->onDelete('cascade');
     $table->foreign('order_id')->references('id')->on('Orders')->onDelete('set null');
     $table->foreign('order_id')->references('id')->on('Orders')->onDelete('set null')->nullable();
@@ -239,12 +240,64 @@ const migration_output_up = `public function up() {
 }
 
 );
-}
+    }
 
+
+    public function down() {
+        Schema::dropIfExists('student_enrollment');
+    }
+
+
+}
 `
+const ColumnTestModel = `namespace App;
 
-const migration_output_down = `public function down() {
-    Schema::dropIfExists('student_enrollments');
+use Illuminate\Database\Eloquent\Model;
+
+class StudentEnrollment extends Model {
+    protected $fillable = ["id_int", 
+"id_medium", 
+"id_small", 
+"id_tiny", 
+"id_big", 
+"id_uuid", 
+"order_id", 
+"order_id", 
+"order_id"
+];
+
+    protected $visible = ["id_int", 
+"id_medium", 
+"id_small", 
+"id_tiny", 
+"id_big", 
+"id_uuid", 
+"order_id", 
+"order_id", 
+"order_id", 
+"name", 
+"dummy_column"
+];
+
+    public static function createValidationRules() {
+        return [
+'id_big' => [ 'unique:StudentEnrollment,id_big' ],
+'id_int' => [ 'min:100', 'max:334', 'number', 'unique:order,order_id' ],
+'id_medium' => [ 'max:334', 'unique:StudentEnrollment,id_medium', 'min:100', 'min:100', 'number' ],
+'id_small' => [ 'unique:orders,id_small' ],
+'id_tiny' => [ 'unique:StudentEnrollment,id_tiny' ]];
+    }
+
+
+    public static function updateValidationRules(array $rowIds) {
+        return [
+'id_big' => [ 'unique:StudentEnrollment,id_big,' . $rowIds['StudentEnrollment'] ],
+'id_int' => [ 'min:100', 'max:334', 'number', 'unique:order,order_id,' . $rowIds['order'] ],
+'id_medium' => [ 'max:334', 'unique:StudentEnrollment,id_medium,' . $rowIds['StudentEnrollment'], 'min:100', 'min:100', 'number' ],
+'id_small' => [ 'unique:orders,id_small,' . $rowIds['orders'] ],
+'id_tiny' => [ 'unique:StudentEnrollment,id_tiny,' . $rowIds['StudentEnrollment'] ]];
+    }
+
+
 }
-
 `

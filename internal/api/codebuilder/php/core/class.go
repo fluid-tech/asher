@@ -2,7 +2,6 @@ package core
 
 import (
 	"asher/internal/api"
-	"errors"
 	"fmt"
 	"strings"
 )
@@ -32,10 +31,6 @@ func NewClass() *Class {
 	}
 }
 
-func (klass *Class) Id() string {
-	return klass.Name
-}
-
 func (klass *Class) SetNumTabs(tabs int) {
 	klass.Tabs = tabs
 }
@@ -54,30 +49,6 @@ func (klass Class) String() string {
 	fmt.Fprint(&sb, api.TabbedString(uint(klass.Tabs)), "}\n")
 
 	return sb.String()
-}
-
-/**
-Searches for the identifier in the members list
-*/
-func (klass *Class) FindMember(identifier string) (api.TabbedUnit, error) {
-	for _, element := range klass.Members {
-		if element.Id() == identifier {
-			return element, nil
-		}
-	}
-	return nil, errors.New(fmt.Sprintf("couldnt find member with identifier %s", identifier))
-}
-
-/**
-Searches for the identifier in the functions list
-*/
-func (klass *Class) FindFunction(identifier string) (*Function, error) {
-	for _, element := range klass.Functions {
-		if element.Id() == identifier {
-			return element, nil
-		}
-	}
-	return nil, errors.New(fmt.Sprintf("couldnt find function with identifier %s", identifier))
 }
 
 /**

@@ -62,7 +62,7 @@ func (controllerHandler *ControllerHandler) handleRestController(identifier stri
 
 	conGen.AddFunctionsInController(controllerConfig.HttpMethods)
 
-	context.GetFromRegistry("controller").AddToCtx(identifier, conGen)
+	context.GetFromRegistry(context.ContextController).AddToCtx(identifier, conGen)
 
 	controllerEmitterFile := core.NewPhpEmitterFile(identifier+"RestController.php", api.ControllerPath, conGen,
 		api.Controller)
@@ -85,8 +85,8 @@ func (controllerHandler *ControllerHandler) handleTransactor(identifier string, 
 
 	var transactorEmmiterFile api.EmitterFile
 
-	modelGen := context.GetFromRegistry("model").GetCtx(identifier).(*generator.ModelGenerator)
-	migrationGen := context.GetFromRegistry("migration").GetCtx(identifier).(*generator.MigrationGenerator)
+	modelGen := context.GetFromRegistry(context.ContextModel).GetCtx(identifier).(*generator.ModelGenerator)
+	migrationGen := context.GetFromRegistry(context.ContextMigration).GetCtx(identifier).(*generator.MigrationGenerator)
 	/*SWITCH CASE FOR TYPE OF TRANSACTOR*/
 
 	switch strings.ToLower(controllerType) {
@@ -106,7 +106,7 @@ func (controllerHandler *ControllerHandler) handleDefaultTransactor(identifier s
 
 	transactorGen := generator.NewTransactorGenerator("Base").SetIdentifier(identifier)
 
-	context.GetFromRegistry("transactor").AddToCtx(identifier, transactorGen)
+	context.GetFromRegistry(context.ContextTransactor).AddToCtx(identifier, transactorGen)
 
 	transactorEmitter := core.NewPhpEmitterFile(identifier+"Transactor.php", api.TransactorPath, transactorGen,
 		api.Transactor)
@@ -125,7 +125,7 @@ func (controllerHandler *ControllerHandler) handleFileTransactor(identifier stri
 	transactorGen := generator.NewTransactorGenerator("file").SetIdentifier(identifier)
 	generator.NewFileTransactor(transactorGen).AddDefaults()
 
-	context.GetFromRegistry("transactor").AddToCtx(identifier, transactorGen)
+	context.GetFromRegistry(context.ContextTransactor).AddToCtx(identifier, transactorGen)
 
 	transactorEmitter := core.NewPhpEmitterFile(identifier+"Transactor.php", api.TransactorPath, transactorGen,
 		api.Transactor)
@@ -147,7 +147,7 @@ func (controllerHandler *ControllerHandler) handleImageTransactor(identifier str
 	/*TRANSACTOR GENERATION*/
 	transactorGen := generator.NewTransactorGenerator("image").SetIdentifier(identifier)
 	generator.NewImageTransactor(transactorGen).AddDefaults()
-	context.GetFromRegistry("transactor").AddToCtx(identifier, transactorGen)
+	context.GetFromRegistry(context.ContextTransactor).AddToCtx(identifier, transactorGen)
 	transactorEmitter := core.NewPhpEmitterFile(identifier+"Transactor.php", api.TransactorPath, transactorGen,
 		api.Transactor)
 	return transactorEmitter
@@ -158,7 +158,7 @@ func (controllerHandler *ControllerHandler) handleMutator(identifier string) api
 	mutatorGen := generator.NewMutatorGenerator()
 	mutatorGen.SetIdentifier(identifier)
 
-	context.GetFromRegistry("mutator").AddToCtx(identifier, mutatorGen)
+	context.GetFromRegistry(context.ContextMutator).AddToCtx(identifier, mutatorGen)
 	mutatorEmitter :=
 		core.NewPhpEmitterFile(identifier+"Mutator.php", api.MutatorPath, mutatorGen, api.Mutator)
 
@@ -170,7 +170,7 @@ func (controllerHandler *ControllerHandler) handleQuery(
 
 	queryGenerator := generator.NewQueryGenerator(true).SetIdentifier(identifier)
 
-	context.GetFromRegistry("query").AddToCtx(identifier, queryGenerator)
+	context.GetFromRegistry(context.ContextQuery).AddToCtx(identifier, queryGenerator)
 
 	emitFile := core.NewPhpEmitterFile(identifier+"Query.php", api.QueryPath, queryGenerator, api.Query)
 
@@ -191,18 +191,20 @@ func (controllerHandler *ControllerHandler) handleRoutes(identifier string, http
 
 	addRouteToEmmitFiles := false
 
-	gen := context.GetFromRegistry("route").GetCtx("api").(*generator.RouteGenerator)
-
+	gen := context.GetFromRegistry(context.ContextRoute).GetCtx("api")
+	var actualGenerator *generator.RouteGenerator
 	if gen == nil {
 		addRouteToEmmitFiles = true
-		gen = generator.NewRouteGenerator()
-		context.GetFromRegistry("route").AddToCtx("api", gen)
+		actualGenerator = generator.NewRouteGenerator()
+		context.GetFromRegistry(context.ContextRoute).AddToCtx("api", actualGenerator)
+	} else {
+		actualGenerator = gen.(*generator.RouteGenerator)
 	}
 
-	gen.AddDefaultRestRoutes(identifier, httpMethods)
+	actualGenerator.AddDefaultRestRoutes(identifier, httpMethods)
 
 	if addRouteToEmmitFiles {
-		return core.NewPhpEmitterFile("asher_api.php", api.RouteFilePath, gen, api.RouterFile)
+		return core.NewPhpEmitterFile("asher_api.php", api.RouteFilePath, actualGenerator, api.RouterFile)
 	}
 
 	return nil

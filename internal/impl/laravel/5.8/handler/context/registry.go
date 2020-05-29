@@ -1,14 +1,25 @@
 package context
 
+const (
+	ContextMigration  = "migration"
+	ContextModel      = "model"
+	ContextRoute      = "route"
+	ContextController = "controller"
+	ContextMutator    = "mutator"
+	ContextTransactor = "transactor"
+	ContextQuery      = "query"
+	ContextRelation   = "relation"
+)
+
 var registry = map[string]BaseContext{
-	"migration":  NewMigrationContext(),
-	"model":      NewModelContext(),
-	"route":      NewRouteContext(),
-	"controller": NewControllerContext(),
-	"mutator":    NewMutatorContext(),
-	"transactor": NewTransactorContext(),
-	"query":      NewQueryContext(),
-	"relation":   NewRelationshipContext(),
+	ContextMigration:  NewGenericContext(),
+	ContextModel:      NewGenericContext(),
+	ContextRoute:      NewGenericContext(),
+	ContextController: NewGenericContext(),
+	ContextMutator:    NewGenericContext(),
+	ContextTransactor: NewGenericContext(),
+	ContextQuery:      NewGenericContext(),
+	ContextRelation:   NewGenericContext(),
 }
 
 /*

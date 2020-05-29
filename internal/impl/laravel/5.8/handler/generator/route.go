@@ -56,11 +56,11 @@ func (routeGenerator *RouteGenerator) AddDefaultRestRoutes(modelName string, sup
 	}
 
 	var apiRouteConfig = []RouteConfig{
-		{actionFunction: "create", method: "POST", subURI: ""},
-		{actionFunction: "edit", method: "PUT", subURI: "{id}"},
-		{actionFunction: "delete", method: "DELETE", subURI: "{id}"},
-		{actionFunction: "findById", method: "GET", subURI: "{id}"},
-		{actionFunction: "getAll", method: "GET", subURI: "all"},
+		{actionFunction: MethodNameCreate, method: HttpPost, subURI: ""},
+		{actionFunction: MethodNameUpdate, method: HttpPut, subURI: "{id}"},
+		{actionFunction: MethodNameDelete, method: HttpDelete, subURI: "{id}"},
+		{actionFunction: MethodNameFindById, method: HttpGet, subURI: "{id}"},
+		{actionFunction: MethodNameGetAll, method: HttpGet, subURI: "all"},
 	}
 
 	for _, routeConfig := range apiRouteConfig {

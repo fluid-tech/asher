@@ -8,6 +8,12 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
+const (
+	MigrationExtends = "Migration"
+	IdentifierDown   = "down"
+	IdentifierUp     = "up"
+)
+
 type MigrationGenerator struct {
 	api.Generator
 	classBuilder interfaces.Class
@@ -91,19 +97,19 @@ func (migrationGenerator *MigrationGenerator) Build() *core.Class {
 
 	schemaBlock := core.NewFunctionCall("Schema::create").AddArg(arg1).AddArg(arg2)
 
-	upFunction := builder.NewFunctionBuilder().SetName("up").SetVisibility("public").
+	upFunction := builder.NewFunctionBuilder().SetName(IdentifierUp).SetVisibility(VisibilityPublic).
 		AddStatement(schemaBlock).GetFunction()
 
 	// Preparing the statements for down function
 	dropStatement := api.TabbedUnit(core.NewSimpleStatement("Schema::dropIfExists('" + migrationGenerator.tableName + "')"))
-	downFunction := builder.NewFunctionBuilder().SetName("down").SetVisibility("public").
+	downFunction := builder.NewFunctionBuilder().SetName(IdentifierDown).SetVisibility(VisibilityPublic).
 		AddStatement(dropStatement).GetFunction()
 
 	migrationGenerator.classBuilder.AddImports([]string{
 		`Illuminate\Database\Migrations\Migration`,
 		`Illuminate\DatabaseSchema\Blueprint`,
 		`Illuminate\Support\Facades\Schema`,
-	}).SetExtends("Migration").AddFunction(upFunction).
+	}).SetExtends(MigrationExtends).AddFunction(upFunction).
 		AddFunction(downFunction)
 
 	return migrationGenerator.classBuilder.GetClass()

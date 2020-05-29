@@ -9,12 +9,11 @@ import (
 //Route::get('/user', 'UserController@index');
 func TestRouteGenerator(t *testing.T) {
 
-	routeGenerator := generator.NewRouteGenerator()
 	var table = []*api.GeneralTest{
-		genRouteTest(routeGenerator, "Student", []string{}, ApiRouteFileAfterStudentWithAllRoutes),
-		genRouteTest(routeGenerator, "Teacher", []string{"GET"}, ApiRouteFileAfterTeacherWithGetRoutes),
-		genRouteTest(routeGenerator, "Admin",
-			[]string{"PUT", "POST", "DELETE"}, ApiRouteFileAfterAdminWithPATCHPOSTDELTERoutes),
+		genRouteTest(generator.NewRouteGenerator(), "Student", []string{}, ApiRouteFileAfterStudentWithAllRoutes),
+		genRouteTest(generator.NewRouteGenerator(), "Teacher", []string{generator.HttpGet}, ApiRouteFileAfterTeacherWithGetRoutes),
+		genRouteTest(generator.NewRouteGenerator(), "Admin",
+			[]string{generator.HttpPut, generator.HttpPost, generator.HttpDelete}, ApiRouteFileAfterAdminWithPATCHPOSTDELTERoutes),
 	}
 	api.IterateAndTest(table, t)
 
