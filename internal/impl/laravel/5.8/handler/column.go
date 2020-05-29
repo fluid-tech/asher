@@ -14,7 +14,8 @@ import (
 type ColumnHandler struct {
 	api.Handler
 }
-
+const FkFmt = "$table->foreign('%s')->references('%s')->on('%s')->onDelete('%s')%s"
+const UuidFmt = "$table->uuid('%s')->primary()"
 func NewColumnHandler() *ColumnHandler {
 	return &ColumnHandler{}
 }
@@ -37,7 +38,6 @@ func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []model
 		columnHandler.handleGuarded(modelGenerator, singleColumn.Guarded, singleColumn.Name)
 		columnHandler.handleValidation(modelGenerator, singleColumn.Validations, singleColumn.Name, modelName)
 	}
-	//fmt.Print(modelGenerator.Build().String())
 	context.GetFromRegistry(context.ContextModel).AddToCtx(modelName, modelGenerator)
 
 	phpEmitter := core.NewPhpEmitterFile(modelName, api.ModelPath, modelGenerator, api.Model)
@@ -63,7 +63,8 @@ func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr
 	return phpEmitter
 }
 
-func (columnHandler *ColumnHandler) handleValidation(modelGenerator *generator.ModelGenerator, validations string, colName string, modelName string) {
+func (columnHandler *ColumnHandler) handleValidation(modelGenerator *generator.ModelGenerator, validations string,
+	colName string, modelName string) {
 	if validations != "" {
 		modelGenerator.AddCreateValidationRule(colName, validations, modelName)
 		modelGenerator.AddUpdateValidationRule(colName, validations, modelName)
@@ -104,7 +105,7 @@ func (columnHandler *ColumnHandler) handlePrimary(colType string, colName string
 		generatedLine = fmt.Sprintf("$table->%s('%s')", primaryKeyMethodName, colName)
 	} else if genStrat == "uuid" {
 		//$table->uuid('id')->primary();
-		generatedLine = fmt.Sprintf("$table->uuid('%s')->primary()", colName)
+		generatedLine = fmt.Sprintf(UuidFmt, colName)
 	} else {
 		panic("input Type does not match with the defined keywords (uuid, auto_increment)")
 	}
@@ -132,7 +133,7 @@ func (columnHandler *ColumnHandler) handleForeign(colName string, colTable strin
 	var sb string
 	var splitedArr []string
 	splitedArr = strings.Split(colTable, ":")
-	sb = fmt.Sprintf("$table->foreign('%s')->references('%s')->on('%s')->onDelete('%s')%s", colName, splitedArr[1], splitedArr[0], colOnDelete, columnHandler.handleNullable(isNullable))
+	sb = fmt.Sprintf(FkFmt, colName, splitedArr[1], splitedArr[0], colOnDelete, columnHandler.handleNullable(isNullable))
 
 	// TODO: check if the onDelete Value is sanitized of not
 	// TODO: do more research on cascade ondelete will it be mandatory or not
