@@ -24,11 +24,13 @@ func (e Emitter) Emit(value interface{}) {
 	// todo make this work for everything apart from Model instances
 
 	model := value.(models.Model)
+
 	GetFromRegistry(ContextColumns).Handle(model.Name, model.Cols)
 	GetFromRegistry(ContextController).Handle(model.Name, model.Controller)
 	GetFromRegistry(ContextAuditCols).Handle(model.Name, helper.NewAuditCol(model.AuditCols,
 		model.SoftDeletes, model.Timestamps, pkColName(model.Cols)))
 	GetFromRegistry(ContextRelation).Handle(model.Name, model.Relations)
+
 
 }
 
