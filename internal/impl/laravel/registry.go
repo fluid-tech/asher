@@ -5,10 +5,18 @@ import (
 	"asher/internal/impl/laravel/5.8/handler"
 )
 
+const (
+	ContextAuditCols  = "auditCols"
+	ContextController = "controller"
+	ContextColumns    = "columns"
+	ContextRelation	  = "relation"
+)
+
 var handlerRegistry = map[string]api.Handler{
-	"auditCols":  handler.NewAuditColHandler(),
-	"controller": handler.NewControllerHandler(),
-	"columns":    handler.NewColumnHandler(),
+	ContextAuditCols:  handler.NewAuditColHandler(),
+	ContextController: handler.NewControllerHandler(),
+	ContextColumns:    handler.NewColumnHandler(),
+	ContextRelation:   handler.NewRelationshipHandler(),
 }
 
 /**

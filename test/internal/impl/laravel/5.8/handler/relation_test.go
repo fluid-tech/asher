@@ -19,7 +19,7 @@ func Test_Relations(t *testing.T) {
 func getRelationTest(className string, hasMany []string, hasOne []string, expectedOut string) *api.GeneralTest {
 
 	modelGen := generator.NewModelGenerator().SetName(className)
-	context.GetFromRegistry("model").AddToCtx(className, modelGen)
+	context.GetFromRegistry(context.ContextModel).AddToCtx(className, modelGen)
 	handler.NewRelationshipHandler().Handle(className, models.Relation{
 		HasMany: hasMany,
 		HasOne:  hasOne,
