@@ -226,20 +226,20 @@ Parameters:
 Returns:
 	- Return instance of ControllerGenerator
 Sample Usage:
-	- controllerGeneratorObject.AddFunctionsInController([]string{"POST"})
+	- controllerGeneratorObject.AddFunctionsInController([]string{"HttpPOST"})
 */
 func (conGen *ControllerGenerator) AddFunctionsInController(methods []string) {
 	if methods != nil && len(methods) > 0 {
 		conGen.AddConstructor()
 		for _, element := range methods {
 			switch strings.ToUpper(element) {
-			case POST:
+			case HttpPOST:
 				conGen.AddCreate()
-			case GET:
+			case HttpGET:
 				conGen.AddFindById().AddGetAll()
-			case PUT:
+			case HttpPUT:
 				conGen.AddUpdate()
-			case DELETE:
+			case HttpDELETE:
 				conGen.AddDelete()
 			}
 		}

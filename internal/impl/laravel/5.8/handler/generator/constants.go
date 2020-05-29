@@ -27,10 +27,10 @@ const (
 	ParentConstructor   = "parent::__construct"
 
 	/*Http METHODS*/
-	POST   = "POST"
-	GET    = "GET"
-	PUT    = "PUT"
-	DELETE = "DELETE"
+	HttpPOST   = "POST"
+	HttpGET    = "GET"
+	HttpPUT    = "PUT"
+	HttpDELETE = "DELETE"
 
 	/*Http Methods Name*/
 	CreateMethod   = "create"
