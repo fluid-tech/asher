@@ -26,7 +26,6 @@ func (arr *ArrayAssignment) SetNumTabs(tabs int) {
 	arr.tabs = tabs
 }
 
-
 func (arr *ArrayAssignment) String() string {
 	var builder strings.Builder
 	fmt.Fprint(&builder, api.TabbedString(uint(arr.tabs)),

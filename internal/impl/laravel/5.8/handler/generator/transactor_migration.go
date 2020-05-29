@@ -29,5 +29,3 @@ func (transactorMigrationGen *TransactorMigration) AddMigrationForFileUrls() *Tr
 	transactorMigrationGen.migrationGen.AddColumn(core.NewSimpleStatement(fileUrlsMigration))
 	return transactorMigrationGen
 }
-
-

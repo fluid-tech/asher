@@ -2,9 +2,9 @@ package generator
 
 /*CONSTANTS*/
 const (
-	fileUrls = `file_urls`
-	urlsOffFileUrls = `file_urls.urls`
-	fileUrlsValidationRule = `sometimes|required`
+	fileUrls                      = `file_urls`
+	urlsOffFileUrls               = `file_urls.urls`
+	fileUrlsValidationRule        = `sometimes|required`
 	urlsOffFileUrlsValidationRule = `array`
 )
 

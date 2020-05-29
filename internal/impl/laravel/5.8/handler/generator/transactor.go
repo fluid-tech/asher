@@ -11,12 +11,8 @@ import (
 
 const TransactorNamespace = `App\Transactors`
 const InitiateSelfClassName = `$this->className = self::CLASS_NAME`
-const CallParentConstructor = `parent::__construct`
 const QueryImporterFmt = `App\Query\%sQuery`
 const MutatorImporterFmt = `App\Transactors\Mutations\%sMutator`
-const TransactorClassNameFmt = `private const CLASS_NAME = '%sTransactor'`
-const QueryObjectFmt = `%sQuery $%s`
-const MutatorObjectFmt = `%sMutator $%s`
 const DollarVarFmt = `$%s`
 
 /*Variables used between functions*/
@@ -131,7 +127,7 @@ func (transactorGenerator *TransactorGenerator) BuildTransactor() *core.Class {
 
 	/*CONSTRUCTOR*/
 
-	constructorFuncBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
+	constructorFuncBuilder := builder.NewFunctionBuilder().SetVisibility(VisibilityPublic).SetName(FunctionNameCtor).
 		AddArguments([]string{
 			fmt.Sprintf(QueryObjectFmt, transactorGenerator.identifier, transactorGenerator.queryVariableName),
 			fmt.Sprintf(MutatorObjectFmt, transactorGenerator.identifier, transactorGenerator.mutatorVariableName)}).
@@ -171,7 +167,8 @@ func (transactorGenerator *TransactorGenerator) addDefaults() *TransactorGenerat
 
 	/*Default CLASS MEMBERS*/
 	transactorGenerator.transactorMembers = append([]api.TabbedUnit{core.NewSimpleStatement(
-		fmt.Sprintf(TransactorClassNameFmt, transactorGenerator.identifier))},
+		fmt.Sprintf(TransactorClassNameFmt, VisibilityPrivate, transactorGenerator.identifier))},
+
 		transactorGenerator.transactorMembers...)
 
 	transactorGenerator.parentConstructorCallArgs = append([]api.TabbedUnit{
@@ -182,7 +179,10 @@ func (transactorGenerator *TransactorGenerator) addDefaults() *TransactorGenerat
 	)
 
 	/*DEFAULT CONSTRUCTOR STATEMENTS*/
-	superConstructorCall = core.NewFunctionCall(CallParentConstructor)
+
+	superConstructorCall = core.NewFunctionCall(FunctionNameBaseCtor)
+
+	superConstructorCall = core.NewFunctionCall(FunctionNameBaseCtor)
 
 	transactorGenerator.constructorStatements = append(transactorGenerator.constructorStatements,
 		superConstructorCall,

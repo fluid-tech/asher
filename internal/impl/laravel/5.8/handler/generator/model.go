@@ -21,6 +21,13 @@ type ModelGenerator struct {
 
 const RowIdsArr = "array $rowIds"
 const RowIdVar = "$rowIds"
+const Unique = "unique"
+const ModelPackage = "App"
+const ModelExtends = "Model"
+const Fillable = "fillable"
+const Visible = "visible"
+const UpdateRuleFunctionName = "updateValidationRules"
+const CreateRuleFunctionName = "createValidationRules"
 
 /**
 Creates a new instance of this generator with a new interfaces.Class
@@ -52,7 +59,7 @@ func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, co
 	returnString := "[ "
 	var ruleArray = strings.Split(colRule, "|")
 	for i := 0; i < len(ruleArray); i++ {
-		if strings.HasPrefix(ruleArray[i], "unique:") {
+		if strings.HasPrefix(ruleArray[i], Unique+":") {
 			tableDataSplitter := strings.Split(ruleArray[i], ",")
 			//tableName := strings.TrimPrefix(tableDataSplitter[0], "unique:")
 			if len(tableDataSplitter) == 1 {
@@ -60,7 +67,7 @@ func (modelGenerator *ModelGenerator) AddCreateValidationRule(colName string, co
 			} else {
 				ruleArray[i] = fmt.Sprintf(`'%s'`, ruleArray[i])
 			}
-		} else if ruleArray[i] == "unique" {
+		} else if ruleArray[i] == Unique {
 			ruleArray[i] = fmt.Sprintf(`'%s:%s,%s'`, ruleArray[i], modelName, colName)
 			//ruleArray[i] = `'` + ruleArray[i] + ":" + modelName + "," + colName + `'`
 		} else {
@@ -89,9 +96,9 @@ func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, co
 	returnString := "[ "
 	var ruleArray = strings.Split(colRule, "|")
 	for i := 0; i < len(ruleArray); i++ {
-		if strings.HasPrefix(ruleArray[i], "unique:") {
+		if strings.HasPrefix(ruleArray[i], Unique+":") {
 			tableDataSplitter := strings.Split(ruleArray[i], ",")
-			tableName := strings.TrimPrefix(tableDataSplitter[0], "unique:")
+			tableName := strings.TrimPrefix(tableDataSplitter[0], Unique+":")
 			if len(tableDataSplitter) == 1 {
 				ruleArray[i] = fmt.Sprintf(`'%s,%s,' . %s['%s']`, ruleArray[i], colName, RowIdVar, tableName)
 				//ruleArray[i] = `'` + ruleArray[i] + `,` + colName + `,' . RowId'` + tableName + `']`
@@ -99,7 +106,7 @@ func (modelGenerator *ModelGenerator) AddUpdateValidationRule(colName string, co
 				ruleArray[i] = fmt.Sprintf(`'%s,' . %s['%s']`, ruleArray[i], RowIdVar, tableName)
 				//ruleArray[i] = `'` + ruleArray[i] + `,' . RowId'` + tableName + `']`
 			}
-		} else if ruleArray[i] == "unique" {
+		} else if ruleArray[i] == Unique {
 			ruleArray[i] = fmt.Sprintf(`'%s:%s,%s,' . %s['%s']`, ruleArray[i], modelName, colName, RowIdVar, modelName)
 			//ruleArray[i] = `'` + ruleArray[i] + ":" + modelName + "," + colName + `,' . RowId'` + modelName + `']`
 		} else {
@@ -138,7 +145,7 @@ func (modelGenerator *ModelGenerator) SetName(tableName string) *ModelGenerator 
 	- AddFillable('student_name')
 */
 func (modelGenerator *ModelGenerator) AddFillable(columnName string) *ModelGenerator {
-	modelGenerator.fillables = append(modelGenerator.fillables, `"`+columnName+`"`)
+	modelGenerator.fillables = append(modelGenerator.fillables, fmt.Sprintf(`"%s"`, columnName))
 	return modelGenerator
 }
 
@@ -152,7 +159,7 @@ func (modelGenerator *ModelGenerator) AddFillable(columnName string) *ModelGener
 	- AddHiddenField('student_name')
 */
 func (modelGenerator *ModelGenerator) AddHiddenField(columnName string) *ModelGenerator {
-	modelGenerator.hidden = append(modelGenerator.hidden, `"`+columnName+`"`)
+	modelGenerator.hidden = append(modelGenerator.hidden, fmt.Sprintf(`"%s"`, columnName))
 	return modelGenerator
 }
 
@@ -163,19 +170,19 @@ Returns:
 	- The corresponding model core.Class from the given ingredients of input.
 */
 func (modelGenerator *ModelGenerator) Build() *core.Class {
-	modelGenerator.classBuilder = modelGenerator.classBuilder.SetPackage("App").AddImport(
+	modelGenerator.classBuilder = modelGenerator.classBuilder.SetPackage(ModelPackage).AddImport(
 		`Illuminate\Database\Eloquent\Model`,
-	).SetExtends("Model")
+	).SetExtends(ModelExtends)
 
 	if len(modelGenerator.fillables) > 0 {
-		fillableArray := api.TabbedUnit(core.NewArrayAssignment("protected", "fillable",
-			modelGenerator.fillables))
+		fillableArray := core.NewArrayAssignment(VisibilityProtected, Fillable,
+			modelGenerator.fillables)
 		modelGenerator.classBuilder.AddMember(fillableArray)
 	}
 
 	if len(modelGenerator.hidden) > 0 {
-		hiddenArray := api.TabbedUnit(core.NewArrayAssignment("protected", "visible",
-			modelGenerator.hidden))
+		hiddenArray := core.NewArrayAssignment(VisibilityProtected, Visible,
+			modelGenerator.hidden)
 		modelGenerator.classBuilder.AddMember(hiddenArray)
 	}
 
@@ -207,9 +214,9 @@ func (modelGenerator *ModelGenerator) String() string {
 	- getValidationRulesFunction(map[string]string{'name':'max:255'})
 */
 func getUpdateValidationRulesFunction(rules map[string]string) *core.Function {
-	returnArray := api.TabbedUnit(core.NewReturnArrayFromMapRaw(rules))
-	function := builder.NewFunctionBuilder().SetName("updateValidationRules").
-		SetVisibility("public").AddStatement(returnArray).SetStatic(true).AddArgument(RowIdsArr).GetFunction()
+	returnArray := core.NewReturnArrayFromMapRaw(rules)
+	function := builder.NewFunctionBuilder().SetName(UpdateRuleFunctionName).
+		SetVisibility(VisibilityPublic).AddStatement(returnArray).SetStatic(true).AddArgument(RowIdsArr).GetFunction()
 	return function
 }
 
@@ -223,8 +230,8 @@ func getUpdateValidationRulesFunction(rules map[string]string) *core.Function {
 	- getValidationRulesFunction(map[string]string{'name':'max:255'})
 */
 func getCreateValidationRulesFunction(rules map[string]string) *core.Function {
-	returnArray := api.TabbedUnit(core.NewReturnArrayFromMapRaw(rules))
-	function := builder.NewFunctionBuilder().SetName("createValidationRules").
-		SetVisibility("public").AddStatement(returnArray).SetStatic(true).GetFunction()
+	returnArray := core.NewReturnArrayFromMapRaw(rules)
+	function := builder.NewFunctionBuilder().SetName(CreateRuleFunctionName).
+		SetVisibility(VisibilityPublic).AddStatement(returnArray).SetStatic(true).GetFunction()
 	return function
 }

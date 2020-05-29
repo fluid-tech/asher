@@ -28,7 +28,7 @@ func TestColumns(t *testing.T) {
 
 }
 
-func genColTest(modelName string, cols []models.Column, t *testing.T, ) []string {
+func genColTest(modelName string, cols []models.Column, t *testing.T) []string {
 	emitterFile, err := handler.NewColumnHandler().Handle(modelName, cols)
 
 	if err != nil {

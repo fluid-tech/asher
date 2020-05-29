@@ -14,7 +14,7 @@ func TestTransactorModel(t *testing.T) {
 	api.IterateAndTest(table, t)
 }
 
-func genTransactorModel(className string,expectedOut string) *api.GeneralTest {
+func genTransactorModel(className string, expectedOut string) *api.GeneralTest {
 	modelGen := generator.NewModelGenerator().SetName(className)
 	generator.NewTransactorModel(modelGen).
 		AddFileUrlsValidationRules().

@@ -7,11 +7,11 @@ import (
 )
 
 func TestBasicController(t *testing.T) {
-	restWithCreate := []string{"post"}
-	restWithUpdate := []string{"put"}
-	restWithGet := []string{"get"}
-	restWithDelete := []string{"DELETE"}
-	restWithAllFUnctions := []string{"POST", "PUT", "DELETE", "GET"}
+	restWithCreate := []string{generator.HttpPost}
+	restWithUpdate := []string{generator.HttpPut}
+	restWithGet := []string{generator.HttpGet}
+	restWithDelete := []string{generator.HttpDelete}
+	restWithAllFUnctions := []string{generator.HttpPost, generator.HttpPut, generator.HttpDelete, generator.HttpGet}
 	table := []*api.GeneralTest{
 		genControllerGeneratorTest(nil, AllFunctionsRestController, "Order"),
 		genControllerGeneratorTest(restWithCreate, CreateRestController, "Order"),
@@ -21,7 +21,7 @@ func TestBasicController(t *testing.T) {
 		genControllerGeneratorTest(restWithAllFUnctions, AllFunctionsRestController, "Order"),
 		genControllerGeneratorTest(restWithAllFUnctions, StudentController, "Student"),
 		genControllerGeneratorTest(restWithGet, TeacherController, "Teacher"),
-		genControllerGeneratorTest([]string{"POST", "DELETE", "PUT"}, AdminController, "Admin"),
+		genControllerGeneratorTest([]string{generator.HttpPost, generator.HttpDelete, generator.HttpPut}, AdminController, "Admin"),
 	}
 
 	api.IterateAndTest(table, t)

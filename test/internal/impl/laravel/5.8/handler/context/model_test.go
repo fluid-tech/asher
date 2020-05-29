@@ -33,4 +33,3 @@ func genModel(className string) *generator.ModelGenerator {
 	context.GetFromRegistry(context.ContextModel).AddToCtx(className, modelGen)
 	return modelGen
 }
-
