@@ -21,6 +21,27 @@ class CreateStudentAllotmentsTable extends Migration {
 }
 `
 
+const StudentEmptyMigrationWithName = `use Illuminate\Database\Migrations\Migration;
+use Illuminate\DatabaseSchema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateStudentTable extends Migration {
+    public function up() {
+        Schema::create('student',  function (Blueprint $table) {
+}
+
+);
+    }
+
+
+    public function down() {
+        Schema::dropIfExists('student');
+    }
+
+
+}
+`
+
 const MigrationWithColumns = `use Illuminate\Database\Migrations\Migration;
 use Illuminate\DatabaseSchema\Blueprint;
 use Illuminate\Support\Facades\Schema;
