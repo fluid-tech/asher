@@ -215,15 +215,15 @@ func Binary(colName string) string {
 }
 
 func DateTime(colName string, dataType []string) string {
-	return multiParamColumnProcessor("dateTime", colName, nil)
+	return multiParamColumnProcessor("dateTime", colName, dataType)
 }
 
 func DateTimeTz(colName string, dataType []string) string {
-	return multiParamColumnProcessor("dateTimeTz", colName, nil)
+	return multiParamColumnProcessor("dateTimeTz", colName, dataType)
 }
 
 func Decimal(colName string, dataType []string) string {
-	return multiParamColumnProcessor("dateTime", colName, nil)
+	return multiParamColumnProcessor("decimal", colName, dataType)
 }
 
 func Geometry(colName string) string {
@@ -295,11 +295,11 @@ func Polygon(colName string) string {
 }
 
 func SoftDeletes(colName string, dataType []string) string {
-	return multiParamColumnProcessor("softDeletes", colName, nil)
+	return multiParamColumnProcessor("softDeletes", colName, dataType)
 }
 
 func SoftDeletesTz(colName string, dataType []string) string {
-	return multiParamColumnProcessor("softDeletesTz", colName, nil)
+	return multiParamColumnProcessor("softDeletesTz", colName, dataType)
 }
 
 func Text(colName string) string {
@@ -307,19 +307,19 @@ func Text(colName string) string {
 }
 
 func Time(colName string, dataType []string) string {
-	return multiParamColumnProcessor("time", colName, nil)
+	return multiParamColumnProcessor("time", colName, dataType)
 }
 
 func TimeTz(colName string, dataType []string) string {
-	return multiParamColumnProcessor("timeTz", colName, nil)
+	return multiParamColumnProcessor("timeTz", colName, dataType)
 }
 
 func Timestamp(colName string, dataType []string) string {
-	return multiParamColumnProcessor("timestamp", colName, nil)
+	return multiParamColumnProcessor("timestamp", colName, dataType)
 }
 
 func TimestampTz(colName string, dataType []string) string {
-	return multiParamColumnProcessor("timestampTz", colName, nil)
+	return multiParamColumnProcessor("timestampTz", colName, dataType)
 }
 
 func Year(colName string) string {

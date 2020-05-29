@@ -25,10 +25,6 @@ func (v *VarDeclaration) SetNumTabs(tabs int) {
 	v.tabs = tabs
 }
 
-func (v *VarDeclaration) Id() string {
-	return v.Identifier
-}
-
 func (v *VarDeclaration) String() string {
 	var builder strings.Builder
 	fmt.Fprint(&builder, api.TabbedString(uint(v.tabs)),

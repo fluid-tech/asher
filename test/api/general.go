@@ -1,6 +1,9 @@
 package api
 
-import "testing"
+import (
+	"asher/internal/impl/laravel/5.8/handler/context"
+	"testing"
+)
 
 type GeneralTest struct {
 	in  string
@@ -20,4 +23,8 @@ func IterateAndTest(table []*GeneralTest, t *testing.T) {
 			t.Errorf("in test case %d expected '%s' found '%s'", i, element.out, element.in)
 		}
 	}
+}
+
+func FromContext(contextName string, fileName string) interface{} {
+	return context.GetFromRegistry(contextName).GetCtx(fileName)
 }
