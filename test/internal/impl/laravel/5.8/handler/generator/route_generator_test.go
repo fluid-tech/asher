@@ -9,7 +9,6 @@ import (
 //Route::get('/user', 'UserController@index');
 func TestRouteGenerator(t *testing.T) {
 
-	routeGenerator := generator.NewRouteGenerator()
 	var table = []*api.GeneralTest{
 		genRouteTest(routeGenerator, "Student", []string{}, ApiRouteFileAfterStudentWithAllRoutes),
 		genRouteTest(routeGenerator, "Teacher", []string{generator.HttpGet}, ApiRouteFileAfterTeacherWithGetRoutes),

@@ -126,7 +126,7 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 	actualMutatorGen := retrievedMutatorGen.(*generator.MutatorGenerator)
 	actualRouteGen := retrievedRouteGen.(*generator.RouteGenerator)
 	actualQueryGen := retrievedQueryGen.(*generator.QueryGenerator)
-
+	context.GetFromRegistry(context.ContextRoute).AddToCtx("api", generator.NewRouteGenerator())
 	return []string{actualControllerGen.String(), actualTransactorGen.String(), actualMutatorGen.String(),
 		actualQueryGen.String(), actualRouteGen.String(), migGen.String(), modelGen.String()}
 }
