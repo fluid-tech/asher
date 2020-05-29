@@ -72,7 +72,7 @@ Sample Usage:
 	- SetIdentifier("ClassName")
 */
 func (conGen *ControllerGenerator) SetIdentifier(identifier string) *ControllerGenerator {
-	conGen.identifier = identifier
+	conGen.identifier = strcase.ToCamel(identifier)
 	conGen.lowerCamelCaseIdentifier = strcase.ToLowerCamel(conGen.identifier)
 	conGen.queryVariableName = conGen.lowerCamelCaseIdentifier + Query
 	conGen.transactorVariableName = conGen.lowerCamelCaseIdentifier + Transactor
@@ -99,7 +99,7 @@ func (conGen *ControllerGenerator) AddCreate() *ControllerGenerator {
 		responseHelperCreate,
 	}
 
-	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName(CreateMethod).
+	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName(MethodNameCreate).
 		SetVisibility(VisibilityPublic).AddArgument(Request).
 		AddStatements(createFunctionStatement).GetFunction())
 	return conGen
@@ -126,7 +126,7 @@ func (conGen *ControllerGenerator) AddUpdate() *ControllerGenerator {
 		functionCallStatement,
 		responseHelperUpdate,
 	}
-	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName(UpdateMethod).
+	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName(MethodNameUpdate).
 		SetVisibility(VisibilityPublic).AddArgument(Request).
 		AddStatements(updateFunctionStatement).GetFunction())
 	return conGen
@@ -153,7 +153,7 @@ func (conGen *ControllerGenerator) AddDelete() *ControllerGenerator {
 		responseHelperDelete,
 	}
 
-	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName(DeleteMethod).
+	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName(MethodNameDelete).
 		SetVisibility(VisibilityPublic).AddArgument(Request).AddArgument(Id).
 		AddStatements(deleteFunctionStatement).GetFunction())
 	return conGen
@@ -171,7 +171,7 @@ func (conGen *ControllerGenerator) AddFindById() *ControllerGenerator {
 		core.NewReturnStatement(fmt.Sprintf(
 			FindByIdCallFmt, ResponseHelperSuccess, conGen.queryVariableName, Id)),
 	}
-	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName(FindByIdMethod).
+	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName(MethodNameFindById).
 		AddArgument(Id).SetVisibility(VisibilityPublic).AddStatements(responseHelperSuccess).GetFunction())
 	return conGen
 }
@@ -187,7 +187,7 @@ func (conGen *ControllerGenerator) AddGetAll() *ControllerGenerator {
 	responseHelperSuccess := core.NewReturnStatement(
 		fmt.Sprintf(GetAllCall, ResponseHelperSuccess, conGen.queryVariableName))
 	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().
-		SetName(GetAllMethod).SetVisibility(VisibilityPublic).
+		SetName(MethodNameGetAll).SetVisibility(VisibilityPublic).
 		AddStatement(responseHelperSuccess).GetFunction())
 	return conGen
 }
@@ -214,7 +214,7 @@ func (conGen *ControllerGenerator) AddConstructor() *ControllerGenerator {
 	}
 
 	conGen.classBuilder.AddFunction(
-		builder.NewFunctionBuilder().SetVisibility(VisibilityPublic).SetName(CallConstructor).
+		builder.NewFunctionBuilder().SetVisibility(VisibilityPublic).SetName(FunctionNameCtor).
 			AddArguments(constructorArguments).AddStatements(constructorStatements).GetFunction())
 	return conGen
 }
@@ -276,9 +276,9 @@ func (conGen *ControllerGenerator) BuildRestController() *core.Class {
 	className := fmt.Sprintf("%sRestController", conGen.identifier)
 
 	restControllerImports := []string{
-		fmt.Sprintf(`App\%s`, conGen.identifier),
-		fmt.Sprintf(`App\Transactors\%s%s`, conGen.identifier, Transactor),
-		fmt.Sprintf(`App\Query\%s%s`, conGen.identifier, Query),
+		fmt.Sprintf(ImportPathModelFmt, conGen.identifier),
+		fmt.Sprintf(ImportPathTransactorFmt, conGen.identifier+Transactor),
+		fmt.Sprintf(ImportPathQueryFmt, conGen.identifier+Query),
 		RequestImport,
 		ResponseHelperImport,
 	}

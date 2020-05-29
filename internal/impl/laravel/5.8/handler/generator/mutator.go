@@ -63,11 +63,11 @@ Sample Usage:
 */
 func (mutatorGenerator *MutatorGenerator) AddConstructor() *MutatorGenerator {
 
-	parentConstructorCall := core.NewFunctionCall(CallParentConstructor).AddArg(core.NewParameter(
+	parentConstructorCall := core.NewFunctionCall(FunctionNameBaseCtor).AddArg(core.NewParameter(
 		fmt.Sprintf(`'App\%s', 'id'`, mutatorGenerator.identifier)))
 
 	mutatorGenerator.classBuilder.AddFunction(
-		builder.NewFunctionBuilder().SetVisibility(VisibilityPublic).SetName(CallConstructor).
+		builder.NewFunctionBuilder().SetVisibility(VisibilityPublic).SetName(FunctionNameCtor).
 			AddStatement(parentConstructorCall).GetFunction())
 	return mutatorGenerator
 }

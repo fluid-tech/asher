@@ -5,6 +5,7 @@ import (
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/core"
 	"fmt"
+	"github.com/iancoleman/strcase"
 )
 
 const QueryExtends = "BaseQuery"
@@ -42,7 +43,7 @@ Sample Usage:
 	- SetIdentifier("ClassName")
 */
 func (queryGenerator *QueryGenerator) SetIdentifier(identifier string) *QueryGenerator {
-	queryGenerator.identifier = identifier
+	queryGenerator.identifier = strcase.ToCamel(identifier)
 	return queryGenerator
 }
 
@@ -56,13 +57,13 @@ func (queryGenerator *QueryGenerator) Build() *core.Class {
 	var className = fmt.Sprintf("%sQuery", queryGenerator.identifier)
 
 	/*IMPORTS*/
-	queryGenerator.Class.AddImport(fmt.Sprintf(`App\%s`, queryGenerator.identifier))
+	queryGenerator.Class.AddImport(fmt.Sprintf(ImportPathModelFmt, queryGenerator.identifier))
 
 	/*CONSTRUCTOR*/
 	constructor := builder.NewFunctionBuilder()
-	constructor.SetName(CallConstructor).SetVisibility(VisibilityPublic)
-	fullyQualifiedModelArg := core.NewParameter(fmt.Sprintf(`"App\%s"`, queryGenerator.identifier))
-	callToSuperConstructor := core.NewFunctionCall(CallParentConstructor).AddArg(fullyQualifiedModelArg)
+	constructor.SetName(FunctionNameCtor).SetVisibility(VisibilityPublic)
+	fullyQualifiedModelArg := core.NewParameter(fmt.Sprintf(`"`+ImportPathModelFmt+`"`, queryGenerator.identifier))
+	callToSuperConstructor := core.NewFunctionCall(FunctionNameBaseCtor).AddArg(fullyQualifiedModelArg)
 	constructor.AddStatement(callToSuperConstructor)
 
 	queryGenerator.Class.AddFunction(constructor.GetFunction()).

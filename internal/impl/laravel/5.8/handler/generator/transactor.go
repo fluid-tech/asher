@@ -127,7 +127,7 @@ func (transactorGenerator *TransactorGenerator) BuildTransactor() *core.Class {
 
 	/*CONSTRUCTOR*/
 
-	constructorFuncBuilder := builder.NewFunctionBuilder().SetVisibility(VisibilityPublic).SetName(CallConstructor).
+	constructorFuncBuilder := builder.NewFunctionBuilder().SetVisibility(VisibilityPublic).SetName(FunctionNameCtor).
 		AddArguments([]string{
 			fmt.Sprintf(QueryObjectFmt, transactorGenerator.identifier, transactorGenerator.queryVariableName),
 			fmt.Sprintf(MutatorObjectFmt, transactorGenerator.identifier, transactorGenerator.mutatorVariableName)}).
@@ -180,9 +180,9 @@ func (transactorGenerator *TransactorGenerator) addDefaults() *TransactorGenerat
 
 	/*DEFAULT CONSTRUCTOR STATEMENTS*/
 
-	superConstructorCall = core.NewFunctionCall(CallParentConstructor)
+	superConstructorCall = core.NewFunctionCall(FunctionNameBaseCtor)
 
-	superConstructorCall = core.NewFunctionCall(CallParentConstructor)
+	superConstructorCall = core.NewFunctionCall(FunctionNameBaseCtor)
 
 	transactorGenerator.constructorStatements = append(transactorGenerator.constructorStatements,
 		superConstructorCall,
