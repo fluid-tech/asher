@@ -40,8 +40,6 @@ type ControllerGenerator struct {
 	queryVariableName        string
 	transactorVariableName   string
 	lowerCamelCaseIdentifier string
-	queryClassName           string
-	transactorClassName      string
 }
 
 func NewControllerGenerator() *ControllerGenerator {
