@@ -92,11 +92,11 @@ func (conGen *ControllerGenerator) AddCreate() *ControllerGenerator {
 		fmt.Sprintf(CreateCallFmt, conGen.lowerCamelCaseIdentifier, conGen.transactorVariableName)).
 		AddArg(core.NewParameter(AuthID)).AddArg(core.NewParameter(RequestAll))
 
-	ResponseHelperCreate := core.NewReturnStatement(fmt.Sprintf(ResponseHelperCreateFmt, conGen.lowerCamelCaseIdentifier))
+	responseHelperCreate := core.NewReturnStatement(fmt.Sprintf(ResponseHelperCreateFmt, conGen.lowerCamelCaseIdentifier))
 
 	createFunctionStatement := []api.TabbedUnit{
 		functionCallStatement,
-		ResponseHelperCreate,
+		responseHelperCreate,
 	}
 
 	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName(CreateMethod).
@@ -120,11 +120,11 @@ func (conGen *ControllerGenerator) AddUpdate() *ControllerGenerator {
 	functionCallStatement.AddArg(core.NewParameter(AuthID))
 	functionCallStatement.AddArg(core.NewParameter(RequestAll))
 
-	ResponseHelperUpdate := core.NewReturnStatement(fmt.Sprintf(ResponseHelperUpdateFmt, conGen.lowerCamelCaseIdentifier))
+	responseHelperUpdate := core.NewReturnStatement(fmt.Sprintf(ResponseHelperUpdateFmt, conGen.lowerCamelCaseIdentifier))
 
 	updateFunctionStatement := []api.TabbedUnit{
 		functionCallStatement,
-		ResponseHelperUpdate,
+		responseHelperUpdate,
 	}
 	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName(UpdateMethod).
 		SetVisibility(VisibilityPublic).AddArgument(Request).
@@ -146,11 +146,11 @@ func (conGen *ControllerGenerator) AddDelete() *ControllerGenerator {
 	functionCallStatement.AddArg(core.NewParameter(Id)).
 		AddArg(core.NewParameter(RequestUserId))
 
-	ResponseHelperDelete := core.NewReturnStatement(fmt.Sprintf(ResponseHelperDeleteFmt, conGen.lowerCamelCaseIdentifier))
+	responseHelperDelete := core.NewReturnStatement(fmt.Sprintf(ResponseHelperDeleteFmt, conGen.lowerCamelCaseIdentifier))
 
 	deleteFunctionStatement := []api.TabbedUnit{
 		functionCallStatement,
-		ResponseHelperDelete,
+		responseHelperDelete,
 	}
 
 	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName(DeleteMethod).
@@ -167,12 +167,12 @@ Sample Usage:
 	- controllerGeneratorObject.AddFindById()
 */
 func (conGen *ControllerGenerator) AddFindById() *ControllerGenerator {
-	ResponseHelperSuccess := []api.TabbedUnit{
+	responseHelperSuccess := []api.TabbedUnit{
 		core.NewReturnStatement(fmt.Sprintf(
 			FindByIdCallFmt, ResponseHelperSuccess, conGen.queryVariableName, Id)),
 	}
 	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().SetName(FindByIdMethod).
-		AddArgument(Id).SetVisibility(VisibilityPublic).AddStatements(ResponseHelperSuccess).GetFunction())
+		AddArgument(Id).SetVisibility(VisibilityPublic).AddStatements(responseHelperSuccess).GetFunction())
 	return conGen
 }
 
@@ -184,11 +184,11 @@ Sample Usage:
 	- controllerGeneratorObject.AddGetAll()
 */
 func (conGen *ControllerGenerator) AddGetAll() *ControllerGenerator {
-	ResponseHelperSuccess := core.NewReturnStatement(
+	responseHelperSuccess := core.NewReturnStatement(
 		fmt.Sprintf(GetAllCall, ResponseHelperSuccess, conGen.queryVariableName))
 	conGen.classBuilder.AddFunction(builder.NewFunctionBuilder().
 		SetName(GetAllMethod).SetVisibility(VisibilityPublic).
-		AddStatement(ResponseHelperSuccess).GetFunction())
+		AddStatement(responseHelperSuccess).GetFunction())
 	return conGen
 }
 
