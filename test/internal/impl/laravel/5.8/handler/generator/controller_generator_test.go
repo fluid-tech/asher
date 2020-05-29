@@ -21,7 +21,7 @@ func TestBasicController(t *testing.T) {
 		genControllerGeneratorTest(restWithAllFUnctions, AllFunctionsRestController, "Order"),
 		genControllerGeneratorTest(restWithAllFUnctions, StudentController, "Student"),
 		genControllerGeneratorTest(restWithGet, TeacherController, "Teacher"),
-		genControllerGeneratorTest([]string{"HttpPost", "HttpDelete", "HttpPut"}, AdminController, "Admin"),
+		genControllerGeneratorTest([]string{generator.HttpPost, generator.HttpDelete, generator.HttpPut}, AdminController, "Admin"),
 	}
 
 	api.IterateAndTest(table, t)

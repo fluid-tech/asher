@@ -193,7 +193,7 @@ func (conGen *ControllerGenerator) AddGetAll() *ControllerGenerator {
 }
 
 /**
-Adds CallConstructor in the controller with Query and Transactor Injected of the currentController
+Adds Constructor in the controller with Query and Transactor Injected of the currentController
 Returns:
 	- Return instance of ControllerGenerator
 Sample Usage:
@@ -241,7 +241,7 @@ Parameters:
 Returns:
 	- Return instance of ControllerGenerator
 Sample Usage:
-	- controllerGeneratorObject.AddFunctionsInController([]string{"HttpPost"})
+	- controllerGeneratorObject.AddFunctionsInController([]string{"Post"})
 */
 func (conGen *ControllerGenerator) AddFunctionsInController(methods []string) {
 	if methods != nil && len(methods) > 0 {

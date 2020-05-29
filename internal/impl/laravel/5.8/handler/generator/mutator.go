@@ -55,7 +55,7 @@ func (mutatorGenerator *MutatorGenerator) AppendImports(imports []string) *Mutat
 }
 
 /**
-Adds CallConstructor in the mutator
+Adds Constructor in the mutator
 Returns:
 	- Return instance of MutatorGenerator
 Sample Usage:

@@ -13,8 +13,8 @@ import (
 func TestController(t *testing.T) {
 
 	/*Demo strings for Model Student have all HTTP methods  BASIC Transactor*/
-	/*Demo strings for Model Teacher have all HttpGet HTTP methods Teacher Image Transactor*/
-	/*Demo strings for Model Admin have all HttpPut HttpDelete HttpPost HTTP methods Admin FIle Transactor*/
+	/*Demo strings for Model Teacher have all Get HTTP methods Teacher Image Transactor*/
+	/*Demo strings for Model Admin have all Put Delete Post HTTP methods Admin FIle Transactor*/
 
 	RESTControllerConfigWithALLHttpMethods := models.Controller{
 		Rest:        true,
@@ -25,7 +25,7 @@ func TestController(t *testing.T) {
 	RESTControllerConfigWithGETHttpMethods := models.Controller{
 		Rest:        true,
 		Mvc:         false,
-		HttpMethods: []string{"HttpGet"},
+		HttpMethods: []string{generator.HttpGet},
 		Type:        "image",
 	}
 	RESTControllerConfigWithPOSTPUTDELETEHttpMethods := models.Controller{
