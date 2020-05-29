@@ -12,12 +12,12 @@ import (
 const TransactorNamespace = `App\Transactors`
 const InitiateSelfClassName = `$this->className = self::CLASS_NAME`
 const CallParentConstructor = `parent::__construct`
-const QueryImporterFormat = `App\Query\%sQuery`
-const MutatorImporterFormat = `App\Transactors\Mutations\%sMutator`
-const TransactorClassName = `private const CLASS_NAME = '%sTransactor'`
-const QueryObject = `%sQuery $%s`
-const MutatorObject = `%sMutator $%s`
-const DollarVar = `$%s`
+const QueryImporterFmt = `App\Query\%sQuery`
+const MutatorImporterFmt = `App\Transactors\Mutations\%sMutator`
+const TransactorClassNameFmt = `private const CLASS_NAME = '%sTransactor'`
+const QueryObjectFmt = `%sQuery $%s`
+const MutatorObjectFmt = `%sMutator $%s`
+const DollarVarFmt = `$%s`
 
 /*Variables used between functions*/
 var superConstructorCall *core.FunctionCall
@@ -133,8 +133,8 @@ func (transactorGenerator *TransactorGenerator) BuildTransactor() *core.Class {
 
 	constructorFuncBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
 		AddArguments([]string{
-			fmt.Sprintf(QueryObject, transactorGenerator.identifier, transactorGenerator.queryVariableName),
-			fmt.Sprintf(MutatorObject, transactorGenerator.identifier, transactorGenerator.mutatorVariableName)}).
+			fmt.Sprintf(QueryObjectFmt, transactorGenerator.identifier, transactorGenerator.queryVariableName),
+			fmt.Sprintf(MutatorObjectFmt, transactorGenerator.identifier, transactorGenerator.mutatorVariableName)}).
 		AddStatements(transactorGenerator.constructorStatements)
 
 	transactorGenerator.classBuilder.AddFunction(constructorFuncBuilder.GetFunction()).
@@ -164,19 +164,19 @@ Prepend is required because defaults are added after the handler inserts the val
 func (transactorGenerator *TransactorGenerator) addDefaults() *TransactorGenerator {
 	/*Default Imports*/
 	transactorImports := []string{
-		fmt.Sprintf(QueryImporterFormat, transactorGenerator.identifier),
-		fmt.Sprintf(MutatorImporterFormat, transactorGenerator.identifier),
+		fmt.Sprintf(QueryImporterFmt, transactorGenerator.identifier),
+		fmt.Sprintf(MutatorImporterFmt, transactorGenerator.identifier),
 	}
 	transactorGenerator.imports = append(transactorImports, transactorGenerator.imports...)
 
 	/*Default CLASS MEMBERS*/
 	transactorGenerator.transactorMembers = append([]api.TabbedUnit{core.NewSimpleStatement(
-		fmt.Sprintf(TransactorClassName, transactorGenerator.identifier))},
+		fmt.Sprintf(TransactorClassNameFmt, transactorGenerator.identifier))},
 		transactorGenerator.transactorMembers...)
 
 	transactorGenerator.parentConstructorCallArgs = append([]api.TabbedUnit{
-		core.NewParameter(fmt.Sprintf(DollarVar, transactorGenerator.queryVariableName)),
-		core.NewParameter(fmt.Sprintf(DollarVar, transactorGenerator.mutatorVariableName)),
+		core.NewParameter(fmt.Sprintf(DollarVarFmt, transactorGenerator.queryVariableName)),
+		core.NewParameter(fmt.Sprintf(DollarVarFmt, transactorGenerator.mutatorVariableName)),
 		core.NewParameter(`"id"`)},
 		transactorGenerator.parentConstructorCallArgs...,
 	)
