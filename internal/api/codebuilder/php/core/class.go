@@ -51,13 +51,6 @@ func (klass Class) String() string {
 	return sb.String()
 }
 
-/**
-Appends a tabbed unit to the members list
-*/
-func (klass *Class) AppendMember(unit api.TabbedUnit) {
-	klass.Members = append(klass.Members, unit)
-}
-
 func (klass *Class) handlePackage(builder *strings.Builder) {
 	if klass.Package != "" {
 		fmt.Fprint(builder, "namespace ", klass.Package, ";\n\n")

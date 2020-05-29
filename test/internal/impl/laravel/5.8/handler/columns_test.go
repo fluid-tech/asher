@@ -38,8 +38,8 @@ func genColTest(modelName string, cols []models.Column, t *testing.T) []string {
 		t.Error("ColHandler didnt return an emitter file")
 	}
 
-	mig := api.FromContext(context.ContextMigration, modelName).(*generator.MigrationGenerator)
-	model := api.FromContext(context.ContextModel, modelName).(*generator.ModelGenerator)
+	mig := api.FromContext(context.Migration, modelName).(*generator.MigrationGenerator)
+	model := api.FromContext(context.Model, modelName).(*generator.ModelGenerator)
 
 	if mig == nil {
 		t.Errorf("migration file for %s not added to context", modelName)

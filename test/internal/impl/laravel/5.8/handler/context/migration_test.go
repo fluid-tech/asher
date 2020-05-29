@@ -13,10 +13,10 @@ func TestMigrationContext(t *testing.T) {
 		MigrationMigExpected *generator.MigrationGenerator
 	}{
 
-		{genMigration("Hello"), api.FromContext(context.ContextMigration,
+		{genMigration("Hello"), api.FromContext(context.Migration,
 			"Hello").(*generator.MigrationGenerator)},
 
-		{genMigration("World"), api.FromContext(context.ContextMigration,
+		{genMigration("World"), api.FromContext(context.Migration,
 			"World").(*generator.MigrationGenerator)},
 	}
 	for _, element := range classes {
@@ -24,13 +24,13 @@ func TestMigrationContext(t *testing.T) {
 			t.Error("Unexpected data")
 		}
 	}
-	if nil != api.FromContext(context.ContextMigration, "nonexistentRecords") {
+	if nil != api.FromContext(context.Migration, "nonexistentRecords") {
 		t.Error("Unexpected data")
 	}
 }
 
 func genMigration(className string) *generator.MigrationGenerator {
 	MigrationGen := generator.NewMigrationGenerator().SetName(className)
-	context.GetFromRegistry(context.ContextMigration).AddToCtx(className, MigrationGen)
+	context.GetFromRegistry(context.Migration).AddToCtx(className, MigrationGen)
 	return MigrationGen
 }
