@@ -55,7 +55,7 @@ func (mutatorGenerator *MutatorGenerator) AppendImports(imports []string) *Mutat
 }
 
 /**
-Adds Constructor in the mutator
+Adds CallConstructor in the mutator
 Returns:
 	- Return instance of MutatorGenerator
 Sample Usage:
@@ -63,11 +63,11 @@ Sample Usage:
 */
 func (mutatorGenerator *MutatorGenerator) AddConstructor() *MutatorGenerator {
 
-	parentConstructorCall := core.NewFunctionCall(ParentConstructor).AddArg(core.NewParameter(
+	parentConstructorCall := core.NewFunctionCall(CallParentConstructor).AddArg(core.NewParameter(
 		fmt.Sprintf(`'App\%s', 'id'`, mutatorGenerator.identifier)))
 
 	mutatorGenerator.classBuilder.AddFunction(
-		builder.NewFunctionBuilder().SetVisibility(VisibilityPublic).SetName(Constructor).
+		builder.NewFunctionBuilder().SetVisibility(VisibilityPublic).SetName(CallConstructor).
 			AddStatement(parentConstructorCall).GetFunction())
 	return mutatorGenerator
 }

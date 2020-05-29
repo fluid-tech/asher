@@ -17,7 +17,7 @@ func NewImageTransactor(transactorGen *TransactorGenerator) *ImageTransactor {
 func (imageTransactor *ImageTransactor) AddDefaults() *ImageTransactor {
 	imageTransactor.transactorGen.AppendImports([]string{ImageUploadHelperPath}).
 		AddParentConstructorCallArgs(core.NewParameter(NewImageUploadHelper)).
-		AddTransactorMember(core.NewSimpleStatement(fmt.Sprintf(`%s const BASE_PATH = "%s"`,
+		AddTransactorMember(core.NewSimpleStatement(fmt.Sprintf(BasePathFmt,
 			VisibilityPrivate, strings.ToLower(imageTransactor.transactorGen.identifier)))).
 		AddTransactorMember(core.NewSimpleStatement(ImageValidationRules))
 	return imageTransactor

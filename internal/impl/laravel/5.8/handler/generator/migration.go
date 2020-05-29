@@ -10,6 +10,8 @@ import (
 
 const (
 	MigrationExtends = "Migration"
+	IdentifierDown = "down"
+	IdentifierUp = "up"
 )
 
 type MigrationGenerator struct {
@@ -95,12 +97,12 @@ func (migrationGenerator *MigrationGenerator) Build() *core.Class {
 
 	schemaBlock := core.NewFunctionCall("Schema::create").AddArg(arg1).AddArg(arg2)
 
-	upFunction := builder.NewFunctionBuilder().SetName("up").SetVisibility(VisibilityPublic).
+	upFunction := builder.NewFunctionBuilder().SetName(IdentifierUp).SetVisibility(VisibilityPublic).
 		AddStatement(schemaBlock).GetFunction()
 
 	// Preparing the statements for down function
 	dropStatement := api.TabbedUnit(core.NewSimpleStatement("Schema::dropIfExists('" + migrationGenerator.tableName + "')"))
-	downFunction := builder.NewFunctionBuilder().SetName("down").SetVisibility(VisibilityPublic).
+	downFunction := builder.NewFunctionBuilder().SetName(IdentifierDown).SetVisibility(VisibilityPublic).
 		AddStatement(dropStatement).GetFunction()
 
 	migrationGenerator.classBuilder.AddImports([]string{

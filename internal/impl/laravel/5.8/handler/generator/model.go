@@ -24,6 +24,10 @@ const RowIdVar = "$rowIds"
 const Unique = "unique"
 const ModelPackage = "App"
 const ModelExtends = "Model"
+const Fillable = "fillable"
+const Visible = "visible"
+const UpdateRuleFunctionName = "updateValidationRules"
+const CreateRuleFunctionName = "createValidationRules"
 
 /**
 Creates a new instance of this generator with a new interfaces.Class
@@ -171,13 +175,13 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 	).SetExtends(ModelExtends)
 
 	if len(modelGenerator.fillables) > 0 {
-		fillableArray := core.NewArrayAssignment(VisibilityProtected, "fillable",
+		fillableArray := core.NewArrayAssignment(VisibilityProtected, Fillable,
 			modelGenerator.fillables)
 		modelGenerator.classBuilder.AddMember(fillableArray)
 	}
 
 	if len(modelGenerator.hidden) > 0 {
-		hiddenArray := core.NewArrayAssignment(VisibilityProtected, "visible",
+		hiddenArray := core.NewArrayAssignment(VisibilityProtected, Visible,
 			modelGenerator.hidden)
 		modelGenerator.classBuilder.AddMember(hiddenArray)
 	}
@@ -211,7 +215,7 @@ func (modelGenerator *ModelGenerator) String() string {
 */
 func getUpdateValidationRulesFunction(rules map[string]string) *core.Function {
 	returnArray := core.NewReturnArrayFromMapRaw(rules)
-	function := builder.NewFunctionBuilder().SetName("updateValidationRules").
+	function := builder.NewFunctionBuilder().SetName(UpdateRuleFunctionName).
 		SetVisibility(VisibilityPublic).AddStatement(returnArray).SetStatic(true).AddArgument(RowIdsArr).GetFunction()
 	return function
 }
@@ -227,7 +231,7 @@ func getUpdateValidationRulesFunction(rules map[string]string) *core.Function {
 */
 func getCreateValidationRulesFunction(rules map[string]string) *core.Function {
 	returnArray := core.NewReturnArrayFromMapRaw(rules)
-	function := builder.NewFunctionBuilder().SetName("createValidationRules").
+	function := builder.NewFunctionBuilder().SetName(CreateRuleFunctionName).
 		SetVisibility(VisibilityPublic).AddStatement(returnArray).SetStatic(true).GetFunction()
 	return function
 }
