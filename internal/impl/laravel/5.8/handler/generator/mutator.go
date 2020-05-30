@@ -13,6 +13,7 @@ const MutatorNamespace = `App\Transactors\Mutations`
 
 type MutatorGenerator struct {
 	api.Generator
+	mutator      *core.Class
 	classBuilder interfaces.Class
 	identifier   string
 	imports      []string
@@ -20,6 +21,7 @@ type MutatorGenerator struct {
 
 func NewMutatorGenerator() *MutatorGenerator {
 	return &MutatorGenerator{
+		mutator: nil,
 		classBuilder: builder.NewClassBuilder(),
 		identifier:   "",
 		imports:      []string{},
@@ -80,6 +82,9 @@ Sample Usage:
 	- mutatorGeneratorObject.BuildMutator()
 */
 func (mutatorGenerator *MutatorGenerator) BuildMutator() *core.Class {
+	if mutatorGenerator.mutator != nil {
+		return mutatorGenerator.mutator
+	}
 
 	var className = fmt.Sprintf("%sMutator", mutatorGenerator.identifier)
 
@@ -87,7 +92,8 @@ func (mutatorGenerator *MutatorGenerator) BuildMutator() *core.Class {
 
 	mutatorGenerator.classBuilder.SetName(className).
 		SetExtends(MutatorExtends).SetPackage(MutatorNamespace).AddImports(mutatorGenerator.imports)
-	return mutatorGenerator.classBuilder.GetClass()
+	mutatorGenerator.mutator = mutatorGenerator.classBuilder.GetClass()
+	return mutatorGenerator.mutator
 }
 
 /**
