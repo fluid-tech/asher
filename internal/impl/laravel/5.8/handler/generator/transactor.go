@@ -20,6 +20,7 @@ var superConstructorCall *core.FunctionCall
 
 type TransactorGenerator struct {
 	api.Generator
+	transactor                *core.Class
 	classBuilder              interfaces.Class
 	identifier                string
 	imports                   []string
@@ -34,6 +35,7 @@ type TransactorGenerator struct {
 
 func NewTransactorGenerator(classToExtend string) *TransactorGenerator {
 	return &TransactorGenerator{
+		transactor:                nil,
 		classBuilder:              builder.NewClassBuilder(),
 		imports:                   []string{},
 		classToExtend:             classToExtend,
@@ -111,6 +113,9 @@ Sample Usage:
 	- transactorGeneratorObject.BuildRestTransactor()
 */
 func (transactorGenerator *TransactorGenerator) BuildTransactor() *core.Class {
+	if transactorGenerator.transactor != nil {
+		return transactorGenerator.transactor
+	}
 
 	transactorGenerator.addDefaults()
 
@@ -137,7 +142,8 @@ func (transactorGenerator *TransactorGenerator) BuildTransactor() *core.Class {
 		SetName(className).SetPackage(TransactorNamespace).
 		SetExtends(fmt.Sprintf(`%sTransactor`, strcase.ToCamel(transactorGenerator.classToExtend)))
 
-	return transactorGenerator.classBuilder.GetClass()
+	transactorGenerator.transactor = transactorGenerator.classBuilder.GetClass()
+	return transactorGenerator.transactor
 }
 
 /**
