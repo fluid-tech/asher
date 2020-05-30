@@ -86,6 +86,8 @@ func Test_Columns(t *testing.T) {
 		{GetInput("unsignedInteger", "desc", nil), expectedOutput(`unsignedInteger('desc')`)},
 		{GetInput("bigInteger", "desc", nil), expectedOutput(`bigInteger('desc')`)},
 		{GetInput("unsignedBigInteger", "desc", nil), expectedOutput(`unsignedBigInteger('desc')`)},
+		{GetInput("smallInteger", "desc", nil), expectedOutput(`smallInteger('desc')`)},
+		{GetInput("unsignedSmallInteger", "desc", nil), expectedOutput(`unsignedSmallInteger('desc')`)},
 	}
 	for i, obj := range columnTestObject {
 		actualOutput, _ := helper.ColTypeSwitcher(obj.in.colType, obj.in.colName, obj.in.allowed)
