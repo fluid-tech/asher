@@ -28,6 +28,11 @@ When you put this configuration the asher generates a controller in  `App\Http\C
 
 With CRUD operations performed in it. So you need to focus on the main business logic.
 
+Every time you add/update a `controller` under the `models` list you need to run following command
+```bash
+$ asher scaffold
+```
+
 ### HttpMethods
 
 There are some case where you don't need all the functions inside the controller. We provide you with that flexibility so that your code looks clean. You just need to add a key `httpMethods` inside the `controller` key by default we add all the methods needed. To do so:
@@ -48,6 +53,11 @@ There are some case where you don't need all the functions inside the controller
 
 `NOTE: By default all the methods are scaffolded`
 
+After you add/update the key please run the following command:
+```bash
+$ asher scaffold
+```
+
 ### Type
  
 There may be case where you need to upload files or images we also provide customization according to the demands.You just need to specify `type` key inside the `controller` To do so:
@@ -61,6 +71,11 @@ There may be case where you need to upload files or images we also provide custo
 }
 ```
 `Note: By default the type is default`
+
+After you add/update the key please run the following command:
+```bash
+$ asher scaffold
+```
 
 We provide 3 different `types` of transactors:
 * [default](#)
