@@ -12,6 +12,7 @@ import (
 
 type ModelGenerator struct {
 	api.Generator
+	model				  *core.Class
 	classBuilder          interfaces.Class
 	fillables             []string
 	hidden                []string
@@ -41,6 +42,7 @@ func NewModelGenerator() *ModelGenerator {
 		hidden:                []string{},
 		createValidationRules: map[string]string{},
 		updateValidationRules: map[string]string{},
+		model: nil,
 	}
 }
 
@@ -170,6 +172,10 @@ Returns:
 	- The corresponding model core.Class from the given ingredients of input.
 */
 func (modelGenerator *ModelGenerator) Build() *core.Class {
+	if modelGenerator.model != nil {
+		return modelGenerator.model
+	}
+
 	modelGenerator.classBuilder = modelGenerator.classBuilder.SetPackage(ModelPackage).AddImport(
 		`Illuminate\Database\Eloquent\Model`,
 	).SetExtends(ModelExtends)
@@ -192,7 +198,8 @@ func (modelGenerator *ModelGenerator) Build() *core.Class {
 	updateFunction := getUpdateValidationRulesFunction(modelGenerator.updateValidationRules)
 	modelGenerator.classBuilder.AddFunction(updateFunction)
 
-	return modelGenerator.classBuilder.GetClass()
+	modelGenerator.model = modelGenerator.classBuilder.GetClass()
+	return modelGenerator.model
 }
 
 /**
