@@ -6,6 +6,8 @@ import (
 	"asher/internal/impl/laravel/5.8/handler/generator"
 	"asher/internal/impl/laravel/5.8/handler/helper"
 	"asher/internal/models"
+	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -32,50 +34,61 @@ Returns:
 func (relationshipHandler *RelationshipHandler) Handle(currentTableName string, relations interface{}) ([]api.EmitterFile,
 	error) {
 
-	currentModelGenerator := context.GetFromRegistry(context.Model).GetCtx(currentTableName).(*generator.ModelGenerator)
-	relationshipModelGenerator := generator.NewRelationshipModel(currentModelGenerator)
-	myRelations := relations.(models.Relation)
+	retrivedModelGenerator := context.GetFromRegistry(context.Model).GetCtx(currentTableName).(*generator.ModelGenerator)
+	if retrivedModelGenerator != nil {
+		relationshipModelGenerator := generator.NewRelationshipModel(retrivedModelGenerator)
+		myRelations := relations.(models.Relation)
 
-	for _, rel := range myRelations.HasMany {
-		var referenceTableName, foreignKey, primaryKey = getRelationshipKeys(rel, currentTableName)
-		relationshipDetailObj := relationshipModelGenerator.AddRelationshipToModel(helper.HasMany, currentTableName,
-			referenceTableName, foreignKey, primaryKey)
-		context.GetFromRegistry(context.Relation).AddToCtx(currentTableName, relationshipDetailObj)
+		for _, rel := range myRelations.HasMany {
+			var referenceTableName, foreignKey, primaryKey, err = getRelationshipKeys(rel, currentTableName)
+			if err != nil {
+				return nil, err
+			}
+			relationshipDetailObj, _ := relationshipModelGenerator.AddRelationshipToModel(helper.HasMany, currentTableName,
+				referenceTableName, foreignKey, primaryKey)
+			context.GetFromRegistry(context.Relation).AddToCtx(currentTableName, relationshipDetailObj)
+		}
+
+		for _, rel := range myRelations.HasOne {
+			var referenceTableName, foreignKey, primaryKey, err = getRelationshipKeys(rel, currentTableName)
+			if err != nil {
+				return nil, err
+			}
+			relationshipDetailObj, _ := relationshipModelGenerator.AddRelationshipToModel(helper.HasOne, currentTableName,
+				referenceTableName, foreignKey, primaryKey)
+			context.GetFromRegistry(context.Relation).AddToCtx(currentTableName, relationshipDetailObj)
+		}
+		return nil, nil
 	}
-
-	for _, rel := range myRelations.HasOne {
-		var referenceTableName, foreignKey, primaryKey = getRelationshipKeys(rel, currentTableName)
-		relationshipDetailObj := relationshipModelGenerator.AddRelationshipToModel(helper.HasOne, currentTableName,
-			referenceTableName, foreignKey, primaryKey)
-		context.GetFromRegistry(context.Relation).AddToCtx(currentTableName, relationshipDetailObj)
-	}
-
-	return nil, nil
+	return nil, errors.New(fmt.Sprintf("model class %s not found", currentTableName))
 }
 
 /**
 This method generates referenceTableName, foreignKey, primaryKey form the Relation string
 as per laravel requirement.
 */
-func getRelationshipKeys(relation string, currentTableName string) (string, string, string) {
-	var referenceTableName, foreignKey, primaryKey string
-	splittedArray := strings.Split(relation, ":")
-	if len(splittedArray) == 1 {
-		referenceTableName = splittedArray[0]
-		foreignKey = strings.ToLower(currentTableName) + "_id"
-		primaryKey = "id"
-	} else if len(splittedArray) == 2 {
-		referenceTableName = splittedArray[0]
-		pkFkSplitter := strings.Split(splittedArray[1], ",")
-		if len(pkFkSplitter) == 2 {
-			foreignKey = pkFkSplitter[0]
-			primaryKey = pkFkSplitter[1]
-		} else if len(pkFkSplitter) == 1 {
-			foreignKey = pkFkSplitter[0]
+func getRelationshipKeys(relation string, currentTableName string) (string, string, string, error) {
+	if relation != "" {
+		var referenceTableName, foreignKey, primaryKey string
+		splittedArray := strings.Split(relation, ":")
+		if len(splittedArray) == 1 {
+			referenceTableName = splittedArray[0]
+			foreignKey = strings.ToLower(currentTableName) + "_id"
 			primaryKey = "id"
+		} else if len(splittedArray) == 2 {
+			referenceTableName = splittedArray[0]
+			pkFkSplitter := strings.Split(splittedArray[1], ",")
+			if len(pkFkSplitter) == 2 {
+				foreignKey = pkFkSplitter[0]
+				primaryKey = pkFkSplitter[1]
+			} else if len(pkFkSplitter) == 1 {
+				foreignKey = pkFkSplitter[0]
+				primaryKey = "id"
+			}
+		} else {
+			return "", "", "", errors.New("rule Cannot be blank")
 		}
-	} else {
-		panic("Rule Cannot be blank")
+		return referenceTableName, foreignKey, primaryKey, nil
 	}
-	return referenceTableName, foreignKey, primaryKey
+	return "", "", "", errors.New("relation String Cannot be Blank")
 }
