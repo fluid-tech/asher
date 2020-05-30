@@ -37,7 +37,6 @@ func Test_Columns(t *testing.T) {
 		{GetInput("unsignedTinyInteger", "desc", nil), expectedOutput("unsignedTinyInteger('desc')")},
 		{GetInput("tinyInteger", "desc", nil), expectedOutput("tinyInteger('desc')")},
 		{GetInput("unsignedMediumInteger", "desc", nil), expectedOutput("unsignedMediumInteger('desc')")},
-		{GetInput("stringsd", "desc", nil), expectedOutput("unsupported datatype")},
 		{GetInput("char|12", "desc", nil), expectedOutput("char('desc', 12)")},
 		{GetInput("enum", "desc", nil), expectedOutput("enum('desc')")},
 		{GetInput("enum", "desc", []string{"1", "2", "3"}), expectedOutput(`enum('desc', ['1', '2', '3'])`)},
@@ -89,7 +88,7 @@ func Test_Columns(t *testing.T) {
 		{GetInput("unsignedBigInteger", "desc", nil), expectedOutput(`unsignedBigInteger('desc')`)},
 	}
 	for i, obj := range columnTestObject {
-		actualOutput := helper.ColTypeSwitcher(obj.in.colType, obj.in.colName, obj.in.allowed)
+		actualOutput, _ := helper.ColTypeSwitcher(obj.in.colType, obj.in.colName, obj.in.allowed)
 		if !reflect.DeepEqual(actualOutput, obj.out.output) {
 			t.Errorf("in test case %d, expected '%s' found '%s'", i, obj.out.output, actualOutput)
 		}
