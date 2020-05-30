@@ -72,12 +72,13 @@ There may be case where you need to upload files or images we also provide custo
 ```
 `Note: By default the type is default`
 
-After you add/update the key please run the following command:
-```bash
-$ asher scaffold
-```
 
 We provide 3 different `types` of transactors:
 * [default](#)
 * [file](#)
 * [image](#)
+
+After you add/update the key please run the following command:
+```bash
+$ asher scaffold
+```
