@@ -13,6 +13,7 @@ import (
 const controllerFileName = "%sRestController"
 const transactorFileName = "%sTransactor"
 const mutatorFileName = "%sMutator"
+const queryFileName = "%sQuery"
 const apiContext = "api"
 
 type ControllerHandler struct {
@@ -192,7 +193,7 @@ func (controllerHandler *ControllerHandler) handleQuery(identifier string) api.E
 	queryGenerator := generator.NewQueryGenerator(true).SetIdentifier(identifier)
 
 	context.GetFromRegistry(context.Query).AddToCtx(identifier, queryGenerator)
-	emitFile := core.NewPhpEmitterFile(identifier+"Query.php", api.QueryPath, queryGenerator, api.Query)
+	emitFile := core.NewPhpEmitterFile(fmt.Sprintf(queryFileName,identifier), api.QueryPath, queryGenerator, api.Query)
 
 	return emitFile
 }
