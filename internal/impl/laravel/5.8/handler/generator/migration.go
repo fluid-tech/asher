@@ -16,6 +16,7 @@ const (
 
 type MigrationGenerator struct {
 	api.Generator
+	migration    *core.Class
 	classBuilder interfaces.Class
 	tableName    string
 	columns      []*core.SimpleStatement
@@ -83,8 +84,11 @@ func (migrationGenerator *MigrationGenerator) AddColumns(columns []*core.SimpleS
 	- a pointer to the corresponding core.Class of this migration
 */
 func (migrationGenerator *MigrationGenerator) Build() *core.Class {
-	// Preparing the arguments for up function
+	if migrationGenerator.migration != nil {
+		return migrationGenerator.migration;
+	}
 
+	// Preparing the arguments for up function
 	arg1 := core.NewParameter("'" + migrationGenerator.tableName + "'")
 	closure := builder.NewFunctionBuilder().AddArgument("Blueprint $table")
 	for _, element := range migrationGenerator.columns {
@@ -112,7 +116,8 @@ func (migrationGenerator *MigrationGenerator) Build() *core.Class {
 	}).SetExtends(MigrationExtends).AddFunction(upFunction).
 		AddFunction(downFunction)
 
-	return migrationGenerator.classBuilder.GetClass()
+	migrationGenerator.migration = migrationGenerator.classBuilder.GetClass()
+	return migrationGenerator.migration
 }
 
 /**
