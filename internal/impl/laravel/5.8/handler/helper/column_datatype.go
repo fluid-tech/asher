@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -18,7 +19,7 @@ import (
  Example:
 	- primaryKeyMethodNameGenerator("integer")
 */
-func ColTypeSwitcher(colType string, colName string, allowed []string) string {
+func ColTypeSwitcher(colType string, colName string, allowed []string) (string, error) {
 	colDataType := strings.Split(colType, "|")
 	switch colDataType[0] {
 	// TODO : Add more column types here
@@ -114,7 +115,7 @@ func ColTypeSwitcher(colType string, colName string, allowed []string) string {
 	default:
 		// TODO: Log this error and replace it with formatted error message.
 		//panic("not supported or wrong input in ColTypeSwitcher :- " + colType)
-		return "unsupported datatype"
+		return "", errors.New("unsupported datatype")
 	}
 }
 
@@ -128,202 +129,202 @@ func ColTypeSwitcher(colType string, colName string, allowed []string) string {
  Example:
 	- primaryKeyMethodNameGenerator("integer")
 */
-func PrimaryKeyMethodNameGenerator(colType string) string {
+func PrimaryKeyMethodNameGenerator(colType string) (string, error) {
 	switch colType {
 	case "integer":
-		return "increments"
+		return "increments", nil
 	case "mediumInteger":
-		return "mediumIncrements"
+		return "mediumIncrements", nil
 	case "smallInteger":
-		return "smallIncrements"
+		return "smallIncrements", nil
 	case "tinyInteger":
-		return "tinyIncrements"
+		return "tinyIncrements", nil
 	case "bigInteger":
-		return "bigIncrements"
+		return "bigIncrements", nil
 	default:
-		panic("Type not supported or invalid inputs")
+		return "", errors.New("type not supported or invalid inputs")
 	}
 }
 
-func UnsignedBigInteger(colName string) string {
-	return normalStringDataProcessor("unsignedBigInteger", colName)
+func UnsignedBigInteger(colName string) (string, error) {
+	return normalStringDataProcessor("unsignedBigInteger", colName), nil
 }
 
-func BigInteger(colName string) string {
-	return normalStringDataProcessor("bigInteger", colName)
+func BigInteger(colName string) (string, error) {
+	return normalStringDataProcessor("bigInteger", colName), nil
 }
 
-func UnsignedInteger(colName string) string {
-	return normalStringDataProcessor("unsignedInteger", colName)
+func UnsignedInteger(colName string) (string, error) {
+	return normalStringDataProcessor("unsignedInteger", colName), nil
 }
 
-func Integer(colName string) string {
-	return normalStringDataProcessor("integer", colName)
+func Integer(colName string) (string, error) {
+	return normalStringDataProcessor("integer", colName), nil
 }
 
-func UnsignedTinyInteger(colName string) string {
-	return normalStringDataProcessor("unsignedTinyInteger", colName)
+func UnsignedTinyInteger(colName string) (string, error) {
+	return normalStringDataProcessor("unsignedTinyInteger", colName), nil
 }
 
-func TinyInteger(colName string) string {
-	return normalStringDataProcessor("tinyInteger", colName)
+func TinyInteger(colName string) (string, error) {
+	return normalStringDataProcessor("tinyInteger", colName), nil
 }
 
-func UnsignedMediumInteger(colName string) string {
-	return normalStringDataProcessor("unsignedMediumInteger", colName)
+func UnsignedMediumInteger(colName string) (string, error) {
+	return normalStringDataProcessor("unsignedMediumInteger", colName), nil
 
 }
 
-func MediumInteger(colName string) string {
-	return normalStringDataProcessor("mediumInteger", colName)
+func MediumInteger(colName string) (string, error) {
+	return normalStringDataProcessor("mediumInteger", colName), nil
 }
 
-func String(colName string, funcArgs []string) string {
-	return multiParamColumnProcessor("string", colName, funcArgs)
+func String(colName string, funcArgs []string) (string, error) {
+	return multiParamColumnProcessor("string", colName, funcArgs), nil
 }
 
-func Boolean(colName string) string {
-	return normalStringDataProcessor("boolean", colName)
+func Boolean(colName string) (string, error) {
+	return normalStringDataProcessor("boolean", colName), nil
 }
 
-func Char(colType string, dataType []string) string {
-	return multiParamColumnProcessor("char", colType, dataType)
+func Char(colType string, dataType []string) (string, error) {
+	return multiParamColumnProcessor("char", colType, dataType), nil
 }
 
-func Date(colName string, dataType []string) string {
-	return normalStringDataProcessor("date", colName)
+func Date(colName string, dataType []string) (string, error) {
+	return normalStringDataProcessor("date", colName), nil
 }
 
-func Double(colType string, dataType []string) string {
-	return multiParamColumnProcessor("double", colType, dataType)
+func Double(colType string, dataType []string) (string, error) {
+	return multiParamColumnProcessor("double", colType, dataType), nil
 }
 
-func Float(colType string, dataType []string) string {
-	return multiParamColumnProcessor("float", colType, dataType)
+func Float(colType string, dataType []string) (string, error) {
+	return multiParamColumnProcessor("float", colType, dataType), nil
 }
 
-func Enum(colFunctionName string, allowed []string) string {
-	return dataArrayProcessor(colFunctionName, allowed, "enum")
+func Enum(colFunctionName string, allowed []string) (string, error) {
+	return dataArrayProcessor(colFunctionName, allowed, "enum"), nil
 }
 
-func Set(colFunctionName string, allowed []string) string {
-	return dataArrayProcessor(colFunctionName, allowed, "set")
+func Set(colFunctionName string, allowed []string) (string, error) {
+	return dataArrayProcessor(colFunctionName, allowed, "set"), nil
 }
 
 func Binary(colName string) string {
 	return normalStringDataProcessor("binary", colName)
 }
 
-func DateTime(colName string, dataType []string) string {
-	return multiParamColumnProcessor("dateTime", colName, dataType)
+func DateTime(colName string, dataType []string) (string, error) {
+	return multiParamColumnProcessor("dateTime", colName, dataType), nil
 }
 
-func DateTimeTz(colName string, dataType []string) string {
-	return multiParamColumnProcessor("dateTimeTz", colName, dataType)
+func DateTimeTz(colName string, dataType []string) (string, error) {
+	return multiParamColumnProcessor("dateTimeTz", colName, dataType), nil
 }
 
-func Decimal(colName string, dataType []string) string {
-	return multiParamColumnProcessor("decimal", colName, dataType)
+func Decimal(colName string, dataType []string) (string, error) {
+	return multiParamColumnProcessor("decimal", colName, dataType), nil
 }
 
-func Geometry(colName string) string {
-	return normalStringDataProcessor("geometry", colName)
+func Geometry(colName string) (string, error) {
+	return normalStringDataProcessor("geometry", colName), nil
 }
 
-func GeometryCollection(colName string) string {
-	return normalStringDataProcessor("geometryCollection", colName)
+func GeometryCollection(colName string) (string, error) {
+	return normalStringDataProcessor("geometryCollection", colName), nil
 }
 
-func IpAddress(colName string) string {
-	return normalStringDataProcessor("ipAddress", colName)
+func IpAddress(colName string) (string, error) {
+	return normalStringDataProcessor("ipAddress", colName), nil
 }
 
-func Json(colName string) string {
-	return normalStringDataProcessor("json", colName)
+func Json(colName string) (string, error) {
+	return normalStringDataProcessor("json", colName), nil
 }
 
-func Jsonb(colName string) string {
-	return normalStringDataProcessor("jsonb", colName)
+func Jsonb(colName string) (string, error) {
+	return normalStringDataProcessor("jsonb", colName), nil
 }
 
-func LineString(colName string) string {
-	return normalStringDataProcessor("lineString", colName)
+func LineString(colName string) (string, error) {
+	return normalStringDataProcessor("lineString", colName), nil
 }
 
-func LongText(colName string) string {
-	return normalStringDataProcessor("longText", colName)
+func LongText(colName string) (string, error) {
+	return normalStringDataProcessor("longText", colName), nil
 }
 
-func MacAddress(colName string) string {
-	return normalStringDataProcessor("macAddress", colName)
+func MacAddress(colName string) (string, error) {
+	return normalStringDataProcessor("macAddress", colName), nil
 }
 
-func Morphs(colName string) string {
-	return normalStringDataProcessor("morphs", colName)
+func Morphs(colName string) (string, error) {
+	return normalStringDataProcessor("morphs", colName), nil
 }
 
-func UuidMorphs(colName string) string {
-	return normalStringDataProcessor("uuidMorphs", colName)
+func UuidMorphs(colName string) (string, error) {
+	return normalStringDataProcessor("uuidMorphs", colName), nil
 }
 
-func MultiLineString(colName string) string {
-	return normalStringDataProcessor("multiLineString", colName)
+func MultiLineString(colName string) (string, error) {
+	return normalStringDataProcessor("multiLineString", colName), nil
 }
 
-func MultiPoint(colName string) string {
-	return normalStringDataProcessor("multiPoint", colName)
+func MultiPoint(colName string) (string, error) {
+	return normalStringDataProcessor("multiPoint", colName), nil
 }
 
-func MultiPolygon(colName string) string {
-	return normalStringDataProcessor("multiPolygon", colName)
+func MultiPolygon(colName string) (string, error) {
+	return normalStringDataProcessor("multiPolygon", colName), nil
 }
 
-func NullableMorphs(colName string) string {
-	return normalStringDataProcessor("nullableMorphs", colName)
+func NullableMorphs(colName string) (string, error) {
+	return normalStringDataProcessor("nullableMorphs", colName), nil
 }
 
-func NullableUuidMorphs(colName string) string {
-	return normalStringDataProcessor("nullableUuidMorphs", colName)
+func NullableUuidMorphs(colName string) (string, error) {
+	return normalStringDataProcessor("nullableUuidMorphs", colName), nil
 }
 
-func Point(colName string) string {
-	return normalStringDataProcessor("point", colName)
+func Point(colName string) (string, error) {
+	return normalStringDataProcessor("point", colName), nil
 }
 
-func Polygon(colName string) string {
-	return normalStringDataProcessor("polygon", colName)
+func Polygon(colName string) (string, error) {
+	return normalStringDataProcessor("polygon", colName), nil
 }
 
-func SoftDeletes(colName string, dataType []string) string {
-	return multiParamColumnProcessor("softDeletes", colName, dataType)
+func SoftDeletes(colName string, dataType []string) (string, error) {
+	return multiParamColumnProcessor("softDeletes", colName, dataType), nil
 }
 
-func SoftDeletesTz(colName string, dataType []string) string {
-	return multiParamColumnProcessor("softDeletesTz", colName, dataType)
+func SoftDeletesTz(colName string, dataType []string) (string, error) {
+	return multiParamColumnProcessor("softDeletesTz", colName, dataType), nil
 }
 
-func Text(colName string) string {
-	return normalStringDataProcessor("text", colName)
+func Text(colName string) (string, error) {
+	return normalStringDataProcessor("text", colName), nil
 }
 
-func Time(colName string, dataType []string) string {
-	return multiParamColumnProcessor("time", colName, dataType)
+func Time(colName string, dataType []string) (string, error) {
+	return multiParamColumnProcessor("time", colName, dataType), nil
 }
 
-func TimeTz(colName string, dataType []string) string {
-	return multiParamColumnProcessor("timeTz", colName, dataType)
+func TimeTz(colName string, dataType []string) (string, error) {
+	return multiParamColumnProcessor("timeTz", colName, dataType), nil
 }
 
-func Timestamp(colName string, dataType []string) string {
-	return multiParamColumnProcessor("timestamp", colName, dataType)
+func Timestamp(colName string, dataType []string) (string, error) {
+	return multiParamColumnProcessor("timestamp", colName, dataType), nil
 }
 
-func TimestampTz(colName string, dataType []string) string {
-	return multiParamColumnProcessor("timestampTz", colName, dataType)
+func TimestampTz(colName string, dataType []string) (string, error) {
+	return multiParamColumnProcessor("timestampTz", colName, dataType), nil
 }
 
-func Year(colName string) string {
-	return normalStringDataProcessor("year", colName)
+func Year(colName string) (string, error) {
+	return normalStringDataProcessor("year", colName), nil
 }
 
 // All Other datatype processor
