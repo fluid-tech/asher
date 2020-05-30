@@ -2,24 +2,9 @@
 
 ### Table of Contents
 
-* [What is REST API](#what-is-rest-api)
 * [Basic Usage](#basic-usage)
 * [HttpMethods](#httpmethods)
 * [Type](#type)
-
-### What is REST API?
-Let’s say you’re trying to find videos about Batman on Youtube. You open up Youtube, type "Batman" into a search field, hit enter, and you see a list of videos about Batman. A REST API works in a similar way. You search for something, and you get a list of results back from the service you’re requesting from.
-
-
-An `API` is an application programming interface. It is a set of rules that allow programs to talk to each other. The developer creates the API on the server and allows the client to talk to it.
-
-`REST` determines how the API looks like. It stands for "Representational State Transfer". It is a set of rules that developers follow when they create their API. One of these rules states that you should be able to get a piece of data (called a resource) when you link to a specific URL.
-
-Each URL is called a `request` while the data sent back to you is called a `response`.
-
-
-Asher provides you with the scaffolding of Laravel `RESTful Controller` as of now. 
-
 
 ### Basic Usage
 To scaffold a controller all you need to do is add a `controller` key in the `config.asher` file with some properties. As shown below:
@@ -77,7 +62,7 @@ There may be case where you need to upload files or images we also provide custo
 ```
 `Note: By default the type is default`
 
-We provide 3 different types of transactors:
+We provide 3 different `types` of transactors:
 * [default](#)
 * [file](#)
 * [image](#)
