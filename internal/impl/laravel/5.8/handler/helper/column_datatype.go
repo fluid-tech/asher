@@ -115,6 +115,8 @@ func ColTypeSwitcher(colType string, colName string, allowed []string) (string, 
 		return TimestampTz(colName, colDataType)
 	case "year":
 		return Year(colName)
+	case "binary":
+		return Binary(colName)
 
 	default:
 		// TODO: Log this error and replace it with formatted error message.
@@ -221,8 +223,8 @@ func Set(colFunctionName string, allowed []string) (string, error) {
 	return dataArrayProcessor(colFunctionName, allowed, "set"), nil
 }
 
-func Binary(colName string) string {
-	return normalStringDataProcessor("binary", colName)
+func Binary(colName string) (string, error) {
+	return normalStringDataProcessor("binary", colName), nil
 }
 
 func DateTime(colName string, dataType []string) (string, error) {

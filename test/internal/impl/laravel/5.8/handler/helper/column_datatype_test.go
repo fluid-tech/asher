@@ -24,12 +24,18 @@ func expectedOutput(expectedOutput string) OUT {
 	return OUT{expectedOutput}
 }
 
-func Test_Columns(t *testing.T) {
+func Test_Column_Datatype(t *testing.T) {
+	ColumnTester(t)
+	PrimaryColumnTester(t)
+}
+
+func ColumnTester(t *testing.T) {
 
 	var columnTestObject = []*struct {
 		in  IN
 		out OUT
 	}{
+		{GetInput("uasdasdasdnsignedBigIntegeraaaa", "desc", nil), expectedOutput("")},
 		{GetInput("unsignedBigInteger", "desc", nil), expectedOutput("unsignedBigInteger('desc')")},
 		{GetInput("bigInteger", "desc", nil), expectedOutput("bigInteger('desc')")},
 		{GetInput("unsignedInteger", "desc", nil), expectedOutput("unsignedInteger('desc')")},
@@ -40,6 +46,8 @@ func Test_Columns(t *testing.T) {
 		{GetInput("char|12", "desc", nil), expectedOutput("char('desc', 12)")},
 		{GetInput("enum", "desc", nil), expectedOutput("enum('desc')")},
 		{GetInput("enum", "desc", []string{"1", "2", "3"}), expectedOutput(`enum('desc', ['1', '2', '3'])`)},
+		{GetInput("set", "desc", nil), expectedOutput("set('desc')")},
+		{GetInput("set", "desc", []string{"1", "2", "3"}), expectedOutput(`set('desc', ['1', '2', '3'])`)},
 		{GetInput("year", "desc", nil), expectedOutput(`year('desc')`)},
 		{GetInput("timeStampTz|0", "desc", nil), expectedOutput(`timestampTz('desc', 0)`)},
 		{GetInput("timestamp|0", "desc", nil), expectedOutput(`timestamp('desc', 0)`)},
@@ -88,6 +96,7 @@ func Test_Columns(t *testing.T) {
 		{GetInput("unsignedBigInteger", "desc", nil), expectedOutput(`unsignedBigInteger('desc')`)},
 		{GetInput("smallInteger", "desc", nil), expectedOutput(`smallInteger('desc')`)},
 		{GetInput("unsignedSmallInteger", "desc", nil), expectedOutput(`unsignedSmallInteger('desc')`)},
+		{GetInput("binary", "desc", nil), expectedOutput(`binary('desc')`)},
 	}
 	for i, obj := range columnTestObject {
 		actualOutput, _ := helper.ColTypeSwitcher(obj.in.colType, obj.in.colName, obj.in.allowed)
@@ -96,4 +105,29 @@ func Test_Columns(t *testing.T) {
 		}
 	}
 
+}
+
+func PrimaryColumnTester(t *testing.T) {
+	var table = []*struct {
+		in  []string
+		out []string
+	}{
+		{genPrimaryKeyTest("unknown Type", t), []string{""}},
+		{genPrimaryKeyTest("integer", t), []string{"increments"}},
+		{genPrimaryKeyTest("bigInteger", t), []string{"bigIncrements"}},
+		{genPrimaryKeyTest("tinyInteger", t), []string{"tinyIncrements"}},
+		{genPrimaryKeyTest("smallInteger", t), []string{"smallIncrements"}},
+		{genPrimaryKeyTest("mediumInteger", t), []string{"mediumIncrements"}},
+	}
+
+	for i, element := range table {
+		if element.in[0] != element.out[0] {
+			t.Errorf("in test case %d expected '%s' found '%s'", i, element.out[0], element.in[0])
+		}
+	}
+}
+
+func genPrimaryKeyTest(key string, t *testing.T) []string {
+	generated, _ := helper.PrimaryKeyMethodNameGenerator(key)
+	return []string{generated}
 }
