@@ -39,6 +39,10 @@ func ColTypeSwitcher(colType string, colName string, allowed []string) (string, 
 		return UnsignedMediumInteger(colName)
 	case "mediumInteger":
 		return MediumInteger(colName)
+	case "unsignedSmallInteger":
+		return UnsignedSmallInteger(colName)
+	case "smallInteger":
+		return smallInteger(colName)
 	case "string":
 		return String(colName, colDataType)
 	case "boolean":
@@ -115,7 +119,7 @@ func ColTypeSwitcher(colType string, colName string, allowed []string) (string, 
 	default:
 		// TODO: Log this error and replace it with formatted error message.
 		//panic("not supported or wrong input in ColTypeSwitcher :- " + colType)
-		return "", errors.New("unsupported datatype")
+		return "", errors.New("unsupported datatype passed value:" + colDataType[0])
 	}
 }
 
@@ -172,11 +176,18 @@ func TinyInteger(colName string) (string, error) {
 
 func UnsignedMediumInteger(colName string) (string, error) {
 	return normalStringDataProcessor("unsignedMediumInteger", colName), nil
-
 }
 
 func MediumInteger(colName string) (string, error) {
 	return normalStringDataProcessor("mediumInteger", colName), nil
+}
+
+func UnsignedSmallInteger(colName string) (string, error) {
+	return normalStringDataProcessor("unsignedSmallInteger", colName), nil
+}
+
+func smallInteger(colName string) (string, error) {
+	return normalStringDataProcessor("smallInteger", colName), nil
 }
 
 func String(colName string, funcArgs []string) (string, error) {
