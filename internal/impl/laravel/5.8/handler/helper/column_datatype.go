@@ -118,7 +118,6 @@ func ColTypeSwitcher(colType string, colName string, allowed []string) (string, 
 
 	default:
 		// TODO: Log this error and replace it with formatted error message.
-		//panic("not supported or wrong input in ColTypeSwitcher :- " + colType)
 		return "", errors.New("unsupported datatype")
 	}
 }
