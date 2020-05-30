@@ -12,9 +12,9 @@ func TestModelContext(t *testing.T) {
 		modelMigOut      *generator.ModelGenerator
 		modelMigExpected *generator.ModelGenerator
 	}{
-		{genModel("Hello"), api.FromContext(context.ContextModel,
+		{genModel("Hello"), api.FromContext(context.Model,
 			"Hello").(*generator.ModelGenerator)},
-		{genModel("World"), api.FromContext(context.ContextModel,
+		{genModel("World"), api.FromContext(context.Model,
 			"World").(*generator.ModelGenerator)},
 	}
 	for _, element := range classes {
@@ -22,7 +22,7 @@ func TestModelContext(t *testing.T) {
 			t.Error("Unexpected data")
 		}
 	}
-	if nil != api.FromContext(context.ContextModel, "nonexistentRecords") {
+	if nil != api.FromContext(context.Model, "nonexistentRecords") {
 		t.Error("Unexpected data")
 	}
 
@@ -30,6 +30,6 @@ func TestModelContext(t *testing.T) {
 
 func genModel(className string) *generator.ModelGenerator {
 	modelGen := generator.NewModelGenerator().SetName(className)
-	context.GetFromRegistry(context.ContextModel).AddToCtx(className, modelGen)
+	context.GetFromRegistry(context.Model).AddToCtx(className, modelGen)
 	return modelGen
 }

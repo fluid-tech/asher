@@ -48,9 +48,9 @@ func (auditColHandler *AuditCol) Handle(identifier string, value interface{}) ([
  in the modelContext
 */
 func (auditColHandler *AuditCol) handleModel(identifier string, input *helper.AuditColInput) error {
-	modelGenerator := context.GetFromRegistry(context.ContextModel).GetCtx(identifier).(*generator.ModelGenerator)
-	if modelGenerator != nil {
-		auditColModel := generator.NewAuditColModel(modelGenerator)
+	retrievedModelGenerator := context.GetFromRegistry(context.Model).GetCtx(identifier)
+	if retrievedModelGenerator != nil {
+		auditColModel := generator.NewAuditColModel(retrievedModelGenerator.(*generator.ModelGenerator))
 		auditColModel.SetTimestamps(input.IsTimestampSet())
 		auditColModel.SetAuditCol(input.IsAuditColSet())
 		auditColModel.SetSoftDeletes(input.IsSoftDeletesSet())
@@ -68,9 +68,9 @@ func (auditColHandler *AuditCol) handleModel(identifier string, input *helper.Au
  in the modelContext
 */
 func (auditColHandler *AuditCol) handleMigration(identifier string, input *helper.AuditColInput) error {
-	migGen := context.GetFromRegistry(context.ContextMigration).GetCtx(identifier).(*generator.MigrationGenerator)
+	migGen := context.GetFromRegistry(context.Migration).GetCtx(identifier)
 	if migGen != nil {
-		auditColMigGen := generator.NewAuditColMigration(migGen)
+		auditColMigGen := generator.NewAuditColMigration(migGen.(*generator.MigrationGenerator))
 		auditColMigGen.SetTimestamps(input.IsTimestampSet())
 		auditColMigGen.SetPkCol(input.PkColVal)
 		auditColMigGen.SetAuditCols(input.IsAuditColSet())

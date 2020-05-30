@@ -72,8 +72,8 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 	modelGen := generator.NewModelGenerator().SetName(className)
 	migGen := generator.NewMigrationGenerator().SetName(className)
 
-	context.GetFromRegistry(context.ContextMigration).AddToCtx(className, migGen)
-	context.GetFromRegistry(context.ContextModel).AddToCtx(className, modelGen)
+	context.GetFromRegistry(context.Migration).AddToCtx(className, migGen)
+	context.GetFromRegistry(context.Model).AddToCtx(className, modelGen)
 
 	emitterFiles, error := handler.NewControllerHandler().Handle(className, controllerConfig)
 
@@ -95,11 +95,11 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 		t.Error("Not returned 4 files", len(emitterFiles))
 	}
 
-	retrievedControllerGen := api.FromContext(context.ContextController, className)
-	retrievedTransactorGen := api.FromContext(context.ContextTransactor, className)
-	retrievedMutatorGen := api.FromContext(context.ContextMutator, className)
-	retrievedRouteGen := api.FromContext(context.ContextRoute, "api")
-	retrievedQueryGen := api.FromContext(context.ContextQuery, className)
+	retrievedControllerGen := api.FromContext(context.Controller, className)
+	retrievedTransactorGen := api.FromContext(context.Transactor, className)
+	retrievedMutatorGen := api.FromContext(context.Mutator, className)
+	retrievedRouteGen := api.FromContext(context.Route, "api")
+	retrievedQueryGen := api.FromContext(context.Query, className)
 
 	if retrievedControllerGen == nil {
 		t.Errorf("controller for %s doesnt exist ", className)
@@ -126,7 +126,8 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 	actualMutatorGen := retrievedMutatorGen.(*generator.MutatorGenerator)
 	actualRouteGen := retrievedRouteGen.(*generator.RouteGenerator)
 	actualQueryGen := retrievedQueryGen.(*generator.QueryGenerator)
-	context.GetFromRegistry(context.ContextRoute).AddToCtx("api", generator.NewRouteGenerator())
+	// clearing context so that tests are isolated
+	context.GetFromRegistry(context.Route).AddToCtx("api", generator.NewRouteGenerator())
 	return []string{actualControllerGen.String(), actualTransactorGen.String(), actualMutatorGen.String(),
 		actualQueryGen.String(), actualRouteGen.String(), migGen.String(), modelGen.String()}
 }
