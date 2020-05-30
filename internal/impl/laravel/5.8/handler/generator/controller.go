@@ -34,6 +34,7 @@ const RequestImport = `Illuminate\Http\Request`
 
 type ControllerGenerator struct {
 	api.Generator
+	class				 	 *core.Class
 	classBuilder             interfaces.Class
 	identifier               string
 	imports                  []string
@@ -45,6 +46,7 @@ type ControllerGenerator struct {
 func NewControllerGenerator() *ControllerGenerator {
 	return &ControllerGenerator{
 		classBuilder: builder.NewClassBuilder(),
+		class: nil,
 		identifier:   "",
 		imports:      []string{},
 	}
@@ -273,6 +275,9 @@ Sample Usage:
 	- controllerGeneratorObject.BuildRestController()
 */
 func (conGen *ControllerGenerator) BuildRestController() *core.Class {
+	if conGen.class != nil {
+		return conGen.class
+	}
 	className := fmt.Sprintf("%sRestController", conGen.identifier)
 
 	restControllerImports := []string{
@@ -291,7 +296,8 @@ func (conGen *ControllerGenerator) BuildRestController() *core.Class {
 		SetPackage(ControllerNamespace).
 		SetExtends(ControllerExtends).
 		AddImports(conGen.imports)
-	return conGen.classBuilder.GetClass()
+	conGen.class = conGen.classBuilder.GetClass()
+	return conGen.class
 }
 
 /**
