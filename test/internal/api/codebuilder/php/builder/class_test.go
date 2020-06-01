@@ -62,7 +62,7 @@ Output:
     }`
 */
 func constructorFunction() interfaces.Function {
-	assigmentSS := api2.TabbedUnit(core.NewSimpleStatement(FullyQualifiedModelAssignment))
+	assigmentSS := core.NewSimpleStatement(FullyQualifiedModelAssignment)
 	return builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
 		AddArgument(FullyQualifiedModelArgs).
 		AddStatement(assigmentSS)
