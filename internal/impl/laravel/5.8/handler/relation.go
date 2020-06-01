@@ -34,9 +34,9 @@ Returns:
 func (relationshipHandler *RelationshipHandler) Handle(currentTableName string, relations interface{}) ([]api.EmitterFile,
 	error) {
 
-	retrivedModelGenerator := context.GetFromRegistry(context.Model).GetCtx(currentTableName).(*generator.ModelGenerator)
-	if retrivedModelGenerator != nil {
-		relationshipModelGenerator := generator.NewRelationshipModel(retrivedModelGenerator)
+	modelGenerator := context.GetFromRegistry(context.Model).GetCtx(currentTableName)
+	if modelGenerator != nil {
+		relationshipModelGenerator := generator.NewRelationshipModel(modelGenerator.(*generator.ModelGenerator))
 		myRelations := relations.(models.Relation)
 
 		for _, rel := range myRelations.HasMany {
