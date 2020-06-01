@@ -60,6 +60,13 @@ func TestController(t *testing.T) {
 		}
 	}
 
+	/*Negative Testing
+	Assuming model and migrations are null and expecting nil and error
+	*/
+
+	modelNullTest(t, "School", RESTControllerConfigWithPOSTPUTDELETEHttpMethods)
+	migrationNullTest(t, "School", RESTControllerConfigWithPOSTPUTDELETEHttpMethods)
+
 }
 
 /**
@@ -130,4 +137,28 @@ func genControllerTest(className string, controllerConfig models.Controller, t *
 	context.GetFromRegistry(context.Route).AddToCtx("api", generator.NewRouteGenerator())
 	return []string{actualControllerGen.String(), actualTransactorGen.String(), actualMutatorGen.String(),
 		actualQueryGen.String(), actualRouteGen.String(), migGen.String(), modelGen.String()}
+}
+
+func modelNullTest(t *testing.T, className string , controllerConfig models.Controller ){
+	emitterFiles, error := handler.NewControllerHandler().Handle(className, controllerConfig)
+
+	if emitterFiles != nil {
+		t.Error("Emitter file not null for nil model")
+	}
+	if error == nil{
+		t.Error("Error  null for nil model")
+	}
+
+}
+
+func migrationNullTest(t *testing.T, className string , controllerConfig models.Controller ){
+	emitterFiles, error := handler.NewControllerHandler().Handle(className, controllerConfig)
+
+	if emitterFiles != nil {
+		t.Error("Emitter file not null for nil  migration")
+	}
+	if error == nil{
+		t.Error("Error  null for nil migration")
+	}
+
 }
