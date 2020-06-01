@@ -3,87 +3,67 @@ package builder
 import (
 	api2 "asher/internal/api"
 	"asher/internal/api/codebuilder/php/builder"
+	"asher/internal/api/codebuilder/php/builder/interfaces"
 	"asher/internal/api/codebuilder/php/core"
 	"asher/test/api"
 	"testing"
 )
 
+const (
+	FullyQualifiedModelAssignment = "$this->fullyQualifiedModel = $fullyQualifiedModel"
+	FullyQualifiedModelArgs       = `string $fullyQualifiedModel`
+)
+
 func TestClassBuilder(t *testing.T) {
 	var table = []*api.GeneralTest{
-		getClassWithExtendsAndInitialization(),
-		getClassWithoutExtendsAndInitialization(),
-		buildClassBuilderWithExistingClass(),
-		buildClassBuilderWithExistingClassAndInterface(),
+		genClassTest("TestMutator", "App", "BaseMutator", "", `Illuminate\Database\Eloquent\Model`, TestClass),
+		genClassTest("TestMutator", "App", "", "", `Illuminate\Database\Eloquent\Model`, TestClass2),
+		genClassTest("Hello", "Test", "", "", "", TestClass3),
+		genClassTest("Hello", "Test", "", "Runnable", "", TestClass4),
 	}
 
 	api.IterateAndTest(table, t)
 }
 
-func getClassWithoutExtendsAndInitialization() *api.GeneralTest {
-	assigmentSS := api2.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
-	//assigmentSS2 := core.TabbedUnit(core.NewSimpleStatement("$this->query = $query"))
-	functionBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
-		AddArgument("string $fullyQualifiedModel").
-		AddStatement(assigmentSS)
-
-	member := api2.TabbedUnit(core.NewVarDeclaration("private", "fullyQualifiedModel"))
-
-	klass := builder.NewClassBuilder().SetName("TestMutator").
-		AddFunction(functionBuilder.GetFunction()).AddMember(member).
-		SetPackage("App").AddImport(`Illuminate\Database\Eloquent\Model`)
-
-	return api.NewGeneralTest(klass.GetClass().String(), TestClass2)
-}
-
-func getClassWithExtendsAndInitialization() *api.GeneralTest {
-	assigmentSS := api2.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
-	//assigmentSS2 := core.TabbedUnit(core.NewSimpleStatement("$this->query = $query"))
-	functionBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
-		AddArgument("string $fullyQualifiedModel").
-		AddStatement(assigmentSS)
-
-	member := api2.TabbedUnit(core.NewVarDeclaration("private", "fullyQualifiedModel"))
-
-	klass := builder.NewClassBuilder().SetName("TestMutator").SetExtends("BaseMutator").
-		AddFunction(functionBuilder.GetFunction()).AddMember(member).
-		SetPackage("App").AddImport(`Illuminate\Database\Eloquent\Model`)
-	return api.NewGeneralTest(klass.GetClass().String(), TestClass)
-}
-
-func buildClassBuilderWithExistingClass() *api.GeneralTest {
-	assigmentSS := api2.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
-	//assigmentSS2 := core.TabbedUnit(core.NewSimpleStatement("$this->query = $query"))
-	functionBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
-		AddArgument("string $fullyQualifiedModel").
-		AddStatement(assigmentSS)
-
+/*
+Generates Test Cases.
+TODO: Replace the input string from an Object of Input Class for better future management of Inputs.
+*/
+func genClassTest(className string, packageName string, extendedClassName string, implementedInterfaceName string, importStatement string, expectedOutput string) *api.GeneralTest {
+	functionBuilder := constructorFunction()
 	member := api2.TabbedUnit(core.NewVarDeclaration("private", "fullyQualifiedModel"))
 
 	klass := core.NewClass()
-	klass.Name = "Hello"
-	klass.Package = "Test"
+	klass.Name = className
+	klass.Package = packageName
 
 	b := builder.NewClassBuilderFromClass(klass).AddFunction(functionBuilder.GetFunction()).AddMember(member).
-		SetPackage("Test")
+		SetPackage(packageName)
 
-	return api.NewGeneralTest(b.GetClass().String(), TestClass3)
+	if importStatement != "" {
+		b.AddImport(importStatement)
+	}
+
+	if extendedClassName != "" {
+		b.SetExtends(extendedClassName)
+	}
+
+	if implementedInterfaceName != "" {
+		b.AddInterface(implementedInterfaceName)
+	}
+	return api.NewGeneralTest(b.GetClass().String(), expectedOutput)
 }
 
-func buildClassBuilderWithExistingClassAndInterface() *api.GeneralTest {
-	assigmentSS := api2.TabbedUnit(core.NewSimpleStatement("$this->fullyQualifiedModel = $fullyQualifiedModel"))
-	//assigmentSS2 := core.TabbedUnit(core.NewSimpleStatement("$this->query = $query"))
-	functionBuilder := builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
-		AddArgument("string $fullyQualifiedModel").
+/*
+Generates Constructor:
+Output:
+	`public function __construct(string $fullyQualifiedModel) {
+        $this->fullyQualifiedModel = $fullyQualifiedModel;
+    }`
+*/
+func constructorFunction() interfaces.Function {
+	assigmentSS := core.NewSimpleStatement(FullyQualifiedModelAssignment)
+	return builder.NewFunctionBuilder().SetVisibility("public").SetName("__construct").
+		AddArgument(FullyQualifiedModelArgs).
 		AddStatement(assigmentSS)
-
-	member := api2.TabbedUnit(core.NewVarDeclaration("private", "fullyQualifiedModel"))
-
-	klass := core.NewClass()
-	klass.Name = "Hello"
-	klass.Package = "Test"
-
-	b := builder.NewClassBuilderFromClass(klass).AddFunction(functionBuilder.GetFunction()).AddMember(member).
-		SetPackage("Test").AddInterface("Runnable")
-
-	return api.NewGeneralTest(b.GetClass().String(), TestClass4)
 }

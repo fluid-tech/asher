@@ -12,6 +12,8 @@ import (
 func Test_Relations(t *testing.T) {
 	var table = []*api.GeneralTest{
 		getRelationTest("Orders", inputHasManyAllCases, inputHasOneAllCases, output1CheckForeignkeyConstraint),
+		getRelationTest("Orders", inputHasManyAllCasesWithBlank1, inputHasOneAllCasesWithBlank1, output1CheckForeignkeyConstraintWithBlank1),
+		getRelationTest("Orders", inputHasManyAllCasesWithBlank2, inputHasOneAllCasesWithBlank2, output1CheckForeignkeyConstraintWithBlank2),
 	}
 	api.IterateAndTest(table, t)
 }

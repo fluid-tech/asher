@@ -5,6 +5,7 @@ import (
 	"asher/internal/api/codebuilder/php/builder"
 	"asher/internal/api/codebuilder/php/core"
 	"asher/internal/impl/laravel/5.8/handler/helper"
+	"errors"
 	"fmt"
 )
 
@@ -32,15 +33,17 @@ Returns:
 Example:
 	- Input: AddRelationshipToModel(1, 'Orders', 'OrderProducts', 'order_id', 'id')
 */
-func (relationshipModel *RelationshipModel) AddRelationshipToModel(relationshipType int, currentTableName string,
-	referenceTableName string, foreignKey string, primaryKey string) *helper.RelationshipDetail {
+func (relationshipModel *RelationshipModel) AddRelationshipToModel(relationshipType int, referenceTableName string, foreignKey string, primaryKey string) (*helper.RelationshipDetail, error) {
 
-	generatedFunction := relationshipModel.buildRelationshipFunction(relationshipType, referenceTableName, foreignKey,
+	generatedFunction, err := relationshipModel.buildRelationship(relationshipType, referenceTableName, foreignKey,
 		primaryKey)
+	if err != nil {
+		return nil, err
+	}
 	relationshipDetailObj := helper.NewRelationshipDetail(relationshipType, generatedFunction, foreignKey,
 		referenceTableName)
 	relationshipModel.modGen.classBuilder.AddFunction(generatedFunction)
-	return relationshipDetailObj
+	return relationshipDetailObj, nil
 
 }
 
@@ -54,24 +57,24 @@ Parameters:
 Returns:
 	- instance of the *core.Function
 Example:
-	- Input: buildRelationshipFunction(1, 'OrderProducts', 'order_id', 'id')
+	- Input: buildRelationship(1, 'OrderProducts', 'order_id', 'id')
 	- Output: output.String() gives :
 		function OrderProducts() {
 			return $this->hasMany('App\OrderProducts', 'order_id', 'id')
 		}
 */
-func (relationshipModel *RelationshipModel) buildRelationshipFunction(relationshipType int, referenceTableName string,
-	foreignKey string, primaryKey string) *core.Function {
+func (relationshipModel *RelationshipModel) buildRelationship(relationshipType int, referenceTableName string,
+	foreignKey string, primaryKey string) (*core.Function, error) {
 	relation := ""
 	if relationshipType == helper.HasMany {
 		relation = "hasMany"
 	} else if relationshipType == helper.HasOne {
 		relation = "hasOne"
 	} else {
-		panic("This type of relation is not supported [relationshipType Number: ]" + string(relationshipType))
+		return nil, errors.New("This type of relation is not supported [relationshipType Number: ]" + string(relationshipType))
 	}
 	returnStatementStringFormatter := fmt.Sprintf(`return $this->%s('App\%s','%s','%s')`, relation,
 		referenceTableName, foreignKey, primaryKey)
 	statement := core.NewSimpleStatement(returnStatementStringFormatter)
-	return builder.NewFunctionBuilder().SetName(referenceTableName).AddStatement(statement).GetFunction()
+	return builder.NewFunctionBuilder().SetName(referenceTableName).AddStatement(statement).GetFunction(), nil
 }

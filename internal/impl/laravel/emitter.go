@@ -25,11 +25,11 @@ func (e Emitter) Emit(value interface{}) {
 
 	model := value.(models.Model)
 
-	GetFromRegistry(ContextColumns).Handle(model.Name, model.Cols)
-	GetFromRegistry(ContextController).Handle(model.Name, model.Controller)
-	GetFromRegistry(ContextAuditCols).Handle(model.Name, helper.NewAuditCol(model.AuditCols,
+	GetFromRegistry(HandlerColumns).Handle(model.Name, model.Cols)
+	GetFromRegistry(HandlerController).Handle(model.Name, model.Controller)
+	GetFromRegistry(HandlerAuditCols).Handle(model.Name, helper.NewAuditCol(model.AuditCols,
 		model.SoftDeletes, model.Timestamps, pkColName(model.Cols)))
-	GetFromRegistry(ContextRelation).Handle(model.Name, model.Relations)
+	GetFromRegistry(HandlerRelation).Handle(model.Name, model.Relations)
 
 }
 

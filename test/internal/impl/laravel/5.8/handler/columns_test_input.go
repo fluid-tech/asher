@@ -98,7 +98,7 @@ var StudentEnrollmentInputArr = []models.Column{
 		Allowed:            nil,
 		Hidden:             true,
 		Guarded:            true,
-		Primary:            false,
+		Primary:            true,
 		Unique:             false,
 		Nullable:           false,
 		OnDelete:           "",
@@ -226,10 +226,10 @@ class CreateStudentEnrollmentTable extends Migration {
         Schema::create('student_enrollment',  function (Blueprint $table) {
     $table->increments('id_int');
     $table->mediumInteger('id_medium');
-    $table->unsupported datatype;
+    $table->smallInteger('id_small');
     $table->tinyInteger('id_tiny')->unique();
     $table->bigIncrements('id_big');
-    $table->unsupported datatype;
+    $table->uuid('id_uuid')->primary();
     $table->foreign('order_id')->references('id')->on('Orders')->onDelete('cascade');
     $table->foreign('order_id')->references('id')->on('Orders')->onDelete('set null');
     $table->foreign('order_id')->references('id')->on('Orders')->onDelete('set null')->nullable();
