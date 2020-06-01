@@ -3,27 +3,8 @@ package helper
 import (
 	"asher/internal/impl/laravel/5.8/handler/helper"
 	"asher/test/api"
-	"reflect"
 	"testing"
 )
-
-type IN struct {
-	colType string
-	colName string
-	allowed []string
-}
-
-type OUT struct {
-	output string
-}
-
-func GetInput(colType string, colName string, allowed []string) IN {
-	return IN{colType, colName, allowed}
-}
-
-func expectedOutput(expectedOutput string) OUT {
-	return OUT{expectedOutput}
-}
 
 func Test_Column_Datatype(t *testing.T) {
 	ColumnTester(t)
@@ -32,80 +13,77 @@ func Test_Column_Datatype(t *testing.T) {
 
 func ColumnTester(t *testing.T) {
 
-	var columnTestObject = []*struct {
-		in  IN
-		out OUT
-	}{
-		{GetInput("uasdasdasdnsignedBigIntegeraaaa", "desc", nil), expectedOutput("")},
-		{GetInput("unsignedBigInteger", "desc", nil), expectedOutput("unsignedBigInteger('desc')")},
-		{GetInput("bigInteger", "desc", nil), expectedOutput("bigInteger('desc')")},
-		{GetInput("unsignedInteger", "desc", nil), expectedOutput("unsignedInteger('desc')")},
-		{GetInput("integer", "desc", nil), expectedOutput("integer('desc')")},
-		{GetInput("unsignedTinyInteger", "desc", nil), expectedOutput("unsignedTinyInteger('desc')")},
-		{GetInput("tinyInteger", "desc", nil), expectedOutput("tinyInteger('desc')")},
-		{GetInput("unsignedMediumInteger", "desc", nil), expectedOutput("unsignedMediumInteger('desc')")},
-		{GetInput("char|12", "desc", nil), expectedOutput("char('desc', 12)")},
-		{GetInput("enum", "desc", nil), expectedOutput("enum('desc')")},
-		{GetInput("enum", "desc", []string{"1", "2", "3"}), expectedOutput(`enum('desc', ['1', '2', '3'])`)},
-		{GetInput("set", "desc", nil), expectedOutput("set('desc')")},
-		{GetInput("set", "desc", []string{"1", "2", "3"}), expectedOutput(`set('desc', ['1', '2', '3'])`)},
-		{GetInput("year", "desc", nil), expectedOutput(`year('desc')`)},
-		{GetInput("timeStampTz|0", "desc", nil), expectedOutput(`timestampTz('desc', 0)`)},
-		{GetInput("timestamp|0", "desc", nil), expectedOutput(`timestamp('desc', 0)`)},
-		{GetInput("timeTz|0", "desc", nil), expectedOutput(`timeTz('desc', 0)`)},
-		{GetInput("time|0", "desc", nil), expectedOutput(`time('desc', 0)`)},
-		{GetInput("text", "desc", nil), expectedOutput(`text('desc')`)},
-		{GetInput("softDeleteTz|0", "desc", nil), expectedOutput(`softDeletesTz('desc', 0)`)},
-		{GetInput("softDelete|0", "desc", nil), expectedOutput(`softDeletes('desc', 0)`)},
-		{GetInput("polygon", "desc", nil), expectedOutput(`polygon('desc')`)},
-		{GetInput("point", "desc", nil), expectedOutput(`point('desc')`)},
-		{GetInput("nullableUuidMorphs", "desc", nil), expectedOutput(`nullableUuidMorphs('desc')`)},
-		{GetInput("nullableMorphs", "desc", nil), expectedOutput(`nullableMorphs('desc')`)},
-		{GetInput("multiPolygon", "desc", nil), expectedOutput(`multiPolygon('desc')`)},
-		{GetInput("multiPoint", "desc", nil), expectedOutput(`multiPoint('desc')`)},
-		{GetInput("multiLineString", "desc", nil), expectedOutput(`multiLineString('desc')`)},
-		{GetInput("uuidMorphs", "desc", nil), expectedOutput(`uuidMorphs('desc')`)},
-		{GetInput("morphs", "desc", nil), expectedOutput(`morphs('desc')`)},
-		{GetInput("macAddress", "desc", nil), expectedOutput(`macAddress('desc')`)},
-		{GetInput("longText", "desc", nil), expectedOutput(`longText('desc')`)},
-		{GetInput("lineString", "desc", nil), expectedOutput(`lineString('desc')`)},
-		{GetInput("jsonb", "desc", nil), expectedOutput(`jsonb('desc')`)},
-		{GetInput("json", "desc", nil), expectedOutput(`json('desc')`)},
-		{GetInput("ipAddress", "desc", nil), expectedOutput(`ipAddress('desc')`)},
-		{GetInput("geometryCollection", "desc", nil), expectedOutput(`geometryCollection('desc')`)},
-		{GetInput("geometry", "desc", nil), expectedOutput(`geometry('desc')`)},
-		{GetInput("decimal", "desc", nil), expectedOutput(`decimal('desc')`)},
-		{GetInput("decimal|8,2", "desc", nil), expectedOutput(`decimal('desc', 8,2)`)},
-		{GetInput("dateTimeTz", "desc", nil), expectedOutput(`dateTimeTz('desc')`)},
-		{GetInput("dateTime|0", "desc", nil), expectedOutput(`dateTime('desc', 0)`)},
-		{GetInput("float", "desc", nil), expectedOutput(`float('desc')`)},
-		{GetInput("float|8,2", "desc", nil), expectedOutput(`float('desc', 8,2)`)},
-		{GetInput("double|8,2", "desc", nil), expectedOutput(`double('desc', 8,2)`)},
-		{GetInput("double", "desc", nil), expectedOutput(`double('desc')`)},
-		{GetInput("date", "desc", nil), expectedOutput(`date('desc')`)},
-		{GetInput("char|100", "desc", nil), expectedOutput(`char('desc', 100)`)},
-		{GetInput("boolean", "desc", nil), expectedOutput(`boolean('desc')`)},
-		{GetInput("string", "desc", nil), expectedOutput(`string('desc')`)},
-		{GetInput("string|100", "desc", nil), expectedOutput(`string('desc', 100)`)},
-		{GetInput("mediumInteger", "desc", nil), expectedOutput(`mediumInteger('desc')`)},
-		{GetInput("unsignedMediumInteger", "desc", nil), expectedOutput(`unsignedMediumInteger('desc')`)},
-		{GetInput("tinyInteger", "desc", nil), expectedOutput(`tinyInteger('desc')`)},
-		{GetInput("unsignedTinyInteger", "desc", nil), expectedOutput(`unsignedTinyInteger('desc')`)},
-		{GetInput("integer", "desc", nil), expectedOutput(`integer('desc')`)},
-		{GetInput("unsignedInteger", "desc", nil), expectedOutput(`unsignedInteger('desc')`)},
-		{GetInput("bigInteger", "desc", nil), expectedOutput(`bigInteger('desc')`)},
-		{GetInput("unsignedBigInteger", "desc", nil), expectedOutput(`unsignedBigInteger('desc')`)},
-		{GetInput("smallInteger", "desc", nil), expectedOutput(`smallInteger('desc')`)},
-		{GetInput("unsignedSmallInteger", "desc", nil), expectedOutput(`unsignedSmallInteger('desc')`)},
-		{GetInput("binary", "desc", nil), expectedOutput(`binary('desc')`)},
+	var columnTestObject = []*api.GeneralTest{
+		columnTester("uasdasdasdnsignedBigIntegeraaaa", "desc", nil, ""),
+		columnTester("unsignedBigInteger", "desc", nil, "unsignedBigInteger('desc')"),
+		columnTester("bigInteger", "desc", nil, "bigInteger('desc')"),
+		columnTester("unsignedInteger", "desc", nil, "unsignedInteger('desc')"),
+		columnTester("integer", "desc", nil, "integer('desc')"),
+		columnTester("unsignedTinyInteger", "desc", nil, "unsignedTinyInteger('desc')"),
+		columnTester("tinyInteger", "desc", nil, "tinyInteger('desc')"),
+		columnTester("unsignedMediumInteger", "desc", nil, "unsignedMediumInteger('desc')"),
+		columnTester("char|12", "desc", nil, "char('desc', 12)"),
+		columnTester("enum", "desc", nil, "enum('desc')"),
+		columnTester("enum", "desc", []string{"1", "2", "3"}, "enum('desc', ['1', '2', '3'])"),
+		columnTester("set", "desc", nil, "set('desc')"),
+		columnTester("set", "desc", []string{"1", "2", "3"}, "set('desc', ['1', '2', '3'])"),
+		columnTester("year", "desc", nil, "year('desc')"),
+		columnTester("timeStampTz|0", "desc", nil, "timestampTz('desc', 0)"),
+		columnTester("timestamp|0", "desc", nil, "timestamp('desc', 0)"),
+		columnTester("timeTz|0", "desc", nil, "timeTz('desc', 0)"),
+		columnTester("time|0", "desc", nil, "time('desc', 0)"),
+		columnTester("text", "desc", nil, "text('desc')"),
+		columnTester("softDeleteTz|0", "desc", nil, "softDeletesTz('desc', 0)"),
+		columnTester("softDelete|0", "desc", nil, "softDeletes('desc', 0)"),
+		columnTester("polygon", "desc", nil, "polygon('desc')"),
+		columnTester("point", "desc", nil, "point('desc')"),
+		columnTester("nullableUuidMorphs", "desc", nil, "nullableUuidMorphs('desc')"),
+		columnTester("nullableMorphs", "desc", nil, "nullableMorphs('desc')"),
+		columnTester("multiPolygon", "desc", nil, "multiPolygon('desc')"),
+		columnTester("multiPoint", "desc", nil, "multiPoint('desc')"),
+		columnTester("multiLineString", "desc", nil, "multiLineString('desc')"),
+		columnTester("uuidMorphs", "desc", nil, "uuidMorphs('desc')"),
+		columnTester("morphs", "desc", nil, "morphs('desc')"),
+		columnTester("macAddress", "desc", nil, "macAddress('desc')"),
+		columnTester("longText", "desc", nil, "longText('desc')"),
+		columnTester("lineString", "desc", nil, "lineString('desc')"),
+		columnTester("jsonb", "desc", nil, "jsonb('desc')"),
+		columnTester("json", "desc", nil, "json('desc')"),
+		columnTester("ipAddress", "desc", nil, "ipAddress('desc')"),
+		columnTester("geometryCollection", "desc", nil, "geometryCollection('desc')"),
+		columnTester("geometry", "desc", nil, "geometry('desc')"),
+		columnTester("decimal", "desc", nil, "decimal('desc')"),
+		columnTester("decimal|8,2", "desc", nil, "decimal('desc', 8,2)"),
+		columnTester("dateTimeTz", "desc", nil, "dateTimeTz('desc')"),
+		columnTester("dateTime|0", "desc", nil, "dateTime('desc', 0)"),
+		columnTester("float", "desc", nil, "float('desc')"),
+		columnTester("float|8,2", "desc", nil, "float('desc', 8,2)"),
+		columnTester("double|8,2", "desc", nil, "double('desc', 8,2)"),
+		columnTester("double", "desc", nil, "double('desc')"),
+		columnTester("date", "desc", nil, "date('desc')"),
+		columnTester("char|100", "desc", nil, "char('desc', 100)"),
+		columnTester("boolean", "desc", nil, "boolean('desc')"),
+		columnTester("string", "desc", nil, "string('desc')"),
+		columnTester("string|100", "desc", nil, "string('desc', 100)"),
+		columnTester("mediumInteger", "desc", nil, "mediumInteger('desc')"),
+		columnTester("unsignedMediumInteger", "desc", nil, "unsignedMediumInteger('desc')"),
+		columnTester("tinyInteger", "desc", nil, "tinyInteger('desc')"),
+		columnTester("unsignedTinyInteger", "desc", nil, "unsignedTinyInteger('desc')"),
+		columnTester("integer", "desc", nil, "integer('desc')"),
+		columnTester("unsignedInteger", "desc", nil, "unsignedInteger('desc')"),
+		columnTester("bigInteger", "desc", nil, "bigInteger('desc')"),
+		columnTester("unsignedBigInteger", "desc", nil, "unsignedBigInteger('desc')"),
+		columnTester("smallInteger", "desc", nil, "smallInteger('desc')"),
+		columnTester("unsignedSmallInteger", "desc", nil, "unsignedSmallInteger('desc')"),
+		columnTester("binary", "desc", nil, "binary('desc')"),
 	}
-	for i, obj := range columnTestObject {
-		actualOutput, _ := helper.ColTypeSwitcher(obj.in.colType, obj.in.colName, obj.in.allowed)
-		if !reflect.DeepEqual(actualOutput, obj.out.output) {
-			t.Errorf("in test case %d, expected '%s' found '%s'", i, obj.out.output, actualOutput)
-		}
-	}
+	api.IterateAndTest(columnTestObject, t)
 
+}
+
+func columnTester(colType string, colName string, allowed []string, expectedOutput string) *api.GeneralTest {
+	actualOutput, _ := helper.ColTypeSwitcher(colType, colName, allowed)
+	return api.NewGeneralTest(actualOutput, expectedOutput)
 }
 
 func PrimaryColumnTester(t *testing.T) {
