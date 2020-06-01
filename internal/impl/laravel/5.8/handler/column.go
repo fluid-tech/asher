@@ -7,6 +7,7 @@ import (
 	"asher/internal/impl/laravel/5.8/handler/generator"
 	"asher/internal/impl/laravel/5.8/handler/helper"
 	"asher/internal/models"
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -26,7 +27,10 @@ func (columnHandler *ColumnHandler) Handle(modelName string, colsArr interface{}
 
 	myColsArray := colsArr.([]models.Column)
 
-	tempMigration := api.EmitterFile(columnHandler.handleMigration(modelName, myColsArray))
+	tempMigration, err := columnHandler.handleMigration(modelName, myColsArray)
+	if err != nil {
+		return nil, err
+	}
 	tempModel := api.EmitterFile(columnHandler.handleModel(modelName, myColsArray))
 
 	return []api.EmitterFile{tempMigration, tempModel}, nil
@@ -47,14 +51,17 @@ func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []model
 	return phpEmitter
 }
 
-func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr []models.Column) api.EmitterFile {
+func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr []models.Column) (*core.PhpEmitterFile, error) {
 	var statementsArr []*core.SimpleStatement
 	for _, singleColumn := range columnArr {
+		stmt, err := columnHandler.handleSingleColumn(identifier, singleColumn)
+		if err != nil {
+			return nil, err
+		}
 		statementsArr = append(
 			statementsArr,
-			columnHandler.handleSingleColumn(identifier, singleColumn),
+			stmt,
 		)
-
 	}
 
 	migrationGenerator := generator.NewMigrationGenerator().SetName(identifier).AddColumns(statementsArr)
@@ -62,7 +69,7 @@ func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr
 
 	phpEmitter := core.NewPhpEmitterFile(identifier, api.ModelPath, migrationGenerator, api.Model)
 
-	return phpEmitter
+	return phpEmitter, nil
 }
 
 func (columnHandler *ColumnHandler) handleValidation(modelGenerator *generator.ModelGenerator, validations string,
@@ -73,14 +80,18 @@ func (columnHandler *ColumnHandler) handleValidation(modelGenerator *generator.M
 	}
 }
 
-func (columnHandler *ColumnHandler) handleSingleColumn(modelName string, column models.Column) *core.SimpleStatement {
+func (columnHandler *ColumnHandler) handleSingleColumn(modelName string, column models.Column) (*core.SimpleStatement, error) {
 
 	if column.Primary {
 		//Handle PrimaryKey
-		return columnHandler.handlePrimary(column.ColType, column.Name, column.GenerationStrategy)
+		stmt, err := columnHandler.handlePrimary(column.ColType, column.Name, column.GenerationStrategy)
+		if err != nil {
+			return nil, err
+		}
+		return stmt, nil
 	} else if column.ColType == "reference" {
 		// Handle ForeignKey
-		return columnHandler.handleForeign(column.Name, column.Table, column.OnDelete, column.Nullable)
+		return columnHandler.handleForeign(column.Name, column.Table, column.OnDelete, column.Nullable), nil
 	} else {
 		// Handle Other Columns
 		return columnHandler.handleOther(column)
@@ -100,26 +111,37 @@ func (columnHandler *ColumnHandler) handleGuarded(modelGenerator *generator.Mode
 	}
 }
 
-func (columnHandler *ColumnHandler) handlePrimary(colType string, colName string, genStrat string) *core.SimpleStatement {
+/*
+If genStrat == auto_increment Then "$table->increments('colName')"
+if genStrat == uuid Then "$table->uuid('id')->primary()"
+else Return an Error
+*/
+func (columnHandler *ColumnHandler) handlePrimary(colType string, colName string, genStrat string) (*core.SimpleStatement, error) {
 	var generatedLine string
 	if genStrat == "auto_increment" {
-		primaryKeyMethodName := helper.PrimaryKeyMethodNameGenerator(colType)
+		primaryKeyMethodName, err := helper.PrimaryKeyMethodNameGenerator(colType)
+		if err != nil {
+			return nil, err
+		}
 		generatedLine = fmt.Sprintf("$table->%s('%s')", primaryKeyMethodName, colName)
 	} else if genStrat == "uuid" {
 		//$table->uuid('id')->primary();
 		generatedLine = fmt.Sprintf(UuidFmt, colName)
 	} else {
-		panic("input Type does not match with the defined keywords (uuid, auto_increment)")
+		return nil, errors.New("input Type does not match with the defined keywords (uuid, auto_increment)")
 	}
 	return &core.SimpleStatement{
 		SimpleStatement: generatedLine,
-	}
+	}, nil
 
 }
 
-func (columnHandler *ColumnHandler) handleOther(column models.Column) *core.SimpleStatement {
+func (columnHandler *ColumnHandler) handleOther(column models.Column) (*core.SimpleStatement, error) {
 	var generatedLine string
-	colTypeVal := helper.ColTypeSwitcher(column.ColType, column.Name, column.Allowed)
+	colTypeVal, err := helper.ColTypeSwitcher(column.ColType, column.Name, column.Allowed)
+	if err != nil {
+		return nil, err
+	}
 	defaultVal := columnHandler.handleDefaultValue(column.DefaultVal)
 	nullableVal := columnHandler.handleNullable(column.Nullable)
 	uniqueVal := columnHandler.handleUnique(column.Unique)
@@ -127,7 +149,7 @@ func (columnHandler *ColumnHandler) handleOther(column models.Column) *core.Simp
 	generatedLine = fmt.Sprintf("$table->%s%s%s%s%s", colTypeVal, defaultVal, nullableVal, uniqueVal, indexVal)
 	return &core.SimpleStatement{
 		SimpleStatement: generatedLine,
-	}
+	}, nil
 }
 
 func (columnHandler *ColumnHandler) handleForeign(colName string, colTable string, colOnDelete string, isNullable bool) *core.SimpleStatement {
