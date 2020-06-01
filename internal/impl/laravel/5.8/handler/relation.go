@@ -44,7 +44,7 @@ func (relationshipHandler *RelationshipHandler) Handle(currentTableName string, 
 			if err != nil {
 				return nil, err
 			}
-			relationshipDetailObj, _ := relationshipModelGenerator.AddRelationshipToModel(helper.HasMany, currentTableName,
+			relationshipDetailObj, _ := relationshipModelGenerator.AddRelationshipToModel(helper.HasMany,
 				referenceTableName, foreignKey, primaryKey)
 			context.GetFromRegistry(context.Relation).AddToCtx(currentTableName, relationshipDetailObj)
 		}
@@ -54,7 +54,7 @@ func (relationshipHandler *RelationshipHandler) Handle(currentTableName string, 
 			if err != nil {
 				return nil, err
 			}
-			relationshipDetailObj, _ := relationshipModelGenerator.AddRelationshipToModel(helper.HasOne, currentTableName,
+			relationshipDetailObj, _ := relationshipModelGenerator.AddRelationshipToModel(helper.HasOne,
 				referenceTableName, foreignKey, primaryKey)
 			context.GetFromRegistry(context.Relation).AddToCtx(currentTableName, relationshipDetailObj)
 		}

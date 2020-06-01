@@ -33,8 +33,7 @@ Returns:
 Example:
 	- Input: AddRelationshipToModel(1, 'Orders', 'OrderProducts', 'order_id', 'id')
 */
-func (relationshipModel *RelationshipModel) AddRelationshipToModel(relationshipType int, currentTableName string,
-	referenceTableName string, foreignKey string, primaryKey string) (*helper.RelationshipDetail, error) {
+func (relationshipModel *RelationshipModel) AddRelationshipToModel(relationshipType int, referenceTableName string, foreignKey string, primaryKey string) (*helper.RelationshipDetail, error) {
 
 	generatedFunction, err := relationshipModel.buildRelationship(relationshipType, referenceTableName, foreignKey,
 		primaryKey)
