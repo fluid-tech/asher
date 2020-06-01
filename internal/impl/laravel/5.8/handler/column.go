@@ -51,7 +51,8 @@ func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []model
 	return phpEmitter
 }
 
-func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr []models.Column) (*core.PhpEmitterFile, error) {
+func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr []models.Column) (*core.PhpEmitterFile,
+	error) {
 	var statementsArr []*core.SimpleStatement
 	for _, singleColumn := range columnArr {
 		stmt, err := columnHandler.handleSingleColumn(identifier, singleColumn)
@@ -80,7 +81,8 @@ func (columnHandler *ColumnHandler) handleValidation(modelGenerator *generator.M
 	}
 }
 
-func (columnHandler *ColumnHandler) handleSingleColumn(modelName string, column models.Column) (*core.SimpleStatement, error) {
+func (columnHandler *ColumnHandler) handleSingleColumn(modelName string, column models.Column) (*core.SimpleStatement,
+	error) {
 
 	if column.Primary {
 		//Handle PrimaryKey
@@ -99,13 +101,15 @@ func (columnHandler *ColumnHandler) handleSingleColumn(modelName string, column 
 
 }
 
-func (columnHandler *ColumnHandler) handleHidden(modelGenerator *generator.ModelGenerator, isHidden bool, colName string) {
+func (columnHandler *ColumnHandler) handleHidden(modelGenerator *generator.ModelGenerator, isHidden bool,
+	colName string) {
 	if isHidden {
 		modelGenerator.AddHiddenField(colName)
 	}
 }
 
-func (columnHandler *ColumnHandler) handleGuarded(modelGenerator *generator.ModelGenerator, isGuarded bool, colName string) {
+func (columnHandler *ColumnHandler) handleGuarded(modelGenerator *generator.ModelGenerator, isGuarded bool,
+	colName string) {
 	if isGuarded {
 		modelGenerator.AddFillable(colName)
 	}
@@ -116,7 +120,8 @@ If genStrat == auto_increment Then "$table->increments('colName')"
 if genStrat == uuid Then "$table->uuid('id')->primary()"
 else Return an Error
 */
-func (columnHandler *ColumnHandler) handlePrimary(colType string, colName string, genStrat string) (*core.SimpleStatement, error) {
+func (columnHandler *ColumnHandler) handlePrimary(colType string, colName string,
+	genStrat string) (*core.SimpleStatement, error) {
 	var generatedLine string
 	if genStrat == "auto_increment" {
 		primaryKeyMethodName, err := helper.PrimaryKeyMethodNameGenerator(colType)
@@ -152,7 +157,8 @@ func (columnHandler *ColumnHandler) handleOther(column models.Column) (*core.Sim
 	}, nil
 }
 
-func (columnHandler *ColumnHandler) handleForeign(colName string, colTable string, colOnDelete string, isNullable bool) *core.SimpleStatement {
+func (columnHandler *ColumnHandler) handleForeign(colName string, colTable string, colOnDelete string,
+	isNullable bool) *core.SimpleStatement {
 	//$table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 	var sb string
 	var splitedArr []string
