@@ -1,4 +1,5 @@
 package handler
+
 import (
 	"asher/internal/api"
 	"asher/internal/api/codebuilder/php/core"
@@ -40,7 +41,7 @@ func (controllerHandler *ControllerHandler) Handle(identifier string, value inte
 	if controllerConfig.Rest {
 		restControllerEmitterFiles, err := controllerHandler.handleRestController(identifier, controllerConfig)
 		if err != nil {
-			return nil,err
+			return nil, err
 		}
 		fileToEmit = append(fileToEmit, restControllerEmitterFiles...)
 	}
@@ -64,19 +65,17 @@ Returns:
 	- array of emmitter files
 */
 func (controllerHandler *ControllerHandler) handleRestController(identifier string,
-	controllerConfig models.Controller) ([]api.EmitterFile,error) {
-
+	controllerConfig models.Controller) ([]api.EmitterFile, error) {
 
 	var fileToEmit []api.EmitterFile
 	conGen := generator.NewControllerGenerator()
 
-
 	conGen.SetIdentifier(identifier).
 		AddFunctionsInController(controllerConfig.HttpMethods)
 	context.GetFromRegistry(context.Controller).AddToCtx(identifier, conGen)
-	controllerEmitterFile := core.NewPhpEmitterFile(fmt.Sprintf(controllerFileName,identifier),
+	controllerEmitterFile := core.NewPhpEmitterFile(fmt.Sprintf(controllerFileName, identifier),
 		api.ControllerPath, conGen, api.Controller)
-	transactorEmitterFile,err := controllerHandler.handleTransactor(identifier, controllerConfig.Type)
+	transactorEmitterFile, err := controllerHandler.handleTransactor(identifier, controllerConfig.Type)
 	if err != nil {
 		return nil, err
 	}
@@ -89,25 +88,23 @@ func (controllerHandler *ControllerHandler) handleRestController(identifier stri
 		fileToEmit = append(fileToEmit, routeEmitterFile)
 	}
 
-	return fileToEmit,nil
+	return fileToEmit, nil
 }
-
 
 /*REFER DOCS FOR TYPE OF TRANSACTOR*/
 func (controllerHandler *ControllerHandler) handleTransactor(identifier string,
-	controllerType string) (api.EmitterFile,error) {
+	controllerType string) (api.EmitterFile, error) {
 
 	var transactorEmmiterFile api.EmitterFile
 	retrievedModelGen := context.GetFromRegistry(context.Model).GetCtx(identifier)
-	if retrievedModelGen == nil{
-		return nil,errors.New(fmt.Sprintf("model class %s not found", identifier))
+	if retrievedModelGen == nil {
+		return nil, errors.New(fmt.Sprintf("model class %s not found", identifier))
 	}
 	modelGen := retrievedModelGen.(*generator.ModelGenerator)
 
-
 	retrievedMigGen := context.GetFromRegistry(context.Migration).GetCtx(identifier)
-	if retrievedMigGen == nil{
-		return nil,errors.New(fmt.Sprintf("migration class %s not found", identifier))
+	if retrievedMigGen == nil {
+		return nil, errors.New(fmt.Sprintf("migration class %s not found", identifier))
 	}
 	migrationGen := retrievedMigGen.(*generator.MigrationGenerator)
 
@@ -121,9 +118,8 @@ func (controllerHandler *ControllerHandler) handleTransactor(identifier string,
 		transactorEmmiterFile = controllerHandler.handleDefaultTransactor(identifier)
 	}
 
-	return transactorEmmiterFile,nil
+	return transactorEmmiterFile, nil
 }
-
 
 func (controllerHandler *ControllerHandler) handleDefaultTransactor(identifier string) api.EmitterFile {
 	//controller := value.(models.Controller)
@@ -131,7 +127,7 @@ func (controllerHandler *ControllerHandler) handleDefaultTransactor(identifier s
 	transactorGen := generator.NewTransactorGenerator("Base").SetIdentifier(identifier)
 
 	context.GetFromRegistry(context.Transactor).AddToCtx(identifier, transactorGen)
-	transactorEmitter := core.NewPhpEmitterFile(fmt.Sprintf(transactorFileName,identifier), api.TransactorPath,
+	transactorEmitter := core.NewPhpEmitterFile(fmt.Sprintf(transactorFileName, identifier), api.TransactorPath,
 		transactorGen, api.Transactor)
 
 	return transactorEmitter
@@ -150,7 +146,7 @@ func (controllerHandler *ControllerHandler) handleFileTransactor(identifier stri
 
 	context.GetFromRegistry(context.Transactor).AddToCtx(identifier, transactorGen)
 
-	transactorEmitter := core.NewPhpEmitterFile(fmt.Sprintf(transactorFileName,identifier), api.TransactorPath,
+	transactorEmitter := core.NewPhpEmitterFile(fmt.Sprintf(transactorFileName, identifier), api.TransactorPath,
 		transactorGen, api.Transactor)
 
 	return transactorEmitter
@@ -168,22 +164,20 @@ func (controllerHandler *ControllerHandler) handleImageTransactor(identifier str
 	transactorGen := generator.NewTransactorGenerator("image").SetIdentifier(identifier)
 	generator.NewImageTransactor(transactorGen).AddDefaults()
 	context.GetFromRegistry(context.Transactor).AddToCtx(identifier, transactorGen)
-	transactorEmitter := core.NewPhpEmitterFile(fmt.Sprintf(transactorFileName,identifier),
+	transactorEmitter := core.NewPhpEmitterFile(fmt.Sprintf(transactorFileName, identifier),
 		api.TransactorPath, transactorGen,
 		api.Transactor)
 	return transactorEmitter
 }
 
-
 func (controllerHandler *ControllerHandler) handleMutator(identifier string) api.EmitterFile {
-
 
 	mutatorGen := generator.NewMutatorGenerator()
 	mutatorGen.SetIdentifier(identifier)
 
 	context.GetFromRegistry(context.Mutator).AddToCtx(identifier, mutatorGen)
 	mutatorEmitter :=
-		core.NewPhpEmitterFile(fmt.Sprintf(mutatorFileName,identifier), api.MutatorPath, mutatorGen, api.Mutator)
+		core.NewPhpEmitterFile(fmt.Sprintf(mutatorFileName, identifier), api.MutatorPath, mutatorGen, api.Mutator)
 
 	return mutatorEmitter
 }
@@ -193,7 +187,7 @@ func (controllerHandler *ControllerHandler) handleQuery(identifier string) api.E
 	queryGenerator := generator.NewQueryGenerator(true).SetIdentifier(identifier)
 
 	context.GetFromRegistry(context.Query).AddToCtx(identifier, queryGenerator)
-	emitFile := core.NewPhpEmitterFile(fmt.Sprintf(queryFileName,identifier), api.QueryPath, queryGenerator, api.Query)
+	emitFile := core.NewPhpEmitterFile(fmt.Sprintf(queryFileName, identifier), api.QueryPath, queryGenerator, api.Query)
 
 	return emitFile
 }
