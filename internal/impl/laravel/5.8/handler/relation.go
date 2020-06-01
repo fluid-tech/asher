@@ -34,9 +34,9 @@ Returns:
 func (relationshipHandler *RelationshipHandler) Handle(currentTableName string, relations interface{}) ([]api.EmitterFile,
 	error) {
 
-	retrivedModelGenerator := context.GetFromRegistry(context.Model).GetCtx(currentTableName).(*generator.ModelGenerator)
-	if retrivedModelGenerator != nil {
-		relationshipModelGenerator := generator.NewRelationshipModel(retrivedModelGenerator)
+	modelGenerator := context.GetFromRegistry(context.Model).GetCtx(currentTableName)
+	if modelGenerator != nil {
+		relationshipModelGenerator := generator.NewRelationshipModel(modelGenerator.(*generator.ModelGenerator))
 		myRelations := relations.(models.Relation)
 
 		for _, rel := range myRelations.HasMany {
@@ -44,7 +44,7 @@ func (relationshipHandler *RelationshipHandler) Handle(currentTableName string, 
 			if err != nil {
 				return nil, err
 			}
-			relationshipDetailObj, _ := relationshipModelGenerator.AddRelationshipToModel(helper.HasMany, currentTableName,
+			relationshipDetailObj, _ := relationshipModelGenerator.AddRelationshipToModel(helper.HasMany,
 				referenceTableName, foreignKey, primaryKey)
 			context.GetFromRegistry(context.Relation).AddToCtx(currentTableName, relationshipDetailObj)
 		}
@@ -54,7 +54,7 @@ func (relationshipHandler *RelationshipHandler) Handle(currentTableName string, 
 			if err != nil {
 				return nil, err
 			}
-			relationshipDetailObj, _ := relationshipModelGenerator.AddRelationshipToModel(helper.HasOne, currentTableName,
+			relationshipDetailObj, _ := relationshipModelGenerator.AddRelationshipToModel(helper.HasOne,
 				referenceTableName, foreignKey, primaryKey)
 			context.GetFromRegistry(context.Relation).AddToCtx(currentTableName, relationshipDetailObj)
 		}
