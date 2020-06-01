@@ -2,6 +2,7 @@ package helper
 
 import (
 	"asher/internal/impl/laravel/5.8/handler/helper"
+	"asher/test/api"
 	"reflect"
 	"testing"
 )
@@ -108,26 +109,18 @@ func ColumnTester(t *testing.T) {
 }
 
 func PrimaryColumnTester(t *testing.T) {
-	var table = []*struct {
-		in  []string
-		out []string
-	}{
-		{genPrimaryKeyTest("unknown Type", t), []string{""}},
-		{genPrimaryKeyTest("integer", t), []string{"increments"}},
-		{genPrimaryKeyTest("bigInteger", t), []string{"bigIncrements"}},
-		{genPrimaryKeyTest("tinyInteger", t), []string{"tinyIncrements"}},
-		{genPrimaryKeyTest("smallInteger", t), []string{"smallIncrements"}},
-		{genPrimaryKeyTest("mediumInteger", t), []string{"mediumIncrements"}},
+	var table = []*api.GeneralTest{
+		genPrimaryKeyTest("unknown Type", ""),
+		genPrimaryKeyTest("integer", "increments"),
+		genPrimaryKeyTest("bigInteger", "bigIncrements"),
+		genPrimaryKeyTest("tinyInteger", "tinyIncrements"),
+		genPrimaryKeyTest("smallInteger", "smallIncrements"),
+		genPrimaryKeyTest("mediumInteger", "mediumIncrements"),
 	}
-
-	for i, element := range table {
-		if element.in[0] != element.out[0] {
-			t.Errorf("in test case %d expected '%s' found '%s'", i, element.out[0], element.in[0])
-		}
-	}
+	api.IterateAndTest(table, t)
 }
 
-func genPrimaryKeyTest(key string, t *testing.T) []string {
+func genPrimaryKeyTest(key string, expectedOut string) *api.GeneralTest {
 	generated, _ := helper.PrimaryKeyMethodNameGenerator(key)
-	return []string{generated}
+	return api.NewGeneralTest(generated, expectedOut)
 }
