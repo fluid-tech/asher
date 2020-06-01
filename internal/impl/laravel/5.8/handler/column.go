@@ -31,12 +31,14 @@ func (columnHandler *ColumnHandler) Handle(modelName string, colsArr interface{}
 	if err != nil {
 		return nil, err
 	}
-	tempModel := api.EmitterFile(columnHandler.handleModel(modelName, myColsArray))
-
+	tempModel, err := columnHandler.handleModel(modelName, myColsArray)
+	if err != nil {
+		return nil, err
+	}
 	return []api.EmitterFile{tempMigration, tempModel}, nil
 }
 
-func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []models.Column) *core.PhpEmitterFile {
+func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []models.Column) (*core.PhpEmitterFile, error) {
 	var modelGenerator = generator.NewModelGenerator().SetName(modelName)
 
 	for _, singleColumn := range colArr {
@@ -46,9 +48,7 @@ func (columnHandler *ColumnHandler) handleModel(modelName string, colArr []model
 	}
 	context.GetFromRegistry(context.Model).AddToCtx(modelName, modelGenerator)
 
-	phpEmitter := core.NewPhpEmitterFile(modelName, api.ModelPath, modelGenerator, api.Model)
-
-	return phpEmitter
+	return core.NewPhpEmitterFile(modelName, api.ModelPath, modelGenerator, api.Model), nil
 }
 
 func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr []models.Column) (*core.PhpEmitterFile, error) {
@@ -67,9 +67,7 @@ func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr
 	migrationGenerator := generator.NewMigrationGenerator().SetName(identifier).AddColumns(statementsArr)
 	context.GetFromRegistry(context.Migration).AddToCtx(identifier, migrationGenerator)
 
-	phpEmitter := core.NewPhpEmitterFile(identifier, api.ModelPath, migrationGenerator, api.Model)
-
-	return phpEmitter, nil
+	return core.NewPhpEmitterFile(identifier, api.ModelPath, migrationGenerator, api.Model), nil
 }
 
 func (columnHandler *ColumnHandler) handleValidation(modelGenerator *generator.ModelGenerator, validations string,
