@@ -67,7 +67,7 @@ func (columnHandler *ColumnHandler) handleMigration(identifier string, columnArr
 	migrationGenerator := generator.NewMigrationGenerator().SetName(identifier).AddColumns(statementsArr)
 	context.GetFromRegistry(context.Migration).AddToCtx(identifier, migrationGenerator)
 
-	return core.NewPhpEmitterFile(identifier, api.ModelPath, migrationGenerator, api.Model), nil
+	return core.NewPhpEmitterFile(identifier, api.MigrationPath, migrationGenerator, api.Model), nil
 }
 
 func (columnHandler *ColumnHandler) handleValidation(modelGenerator *generator.ModelGenerator, validations string,
