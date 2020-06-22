@@ -13,6 +13,7 @@ const QueryNamespace = `App\Queries`
 
 type QueryGenerator struct {
 	api.Generator
+	query      *core.Class
 	Class      *builder.Class
 	imports    []api.TabbedUnit
 	identifier string
@@ -32,7 +33,12 @@ Sample Usage:
 */
 func NewQueryGenerator(relation bool) *QueryGenerator {
 	classBuilder := builder.NewClassBuilder()
-	return &QueryGenerator{Class: classBuilder, imports: nil, relation: relation}
+	return &QueryGenerator{
+		query:    nil,
+		Class:    classBuilder,
+		imports:  nil,
+		relation: relation,
+	}
 }
 
 /**
@@ -54,6 +60,10 @@ Returns:
 	- *core.Class (class object of the the query class)
 */
 func (queryGenerator *QueryGenerator) Build() *core.Class {
+	if queryGenerator.query != nil {
+		return queryGenerator.query
+	}
+
 	var className = fmt.Sprintf("%sQuery", queryGenerator.identifier)
 
 	/*IMPORTS*/
@@ -69,7 +79,8 @@ func (queryGenerator *QueryGenerator) Build() *core.Class {
 	queryGenerator.Class.AddFunction(constructor.GetFunction()).
 		SetName(className).SetPackage(QueryNamespace).SetExtends(QueryExtends)
 
-	return queryGenerator.Class.GetClass()
+	queryGenerator.query = queryGenerator.Class.GetClass()
+	return queryGenerator.query
 }
 
 /**

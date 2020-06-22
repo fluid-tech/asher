@@ -9,14 +9,16 @@ import (
 
 type RouteGenerator struct {
 	api.Generator
-	imports []api.TabbedUnit
-	routes  []*core.FunctionCall
+	generatedRoutes []api.TabbedUnit
+	imports         []api.TabbedUnit
+	routes          []*core.FunctionCall
 }
 
 func NewRouteGenerator() *RouteGenerator {
 	return &RouteGenerator{
-		imports: []api.TabbedUnit{},
-		routes:  []*core.FunctionCall{},
+		generatedRoutes: nil,
+		imports:         []api.TabbedUnit{},
+		routes:          []*core.FunctionCall{},
 	}
 }
 
@@ -108,6 +110,10 @@ Returns:
 	- array of tabbed units
 */
 func (routeGenerator *RouteGenerator) Build() []api.TabbedUnit {
+	if routeGenerator.generatedRoutes != nil {
+		return routeGenerator.generatedRoutes
+	}
+
 	buildRoutFile := []api.TabbedUnit{core.NewSimpleStatement(`use Illuminate\Support\Facades\Route`)}
 
 	/*ADD ALL FUNCTION CALLS*/
@@ -115,7 +121,8 @@ func (routeGenerator *RouteGenerator) Build() []api.TabbedUnit {
 		buildRoutFile = append(buildRoutFile, functionCall)
 	}
 
-	return buildRoutFile
+	routeGenerator.generatedRoutes = buildRoutFile
+	return routeGenerator.generatedRoutes
 }
 
 /**
